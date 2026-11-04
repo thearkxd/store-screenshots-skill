@@ -73,6 +73,45 @@ def is_title_case(h):
     return len(words) >= 3 and all(w[0].isupper() for w in words) and not h.isupper()
 
 
+# Turkish suffixes after a foreign word follow how it is SAID: carousel ("karusel") -> carousel'in, carousel'ler;
+# hook ("huk") -> hook'u; TikTok'ta, Instagram'a, YouTube'da. Last vowel of the pronunciation:
+LOANWORDS = {"carousel": "e", "karusel": "e", "hook": "u", "story": "i", "stories": "i", "reels": "i", "feed": "i",
+             "post": "o", "tiktok": "o", "instagram": "a", "youtube": "u", "netflix": "i", "spotify": "ı",
+             "iphone": "o", "google": "ı", "app": "e", "web": "e", "link": "i", "playlist": "i", "widget": "ı"}
+TR_VOWELS = "aeıioöuü"
+
+
+def tr_lower(text):
+    return text.replace("I", "ı").replace("İ", "i").lower()
+
+
+def harmonize(prev, suffix):
+    """Rewrite a suffix's vowels by Turkish vowel harmony after a word whose last vowel is `prev`."""
+    out = []
+    for ch in suffix:
+        if ch in "ae":
+            ch = "e" if prev in "eiöü" else "a"
+        elif ch in "ıiuü":
+            ch = {"e": "i", "i": "i", "ö": "ü", "ü": "ü", "a": "ı", "ı": "ı", "o": "u", "u": "u"}[prev]
+        if ch in TR_VOWELS:
+            prev = ch
+        out.append(ch)
+    return "".join(out)
+
+
+def suffix_checks(h):
+    out = []
+    for m in re.finditer(r"([A-Za-zÇĞİÖŞÜçğıöşü]+)['’]([a-zçğıöşüA-ZÇĞİÖŞÜ]+)", h):
+        word, suf = m.group(1), m.group(2)
+        last = LOANWORDS.get(tr_lower(word))
+        if not last:
+            continue
+        good = harmonize(last, tr_lower(suf))
+        if good != tr_lower(suf):
+            out.append(f"\"{word}'{suf}\" - the suffix follows how the word is said: {word}'{good}")
+    return out
+
+
 def copy_checks(h, lang, store):
     out = []
     low = h.lower()
@@ -88,6 +127,8 @@ def copy_checks(h, lang, store):
         out.append("Title Case slogan - use sentence case")
     if lang == "tr" and h and not any(c in TR_CHARS for c in h) and set(re.findall(r"[a-z]+", low)) & EN_STOP:
         out.append("looks English in a Turkish set")
+    if lang == "tr":
+        out += suffix_checks(h)
     if store == "android":
         for pat in PLAY_FORBIDDEN:
             m = re.search(pat, low)

@@ -73,6 +73,9 @@ as one row covering two shot numbers (e.g. "02-03 · span · bridge").
   dashboard around it. A span pair fits a wide output.
 - **Numbers must hold up.** Vary them (no figure repeated down a list), give every "best" or "winner" more
   than one sample, keep totals consistent between screens. People in the domain notice thin demo data.
+- **The same item tells the same story on every screen.** A post that is the "best performer" in analytics
+  can't be "planned for tonight" in the calendar; a show "watched" in one shot isn't "on the watchlist" in the
+  next. Seed one consistent demo account and capture every screen from it.
 - **One proof per shot.** The same screen (or the same element - one failed post, one card) in two shots is
   one proof shown twice; use the slot for something new.
 - Check enlarged pieces at full size before using them: a callout magnifies UI bugs as much as UI.

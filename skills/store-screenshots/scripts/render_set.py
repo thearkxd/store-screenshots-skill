@@ -836,7 +836,11 @@ def _render_shot(shot, style, W, H, fonts, spec_dir, lang, base=None, info=None,
         if total > area_bot - area_top:
             k *= (area_bot - area_top - gap * (len(pieces) - 1)) / (sum(p.height for p in pieces) * k)
             total = area_bot - area_top
-        y = (area_top + area_bot - total) / 2 if shot.get("card_align", "center") == "center" else area_top
+        # "optical" (default): the stack sits nearer the caption, so a short stack doesn't float in the middle of
+        # an empty canvas, far from its headline; "center" and "top" as named
+        free = max(0.0, area_bot - area_top - total)
+        align = shot.get("card_align", "optical")
+        y = area_top + (free / 2 if align == "center" else 0 if align == "top" else free * (0.3 if pos == "top" else 0.7))
         cx = W * s["card"].get("x", 0.5)
         for p_ in pieces:
             h = p_.height * k
@@ -1097,7 +1101,8 @@ def promise_warnings(shots, words, lang):
     """The first three shots are what search shows: one of their headlines must name what the app does or
     makes (spec "promise_words", from the brief - e.g. ["carousel", "TikTok"])."""
     if not words:
-        return []
+        return ["no \"promise_words\" in the spec - add the 2-4 words from the brief that say what the app does or "
+                "makes (e.g. [\"carousel\", \"TikTok\"]), so the first three shots can be checked"]
     words = [words] if isinstance(words, str) else [w for w in words if w]
     low = (lambda t: tr_lower(t)) if lang == "tr" else (lambda t: t.lower())
     heads = [low((u.get("headline") or "").replace("*", "").replace("\n", " ")) for _, u in slot_units(shots)[:3]]
@@ -1122,6 +1127,7 @@ def repeat_warnings(shots):
         else:
             slot += 1
             units.append((f"{slot:02d}", sh))
+    by_screen = {}
     for label, u in units:
         if not u.get("screen") or not isinstance(u["screen"], str):
             continue
@@ -1131,8 +1137,12 @@ def repeat_warnings(shots):
         if key in seen:
             out.append(f"shots {seen[key]} and {label} show {os.path.basename(u['screen'])} the same way - each shot "
                        "should prove something new (another screen, or a crop of a different element)")
-        else:
-            seen[key] = label
+            continue
+        seen[key] = label
+        first = by_screen.setdefault(os.path.normpath(u["screen"]), label)
+        if first != label:
+            out.append(f"shots {first} and {label} both use {os.path.basename(u['screen'])} - make sure they prove different "
+                       "things: a crop of something already visible in the other shot is the same proof twice")
     return out
 
 

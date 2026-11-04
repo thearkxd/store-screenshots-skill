@@ -215,11 +215,20 @@ def quality_tests(tmp):
         json.dump(dict(d, sizes=["ios"], shots=shots or d["shots"], **extra), open(path, "w", encoding="utf-8"), ensure_ascii=False)
         return run(s("render_set.py"), path, "--out", os.path.join(tmp, "q", name), both=True)
     good = render({}, "good")
-    assert "first three headlines" not in good and "the same way" not in good, good
+    assert "first three headlines" not in good and "the same way" not in good and "both use" not in good, good
+    assert "promise_words" not in good, good
     assert "none of the first three headlines names what the app does" in render({"promise_words": ["carousel", "TikTok"]}, "promise")
+    assert 'no "promise_words" in the spec' in render({"promise_words": []}, "no-promise")
     twice = [dict(sh) for sh in d["shots"]]
     twice[4] = dict(twice[4], screen=twice[0]["screen"])
     assert "shots 01 and 05 show 01-home.jpg the same way" in render({}, "twice", twice)
+    again = [dict(sh) for sh in d["shots"]]
+    again[4] = dict(again[4], screen=again[2]["screen"])  # 03 zooms into stats, 05 shows the whole stats screen
+    assert "shots 03 and 05 both use 03-stats.jpg" in render({}, "again", again)
+    # Turkish suffixes after loanwords
+    out = run(s("check_set.py"), os.path.join(tmp, "q", "good", "ios"), "--store", "ios", "--lang", "tr", "--headlines",
+              "Carousel'ın hazır. Son söz sende.", "En iyi carousel'ler", "Hook'u sen değil, veri seçsin", "TikTok'ta ve Instagram'a")
+    assert "Carousel'in" in out and out.count("suffix follows") == 1, out
     # thin demo data: one figure three times on a screen
     raw = os.path.join(tmp, "thin")
     os.makedirs(raw)

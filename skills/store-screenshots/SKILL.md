@@ -94,7 +94,8 @@ to App Store categories; see `references/library-guide.md` for the list and the 
 
 ### Phase 3 - Story and copy
 - Order the proof points by what the *user* cares about, not by the app's menu (`references/storytelling.md`).
-- **Shots 1–3 say what the app does** - search shows only those. A stranger must be able to answer "what
+- **Shots 1–3 say what the app does** - search shows only those. Put the shot that names the product
+  (what it makes, where it posts) first, not last. A stranger must be able to answer "what
   does it make or do?" from their headlines alone; a clever line about a secondary feature (analytics, a
   setting) waits until later.
 - **If the app makes something** (content, designs, photos, documents, music, plans), at least one early
@@ -171,7 +172,8 @@ Open `out/ios/_search-preview.jpg`, `out/ios/_overview.jpg` and `peer.jpg` and a
   re-captured, never painted over.
 - **Is the data believable?** The same figure repeated across a screen, or a "winner" resting on one sample,
   reads as fake to the people who know the domain (`prepare_screens.py` flags repeated figures when
-  tesseract is installed). Re-seed and re-capture.
+  tesseract is installed). Does every item tell the same story on every screen (published here, planned
+  there)? Re-seed one consistent demo account and re-capture.
 - Does the headline name a part of the screen ("which font worked?")? Then that part is pulled out or
   marked - not left in the middle of a long list.
 - Does a headline just repeat the screen's own title? Rewrite it to add the benefit.

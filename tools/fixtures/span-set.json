@@ -1,5 +1,5 @@
 {
- "_doc": "Smoke-test fixture for span pairs: a bridge span (one phone across the seam) at 2-3 and a pair span (shared ground, a phone per half) at 5-6, in two locales. Screens are the template's demo screens.",
+ "_doc": "Smoke-test fixture for span pairs: a bridge span (one phone across the seam) at 2-3 and a pair span (shared ground, a phone per half) at 5-6, in two locales. Screens are the template's demo screens. Two screens come from examples/seenfy so no screen is used twice.",
  "app": "Span fixture",
  "locales": [
   "tr",
@@ -140,19 +140,10 @@
     },
     {
      "headline": {
-      "tr": "Ne izlesem diye\n*düşünme*",
-      "en": "Stop wondering\n*what to watch*"
+      "tr": "İzle, beğen,\n*işaretle*",
+      "en": "Watch, like,\n*check it off*"
      },
-     "screen": "../../skills/store-screenshots/templates/example-screens/03-stats.jpg",
-     "layout": "zoom",
-     "crops": [
-      [
-       0.03,
-       0.51,
-       0.97,
-       0.652
-      ]
-     ]
+     "screen": "../../examples/seenfy/screens/04-detay.jpg"
     }
    ]
   },
@@ -161,18 +152,7 @@
     "tr": "Ne izlesem diye\n*düşünme*",
     "en": "Stop wondering\n*what to watch*"
    },
-   "screen": "../../skills/store-screenshots/templates/example-screens/01-home.jpg",
-   "callouts": [
-    {
-     "crop": [
-      0.0448,
-      0.1579,
-      0.9552,
-      0.5686
-     ],
-     "scale": 1.06
-    }
-   ]
+   "screen": "../../examples/seenfy/screens/01-kesfet.jpg"
   }
  ]
 }

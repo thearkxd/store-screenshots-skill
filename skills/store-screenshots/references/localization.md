@@ -35,6 +35,10 @@ flatter and keeps English rhythm.
 - **Punctuation:** a period at the end of a short Turkish headline reads confident; "!" on every shot reads
   like a banner ad (Halkbank, Ziraat, A101).
 - **Local proof:** TL amounts, Turkish cities and real Turkish content in the UI.
+- **Suffixes after foreign words follow the pronunciation**, with an apostrophe: carousel ("karusel") →
+  *carousel'in, carousel'ler*; hook ("huk") → *hook'u*; *TikTok'ta, Instagram'a, story'si, Netflix'te*.
+  "Carousel'ın" is wrong. `check_set.py --lang tr` checks the common app and social-media loanwords. Use the
+  same form the app's UI uses.
 
 ## Checklist per locale
 

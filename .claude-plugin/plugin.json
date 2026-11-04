@@ -1,7 +1,7 @@
 {
   "name": "store-screenshots",
   "description": "Plan, write and render App Store / Google Play screenshots that explain the app and don't look AI-made - with a classified library of 1,700+ real top-chart screenshots (TR + US), category playbooks, seven design directions with a concept checkpoint, and scripts for search, rendering, store checks and peer tests.",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "author": {
     "name": "Alpiworks"
   },
