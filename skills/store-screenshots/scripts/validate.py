@@ -67,7 +67,7 @@ def truth_errors(scene):
     out = []
     for op in walk(scene.ops):
         m = op.get("meta", {})
-        if op["op"] == "image" and m.get("sha256") and file_sha(m["file"]) != m["sha256"]:
+        if m.get("sha256") and m.get("file") and file_sha(m["file"]) != m["sha256"]:
             out.append(f"{m.get('kind')} {m.get('evidence')!r} changed since evidence.json was built - rebuild it "
                        "(evidence.py build) so the set shows what is on disk")
     return out
@@ -87,13 +87,13 @@ def scene_warnings(scene, img, ctx):
     shot = scene.shot
     campaign = ctx.get("campaign") or {}
     # --- the app's UI: nothing painted over it
-    screens = [(i, op) for i, op in enumerate(ops) if op["op"] == "image" and op["meta"].get("kind") == "screen"]
+    screens = [(i, op) for i, op in enumerate(ops) if op["op"] in ("image", "device3d") and op["meta"].get("kind") == "screen"]
     for i, sop in screens:
-        sb = sop["meta"]["bbox"]
+        sb = sop["meta"].get("screen_bbox", sop["meta"]["bbox"])
         for op in ops[i + 1:]:
             m = op.get("meta", {})
             role = m.get("role")
-            if op["op"] in ("image", "lines", "group") or role in ("annotation", "label", "background"):
+            if op["op"] in ("image", "lines", "group", "device3d") or role in ("annotation", "label", "background"):
                 continue
             ov = area(inter(sb, m.get("bbox", (0, 0, 0, 0))))
             if ov > 0.02 * area(sb):
@@ -245,10 +245,10 @@ def store_warnings(scene, ctx):
     out = []
     c = scene.c
     ops = list(walk(scene.ops))
-    screens = [op for op in ops if op["op"] == "image" and op["meta"].get("kind") == "screen"]
+    screens = [op for op in ops if op["op"] in ("image", "device3d") and op["meta"].get("kind") == "screen"]
     for op in screens:
         b = op["box"]
-        k = (b[2] - b[0]) / max(1, op["img"].width)
+        k = op["meta"]["px_scale"] if op["op"] == "device3d" else (b[2] - b[0]) / max(1, op["img"].width)
         if k > UPSCALE_LIMIT:
             out.append(f"screen {op['meta'].get('evidence')!r} is drawn at {k:.1f}x its pixels and will look soft - show it "
                        f"smaller or a bigger part of it, or capture the screen at a higher resolution")
@@ -258,15 +258,18 @@ def store_warnings(scene, ctx):
         for op in screens:
             if tuple(op["meta"]["crop"]) != (0.0, 0.0, 1.0, 1.0):
                 continue
-            r = op["img"].height / max(1, op["img"].width)
+            src = op.get("src") or op["img"]
+            r = src.height / max(1, src.width)
             if not lo <= r <= hi:
-                out.append(f"screen {op['meta'].get('evidence')!r} ({op['img'].width}x{op['img'].height}) isn't {rs.CLASS_NAMES[dev]} "
+                out.append(f"screen {op['meta'].get('evidence')!r} ({src.width}x{src.height}) isn't {rs.CLASS_NAMES[dev]} "
                            f"screen - capture it on that device and give it per size (\"layers\": {{\"default\": …, "
                            f"\"{ctx.get('preset')}\": …}})")
     if ctx.get("store") == "android" and scene.shot.get("id") != "feature-graphic":
-        if any(op.get("frame") and op["frame"]["style"] in ("phone", "android") for op in screens):
-            out.append("device frame in a Google Play set - Play advises against device imagery; show the bare screen "
-                       "(radius, no \"frame\") in the android variant")
+        any3d = any(op["op"] == "device3d" for op in screens)
+        if any3d or any(op.get("frame") and op["frame"]["style"] in ("phone", "android") for op in screens):
+            out.append(f"device frame in a Google Play set{' (a 3D device is one too)' if any3d else ''} - Play advises against "
+                       "device imagery; in the android variant show the bare screen (a flat \"screen\" layer with a radius, "
+                       "no \"frame\")")
         for slot in range(scene.span):
             hs = [op["meta"].get("ink", op["meta"]["bbox"]) for op in ops if op["op"] == "text" and op["meta"].get("role") not in ("label", "annotation")
                   and slot_of(scene, op["meta"]["bbox"]) == slot]  # a giant number is tagline text too
@@ -425,7 +428,7 @@ def fingerprint(scene, slot):
         return ((b[0] - x0) / c.slot_w, b[1] / c.H, (b[2] - x0) / c.slot_w, b[3] / c.H)
     in_slot = [op for op in ops if slot_of(scene, op["meta"]["bbox"]) == slot or scene.span == 1]
     head = [op for op in in_slot if op["op"] == "text" and op["meta"].get("role") == "headline"]
-    vis = [op for op in in_slot if op["op"] == "image"]
+    vis = [op for op in in_slot if op["op"] in ("image", "device3d")]
     hb = norm(head[0]["meta"]["bbox"]) if head else None
     vb = norm(max(vis, key=lambda o: area(o["meta"]["bbox"]))["meta"]["bbox"]) if vis else None
     return hb, vb
@@ -452,6 +455,23 @@ def set_warnings(fps):
     for g in groups:
         out.append(f"shots {', '.join(fps[k][0] for k in g)} share one composition (headline and main visual in the same place, "
                    "same scale) - vary scale, crop or placement; let the campaign system, not a layout, hold the set together")
+    return out
+
+
+def device3d_set_warnings(scenes):
+    """3D devices across a set: one lens and one light, and turned phones only where depth means something."""
+    out = []
+    devs = [(sc.shot.get("id"), op["meta"]) for sc in scenes for op in walk(sc.ops) if op["op"] == "device3d"]
+    if not devs:
+        return out
+    cams = {(m["camera"]["fov"], tuple(m["camera"]["light"])) for _, m in devs}
+    if len(cams) > 1:
+        out.append(f"the 3D devices use {len(cams)} different lenses/lights - one camera for the set (campaign \"camera\": "
+                   "{\"fov\", \"light\"}), or the shots look like they come from different shoots")
+    turned = {sid for sid, m in devs if abs(m["angles"][0]) > 3 or abs(m["angles"][1]) > 3}
+    if len(turned) > 2 or (len(scenes) >= 3 and len(turned) * 2 > len(scenes)):
+        out.append(f"turned 3D phones in {len(turned)} of {len(scenes)} shots - tilted phones in every shot read as a "
+                   "template (and as AI); keep depth for the shots where it means something, show the rest flat")
     return out
 
 

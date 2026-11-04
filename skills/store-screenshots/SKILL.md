@@ -55,7 +55,7 @@ All scripts are Python 3 and live in `scripts/` next to this file (in Claude Cod
 | `prepare_screens.py` | Check incoming raw screens (resolution, ratio, JPEG, mismatched status bars, repeated figures), repaint a clean status bar (`--status-bar 9:41`), cover debug UI (`--cover`) |
 | `evidence.py` | **The evidence manifest:** register raw screens and brand assets (ids, SHA-256, OCR words); `show` a screen with a grid and OCR boxes; `name` a region (and read its text up close) for crops and claim checks |
 | `dna.py` | **Visual DNA:** `measure` the palette with roles, dark/light UI and type scale from the screens (+ website fonts/colours); `fonts` puts the app's text next to candidate fonts; `board` renders the DNA board to confirm |
-| `compose.py` | **The design renderer:** `render` a version-2 set - every shot a free scene of layers (text, screens and crops, lifts, brand images, shapes, paths, SVG, groups, hand marks) - to every store size and locale, as PNG + editable SVG, with truth, claim, legibility, campaign, monotony and store checks; `xray` shows a shot's layer boxes and thumbnail; `concepts` renders the concept checkpoint with the DNA board |
+| `compose.py` | **The design renderer:** `render` a version-2 set - every shot a free scene of layers (text, screens and crops, lifts, **3D devices** with exact perspective, brand images, shapes, paths, SVG, groups, hand marks) - to every store size and locale, as PNG + editable SVG, with truth, claim, legibility, campaign, monotony and store checks; `xray` shows a shot's layer boxes and thumbnail; `concepts` renders the concept checkpoint with the DNA board |
 | `check_set.py` | Check finished PNGs (`--store ios / duo / ipad / android`): exact store sizes, the required iPhone sizes, no alpha, count limits, headline length, banned phrases, Turkish suffixes, Google Play's rules; reprints the renderer's warnings; writes a **search-result preview** (first 3 shots at thumbnail size) and an overview sheet |
 | `peer_test.py` | Put your set next to 2–3 exemplary sets from the same category at the same size |
 | `crop_helper.py` | `grid` draws a labelled coordinate grid on a screen; `check` previews every crop of a preset spec |
@@ -243,8 +243,8 @@ substitute).
 - Logo, splash, login, onboarding or "we renewed the app" as shot 1; more than one non-UI shot in a set
   (Apple wants most screenshots to show the app in use).
 - Paragraphs, exclamation marks on every shot, Title Case Slogans, three different type sizes in one caption.
-- Floating tilted phones, 3D blobs/chrome objects, glow, default purple-blue gradients, stock people
-  laughing at phones.
+- Floating tilted phones (a 3D device needs a reason, a shadow, the set's one light and lens, and appears in at
+  most two shots), 3D blobs/chrome objects, glow, default purple-blue gradients, stock people laughing at phones.
 - English captions in a Turkish listing (or vice versa); UI language ≠ caption language.
 - Unverifiable claims (#1, awards, "millions of users") the user hasn't confirmed; on **Google Play** no
   ranking claims, award badges, prices, promos, calls to action ("download now") or testimonials at all.

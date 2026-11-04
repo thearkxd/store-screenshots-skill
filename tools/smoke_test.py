@@ -3,6 +3,7 @@
 
   python3 tools/smoke_test.py            # exits non-zero on the first failure
 """
+import math
 import os
 import subprocess
 import sys
@@ -387,6 +388,204 @@ def design_tests(tmp):
             assert px[0] > 200 and px[1] < 140, (backend, px, out)
 
 
+def device3d_tests(tmp):
+    """3D devices must never be wrong: every pixel of the screen lands where the camera puts it, the body has no
+    holes or seams, the faces we see are the right ones, the picture is symmetric and repeatable - on both
+    backends - and the rules (angle limits, foreshortening, shadow, one camera per set, Play) hold."""
+    import json
+    import time
+    from PIL import Image, ImageChops, ImageDraw, ImageOps, ImageStat
+    sys.path.insert(0, SCRIPTS)
+    import compose
+    import device3d as d3
+    import render_set as rs
+    import scene as sc
+    d = os.path.join(tmp, "d3")
+    os.makedirs(os.path.join(d, "screens"))
+    # a screen of known marks: coloured squares at known places, a fine grid, text
+    W, H = 1206, 2622
+    marks = {(255, 0, 0): (0.12, 0.12), (0, 200, 0): (0.88, 0.12), (0, 90, 255): (0.5, 0.5), (255, 220, 0): (0.12, 0.88),
+             (255, 0, 255): (0.88, 0.88), (0, 230, 230): (0.3, 0.7)}
+    scr = Image.new("RGB", (W, H), (32, 32, 36))
+    dr = ImageDraw.Draw(scr)
+    for x in range(0, W, 60):
+        dr.line([(x, 0), (x, H)], fill=(52, 52, 58), width=2)
+    for y in range(0, H, 60):
+        dr.line([(0, y), (W, y)], fill=(52, 52, 58), width=2)
+    for col, (u, v) in marks.items():
+        dr.rectangle([u * W - 14, v * H - 14, u * W + 14, v * H + 14], fill=col)
+    dr.text((120, 1500), "Kaldığın bölüm hep hazır", font=rs.Fonts(SKILL).get("text", 60), fill=(240, 240, 240))
+    scr.save(os.path.join(d, "screens", "01-marks.png"))
+    sym = Image.new("RGB", (W, H), (30, 30, 34))
+    sd = ImageDraw.Draw(sym)
+    for i in range(12):
+        sd.rectangle([60 + i * 40, 200 + i * 170, 300 + i * 25, 320 + i * 170], fill=(40 + i * 15, 120, 220 - i * 12))
+    sym.paste(ImageOps.mirror(sym.crop((0, 0, W // 2, H))), (W - W // 2, 0))
+    sym.save(os.path.join(d, "screens", "02-sym.png"))
+    ev = os.path.join(d, "ev.json")
+    run(s("evidence.py"), "build", os.path.join(d, "screens"), "-o", ev, "--no-ocr")
+    base = json.load(open(os.path.join(SKILL, "templates", "scene.example.json"), encoding="utf-8"))
+    base["evidence"] = ev
+    fonts = rs.Fonts(os.path.join(SKILL, "templates"))
+
+    def ctx_for(size="ios", camera=None):
+        b = dict(base, campaign=dict(base["campaign"], camera=camera) if camera else base["campaign"])
+        return compose.context(b, os.path.join(SKILL, "templates"), "tr", fonts, size, *rs.preset_size(size))
+
+    def build(layer, size="ios", camera=None, extra=None):
+        Wc, Hc = rs.preset_size(size)
+        shot = {"id": "t", "proof": [{"evidence": "marks"}], "background": {"fill": "#808080"}, "layers": [layer] + (extra or [])}
+        return sc.Scene(shot, Wc, Hc, ctx_for(size, camera)).build()
+
+    def dev_layer(**kw):
+        return dict({"type": "device3d", "id": "ph", "evidence": "marks", "w": 0.78, "cx": "50%", "cy": "50%"}, **kw)
+
+    def centroid(img, col, box):
+        px = img.crop(box).load()
+        xs = ys = n = 0
+        for yy in range(box[3] - box[1]):
+            for xx in range(box[2] - box[0]):
+                p = px[xx, yy]
+                if sum((p[k] - col[k]) ** 2 for k in range(3)) < 40 ** 2:
+                    xs, ys, n = xs + xx, ys + yy, n + 1
+        return (box[0] + xs / n, box[1] + ys / n, n) if n else None
+
+    # 1. every mark lands where the camera says - several angles, both backends
+    poses = [(0, 0, 0), (-25, 0, 0), (24, 8, 0), (-15, -12, 9), (35, 5, -4), (0, 22, 0), (10, 0, 20)]
+    backends = ["pillow"] + (["svg"] if sc.have_resvg() else [])
+    for yaw, pitch, roll in poses:
+        scn = build(dev_layer(rotate3d={"yaw": yaw, "pitch": pitch, "roll": roll}))
+        op = scn.by_id["ph"]
+        for be in backends:
+            img, _, _ = sc.render(scn, fonts, be)
+            for col, (u, v) in marks.items():
+                ex, ey = d3.hmap(op["H"], u * W, v * H)
+                got = centroid(img, col, (int(ex) - 40, int(ey) - 40, int(ex) + 40, int(ey) + 40))
+                assert got and got[2] > 60, (yaw, pitch, roll, be, col, "mark missing")
+                err = math.dist((ex, ey), got[:2])
+                assert err < 1.2, f"pose {(yaw, pitch, roll)} {be}: mark {col} off by {err:.2f}px"
+    # 2. facing the camera, the 3D screen is the flat screen: same pixels at the same size
+    scn = build(dev_layer())
+    op = scn.by_id["ph"]
+    q = op["quad"]
+    assert abs(q[0][1] - q[1][1]) < 0.01 and abs(q[0][0] - q[3][0]) < 0.01, q  # an upright rectangle
+    img, _, _ = sc.render(scn, fonts, "pillow")
+    x0, y0, x1, y1 = q[0][0], q[0][1], q[2][0], q[2][1]
+    flat = scr.resize((round(x1 - x0), round(y1 - y0)), Image.LANCZOS)
+    got = img.crop((round(x0), round(y0), round(x0) + flat.width, round(y0) + flat.height))
+    inner = (40, 260, flat.width - 40, flat.height - 200)  # away from the rounded corners and the island
+    diff = sum(ImageStat.Stat(ImageChops.difference(flat.crop(inner), got.crop(inner))).mean) / 3
+    assert diff < 3.5, f"front view differs from the flat screen by {diff:.2f}"
+    # 3. no holes, no seams: the body is opaque inside its silhouette, at every pose; the homography is the camera
+    for yaw, pitch, roll in poses:
+        dev = d3.Device((W, H), 900, yaw, pitch, roll, "island").place(1000, 1500)
+        corners = [dev.proj((sx * dev.sw / 2, sy * dev.sh / 2, -dev.T / 2)) for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+        assert all(math.dist(a, b) < 1e-6 for a, b in zip(corners, dev.screen_quad())), "homography disagrees with the camera"
+        front = [dev.proj((x, y, -dev.T / 2)) for x, y in dev.outline]
+        poly = Image.new("L", (2400, 3200), 0)
+        ImageDraw.Draw(poly).polygon(front, fill=255)
+        edge, _ = d3.rounded_outline(dev.sw, dev.sh, dev.r_screen)
+        edge = [dev.proj((x, y, -dev.T / 2)) for x, y in edge]
+        assert all(poly.getpixel((round(x + (1000 - x) * 0.004), round(y + (1500 - y) * 0.004))) == 255 for x, y in edge), \
+            "the screen reaches past the front of the body"
+        body, (X0, Y0) = dev.render(scr)
+        a = body.getchannel("A")
+        bb = a.getbbox()
+        inside = Image.new("L", a.size, 0)
+        hull = d3.convex_hull([((p[0] - X0), (p[1] - Y0)) for p in
+                               [dev.proj((x, y, z)) for x, y in dev.outline for z in (-dev.T / 2, dev.T / 2)]])
+        cx_, cy_ = sum(p[0] for p in hull) / len(hull), sum(p[1] for p in hull) / len(hull)
+        shrunk = [(cx_ + (x - cx_) * 0.995 - (2 if x > cx_ else -2), cy_ + (y - cy_) * 0.995 - (2 if y > cy_ else -2)) for x, y in hull]
+        ImageDraw.Draw(inside).polygon(shrunk, fill=255)
+        holes = ImageChops.multiply(ImageChops.invert(a), inside).getextrema()[1]
+        assert holes < 8, f"pose {(yaw, pitch, roll)}: a gap in the body (alpha {255 - holes})"
+        assert bb and bb[0] <= 4 and bb[1] <= 4, (bb, "raster too tight")
+    # 4. the right faces: turned right, the left side shows; turned left, the right side
+    for yaw, side in ((25, "left"), (-25, "right")):
+        dev = d3.Device((W, H), 900, yaw, 0, 0, "slab").place(600, 1300)
+        qd, bx = dev.screen_quad(), dev.bbox()
+        left_gap, right_gap = min(p[0] for p in qd) - bx[0], bx[2] - max(p[0] for p in qd)
+        assert (left_gap > right_gap * 1.6) if side == "left" else (right_gap > left_gap * 1.6), (yaw, left_gap, right_gap)
+    for pitch, side in ((20, "bottom"), (-20, "top")):
+        dev = d3.Device((W, H), 900, 0, pitch, 0, "slab").place(600, 1300)
+        qd, bx = dev.screen_quad(), dev.bbox()
+        top_gap, bot_gap = min(p[1] for p in qd) - bx[1], bx[3] - max(p[1] for p in qd)
+        assert (bot_gap > top_gap * 1.4) if side == "bottom" else (top_gap > bot_gap * 1.4), (pitch, top_gap, bot_gap)
+    # 5. symmetric: a symmetric screen turned right is the mirror image of it turned left (light from the front)
+    flat_light = {"fov": 22, "light": [0, 0, -1]}
+    renders = []
+    for yaw in (18, -18):
+        dev = d3.Device((W, H), 900, yaw, 0, 0, "slab", {"buttons": None, "cutout": None}, flat_light).place(700, 1300)
+        body, at = dev.render(sym)
+        canvas = Image.new("RGBA", (1400, 2600), (128, 128, 128, 255))
+        canvas.alpha_composite(body, at)
+        renders.append(canvas.convert("RGB"))
+    mdiff = sum(ImageStat.Stat(ImageChops.difference(ImageOps.mirror(renders[0]), renders[1])).mean) / 3
+    assert mdiff < 1.0, f"yaw ±18 aren't mirror images ({mdiff:.2f})"
+    # 6. repeatable to the byte
+    a1 = d3.Device((W, H), 900, 21, 7, -3).place(600, 1300).render(scr)[0].tobytes()
+    a2 = d3.Device((W, H), 900, 21, 7, -3).place(600, 1300).render(scr)[0].tobytes()
+    assert a1 == a2, "two renders of the same pose differ"
+    # 7. speed: the largest iPhone size stays quick
+    t0 = time.time()
+    scn = build(dev_layer(rotate3d={"yaw": -20, "pitch": 6}, w=0.84), size="ios-large")
+    sc.render(scn, fonts, "pillow")
+    assert time.time() - t0 < 12, f"device3d at 1320x2868 took {time.time() - t0:.1f}s"
+    # 8. rules - refused
+    for layer, msg in ((dev_layer(rotate3d={"yaw": 45}), "past 40"), (dev_layer(rotate3d={"pitch": -31}), "past 30"),
+                       (dev_layer(crop=[0, 0, 1, 0.5]), "whole screen"), (dev_layer(rotate=10), "rotate3d"),
+                       (dev_layer(opacity=0.5), "shown as they are"), (dev_layer(w=0.7, h=1.4), "not both"),
+                       (dev_layer(camera={"fov": 90}), "fov"), (dev_layer(model="foldable"), "model")):
+        try:
+            build(layer)
+        except sc.SceneError as e:
+            assert msg in str(e), (msg, str(e))
+        else:
+            raise AssertionError(f"not refused: {layer}")
+    try:
+        build(dev_layer(), extra=[{"type": "screen", "evidence": "marks", "crop": [0.1, 0.1, 0.4, 0.2], "lift": {"from": "ph"}}])
+    except sc.SceneError as e:
+        assert "can't be lifted" in str(e), e
+    else:
+        raise AssertionError("lift from a 3D device not refused")
+    # rules - warned
+    scn = build(dev_layer(rotate3d={"yaw": 38}, camera={"fov": 55}, shadow="none"))
+    w = " ".join(scn.warnings)
+    assert "far side" in w and "floats" in w, scn.warnings
+    scn = build(dev_layer(rotate3d={"yaw": 15}))
+    assert not scn.warnings, scn.warnings
+    # a hand mark on a 3D screen follows its perspective
+    scn = build(dev_layer(rotate3d={"yaw": 22, "pitch": 6}),
+                extra=[{"type": "mark", "id": "m", "kind": "circle", "on": "ph", "region": [0.5 - 0.02, 0.5 - 0.01, 0.5 + 0.02, 0.5 + 0.01]}])
+    mb = scn.by_id["m"]["meta"]["bbox"]
+    ex, ey = d3.hmap(scn.by_id["ph"]["H"], 0.5 * W, 0.5 * H)
+    assert abs((mb[0] + mb[2]) / 2 - ex) < 12 and abs((mb[1] + mb[3]) / 2 - ey) < 12, (mb, ex, ey)
+    # set rules through compose: Play, paint-over, one camera, not every shot turned
+    head = {"type": "text", "id": "head", "role": "headline", "style": "headline", "text": "Kaldığın *bölüm* hazır", "x": 0.08, "y": 0.12, "w": 0.84}
+    shots = [{"id": f"s{i}", "proof": [{"evidence": "marks"}], "background": {"fill": "$ground"},
+              "layers": [head, dev_layer(rotate3d={"yaw": y}, camera={"fov": f}, cy=None, y=0.55)]}
+             for i, (y, f) in enumerate(((-20, 22), (18, 22), (-15, 30)))]
+    for sh in shots:
+        sh["layers"][1].pop("cy")
+    shots[0]["layers"].append({"type": "text", "role": "headline", "style": "headline", "text": "Üstünde yazı", "x": 0.2, "y": 1.0})
+    p = os.path.join(d, "set.json")
+    json.dump(dict(base, sizes=["ios", "android"], shots=shots, feature_graphic=None), open(p, "w", encoding="utf-8"), ensure_ascii=False)
+    out = run(s("compose.py"), "render", p, "--out", os.path.join(d, "out"), both=True)
+    for msg in ("different lenses", "turned 3D phones in 3 of 3", "device frame in a Google Play set", "covers"):
+        assert msg in out, (msg, out)
+    svg = open(os.path.join(d, "out", "ios", "01.svg"), encoding="utf-8").read()
+    assert 'data-evidence="marks"' in svg
+    out = run(s("check_set.py"), os.path.join(d, "out", "ios"), "--store", "ios")
+    assert "different lenses" in out, out
+    # the 3D fixture (two devices facing each other, one laid back, flat shots between) renders clean on both sizes
+    fx = os.path.join(ROOT, "tools", "fixtures", "device3d-set.json")
+    out = run(s("compose.py"), "render", fx, "--out", os.path.join(d, "fx"), both=True)
+    assert "!" not in out, out
+    for size in ("ios", "ios-large"):
+        out = run(s("check_set.py"), os.path.join(d, "fx", size), "--store", "ios", "--lang", "tr")
+        assert "WARN" not in out and "ERROR" not in out, out
+
+
 def quality_tests(tmp):
     """The checks that catch a set that looks fine but doesn't sell: no promise in shots 1-3, the same proof
     twice, thin demo data."""
@@ -496,6 +695,7 @@ def main():
         size_tests(tmp)
         quality_tests(tmp)
         design_tests(tmp)
+        device3d_tests(tmp)
         # every bundled font covers Turkish
         sys.path.insert(0, SCRIPTS)
         import render_set

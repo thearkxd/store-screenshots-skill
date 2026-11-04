@@ -89,7 +89,7 @@ def proof_units(shot, scene):
     units = []
     for op in va.walk(scene.ops):
         m = op.get("meta", {})
-        if op["op"] == "image" and m.get("kind") == "screen":
+        if op["op"] in ("image", "device3d") and m.get("kind") == "screen":
             units.append((va.slot_of(scene, m["bbox"]), m["evidence"], tuple(round(v, 3) for v in m["crop"])))
     return units
 
@@ -173,6 +173,7 @@ def cmd_render(a):
             set_rules = []
             if not a.shots:  # set rules need the whole set
                 set_rules = rs.set_warnings(shots, report["store"]) + va.set_warnings(fps) + va.headline_fonts(scenes)
+                set_rules += va.device3d_set_warnings(scenes)
                 set_rules += rs.promise_warnings(pseudo, spec.get("promise_words"), lang)
                 set_rules += repeat_units(units)
                 if report["device"] == "iphone" and not a.size:

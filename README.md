@@ -17,7 +17,7 @@ and its own visual DNA, with copy that passes the "swap test" and doesn't read a
 - **Design-driven, not template-driven** - the skill measures the app's **visual DNA** from its real screens
   (and website): palette with roles, fonts, shape language, the signature elements only this app has. From
   that it writes **three app-specific concepts**, and composes every screenshot freely as a **scene** of
-  layers - the real screens and crops of them, lifted elements, type, shapes, SVG, hand marks - instead of
+  layers - the real screens and crops of them, lifted elements, 3D devices, type, shapes, SVG, hand marks - instead of
   filling one layout. A campaign system (one ground family, one type pairing, one emphasis device, one motif)
   holds the set together while each composition changes. Output: PNGs at every store size plus **editable
   SVGs** (Figma, Illustrator).
@@ -90,6 +90,16 @@ python3 $S/compose.py render examples/seenfy-v2/set.json --out out/       # ios,
 
 > The Seenfy example screens are 738 px wide, so the renderer warns where a crop is enlarged past 1.8× - real
 > captures (1206+ px) don't have that problem.
+
+**3D devices** (`device3d`) - a whole real screen on a phone body turned in space:
+- The screen is mapped with the camera's exact perspective, so every pixel lands where the camera puts it.
+  Tests check that to within 1.2 px at seven poses on both renderers.
+- The body is drawn in the same camera: glass, rounded slab, metal band, keys, island. One light and one lens
+  serve the whole set, and the shadow falls away from the light.
+- The renderer warns when the far side stops reading, when a device floats with no shadow, when the lenses
+  differ, and when turned phones appear in most shots.
+
+![3D devices: two phones facing each other, a flat shot, one laid back, a flat shot, and a 100 % detail](docs/images/device3d-example.jpg)
 
 <details><summary>The bundled scene example (fictional app, <code>templates/scene.example.json</code>, concept "Tek Turuncu")</summary>
 
@@ -258,7 +268,7 @@ skills/store-screenshots/
   references/                 intake · angle · design-process · scene-format · categories · directions ·
                               copy-rules · storytelling · layouts · anti-ai · localization · store-specs ·
                               critique · library-guide
-  scripts/                    evidence · dna · compose · scene · validate (design route) ·
+  scripts/                    evidence · dna · compose · scene · device3d · validate (design route) ·
                               fetch_listing · prepare_screens · crop_helper · search_library · concepts ·
                               render_set · design · check_set · peer_test · make_sheet · collect_examples ·
                               find_challengers · build_catalog

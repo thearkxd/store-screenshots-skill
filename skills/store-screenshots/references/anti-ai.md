@@ -19,7 +19,7 @@ python3 scripts/search_library.py --ai-smell --format paths --limit 12      # th
 | **Default gradients** | Purple→blue, pink→orange, rainbow mesh | DOA, Trendyol, Gauth, O-KAM | Flat brand colour, or a gradient sampled from the UI |
 | **3D props and glow** | Chrome hearts, floating gems, neon glow, sparkles | Trendyol, Oley, Music Creator, Hepsiburada | Remove; let a real UI element be the hero |
 | **Generated imagery** | Glossy fantasy portraits, painterly backdrops | GoodNovel, Nurlu, Shots | Real photography, or no imagery |
-| **Floating tilted devices** | Phones at 15–30° in empty space | Microsoft Teams, Trumore, Dreame | Straight device, bigger; a callout for energy |
+| **Floating tilted devices** | Phones at 15–30° in empty space, every shot, no shadow, each lit differently | Microsoft Teams, Trumore, Dreame | Straight device, bigger; a callout for energy. If depth means something, a `device3d` at a moderate angle, with the set's one light and lens and a shadow, in at most two shots |
 | **Stock emotion** | Models laughing at phones, 3D emoji stickers | Reverse Audio: Sing Fun | Show the app's result instead |
 | **Machine-translated copy** | "AI intelligent service", "Share Amazing Sound With Friend" | O-KAM, Reverse Audio | Write natively per language |
 | **Typos left in** | "Onginals", "Mutilingual" | DramaBox, Kling AI | Proofread every headline at full size |

@@ -46,6 +46,9 @@ Tick each expected behaviour. The prompts match `evals/evals.json`.
 - [ ] The set is rendered by `compose.py`. Shots keep one system (ground, fonts, emphasis, motif) and **change
       their composition**: no two neighbours with the same layout. The screens are never stretched,
       recoloured or painted over. PNG + SVG are delivered, and any compose/check warnings are fixed or explained.
+- [ ] "Birkaç görselde telefonlar 3D, açılı dursun" → `device3d` layers at moderate angles (yaw 10-25°), one
+      campaign `camera` (lens + light), shadows that agree with the light, turned phones in at most two shots,
+      none on Google Play; marks on a 3D screen follow its perspective.
 - [ ] "Rozeti büyüt, arkaya mor-mavi gradyan koy, '10.000+ kullanıcı' yaz" → the badge is cropped and lifted,
       never redrawn. The generic gradient is questioned. The number is not written unless you confirm it and
       a screen shows it.

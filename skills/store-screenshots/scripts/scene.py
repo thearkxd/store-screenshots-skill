@@ -26,6 +26,7 @@ from xml.sax.saxutils import escape
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import design  # noqa: E402
+import device3d as d3  # noqa: E402
 import render_set as rs  # noqa: E402
 from PIL import Image, ImageChops, ImageDraw, ImageFilter  # noqa: E402
 
@@ -585,9 +586,9 @@ class Scene:
     def layer(self, L, ops):
         t = L.get("type")
         fn = {"text": self.text, "screen": self.screen, "image": self.image, "rect": self.shape, "ellipse": self.shape,
-              "path": self.path, "group": self.group, "mark": self.mark, "svg": self.svg}.get(t)
+              "path": self.path, "group": self.group, "mark": self.mark, "svg": self.svg, "device3d": self.device3d}.get(t)
         if not fn:
-            raise SceneError(f"unknown layer type {t!r} (text, screen, image, rect, ellipse, path, group, mark, svg)")
+            raise SceneError(f"unknown layer type {t!r} (text, screen, device3d, image, rect, ellipse, path, group, mark, svg)")
         try:
             fn(self.anchored(L), ops)
         except SceneError as e:
@@ -656,6 +657,9 @@ class Scene:
         c = self.c
         if L.get("lift"):
             src = self.by_id.get(L["lift"]["from"])
+            if src and src["op"] == "device3d":
+                raise SceneError("lift: a 3D device can't be lifted from (a flat piece over a turned phone looks pasted on) - "
+                                 "lift from a flat screen layer, or show the crop as its own layer")
             if not src or src["op"] != "image" or src["meta"].get("evidence") != eid:
                 raise SceneError(f'lift: "from" must name an earlier screen layer of the same evidence ({eid})')
             sb = src["src_box"]
@@ -700,6 +704,76 @@ class Scene:
         self.common(L, op, outer)
         op["meta"].update(role=L.get("role", "proof" if kind == "screen" else "brand"), kind=kind,
                           evidence=eid, sha256=item.get("sha256"), file=path, crop=r, lift=bool(L.get("lift")))
+        ops.append(op)
+
+    DEVICE3D_FORBIDDEN = {"filter": "the app's pixels are shown as they are", "blur": "the app's pixels are shown as they are",
+                          "tint": "the app's pixels are shown as they are", "recolor": "the app's pixels are shown as they are",
+                          "saturation": "the app's pixels are shown as they are", "brightness": "the app's pixels are shown as they are",
+                          "opacity": "the app's pixels are shown as they are",
+                          "crop": "a 3D device shows the whole screen - use a flat \"screen\" layer for a crop",
+                          "rotate": "turn it with \"rotate3d\": {\"yaw\", \"pitch\", \"roll\"}",
+                          "lift": "lift from a flat screen layer", "frame": "the 3D device is its own frame (\"model\", \"body\")",
+                          "radius": "the corner radius comes from the \"model\" (or \"body\": {\"radius\"})"}
+
+    def device3d(self, L, ops):
+        """A real screen on a phone body turned in space (device3d.py): exact perspective, one light, a shadow."""
+        for bad, why in self.DEVICE3D_FORBIDDEN.items():
+            if bad in L:
+                raise SceneError(f'"{bad}" isn\'t allowed on a device3d - {why}')
+        if "w" in L and "h" in L:
+            raise SceneError('give "w" or "h", not both - the other follows the screen, so the UI keeps its proportions')
+        eid = L.get("evidence")
+        img, item, path = self.evidence_image(eid)
+        c = self.c
+        tokens = self.ctx["tokens"]
+        cam = dict((self.ctx.get("campaign") or {}).get("camera") or {})
+        cam.update(L.get("camera") or {})
+        r3 = L.get("rotate3d") or {}
+        body = dict(L.get("body") or {})
+        if body.get("color") and body["color"] not in d3.FRAMES:
+            body["color"] = color(body["color"], tokens)
+        model = L.get("model") or {"android": "punch", "duo": "slab", "ipad": "slab"}.get(self.ctx.get("device"), "island")
+        try:
+            if "h" in L:
+                probe = d3.Device(img.size, 1000.0, model=model, body=body)
+                width = c.len_y(L["h"], "h") * probe.W / probe.Hb
+            else:
+                width = c.len_x(L.get("w", 0.8), "w")
+            dev = d3.Device(img.size, width, float(r3.get("yaw", 0)), float(r3.get("pitch", 0)), float(r3.get("roll", 0)),
+                            model, body, cam)
+        except d3.DeviceError as e:
+            raise SceneError(str(e)) from None
+        b = dev.rel_bbox
+        x, y = c.place_x(L, b[2] - b[0]), c.place_y(L, b[3] - b[1])
+        dev.place(x - b[0], y - b[1])
+        raster, (X0, Y0) = dev.render(img, ss=int(L.get("supersample", 3)))
+        shadow = L.get("shadow", "auto")
+        if shadow == "auto":  # falls away from the light, so every device in the set agrees with it
+            lx, ly = dev.light[0], dev.light[1]
+            shadow = {"blur": 0.05, "dx": -lx * 0.045, "dy": -ly * 0.045 + 0.012, "opacity": 0.38}
+        sh = shadow_spec(shadow if shadow not in ("none", False) else None, c.U)
+        if sh:
+            simg, (sx, sy) = d3.shadow_for(raster, sh, 2)
+            ox, oy = min(0, sx), min(0, sy)
+            comp = Image.new("RGBA", (max(raster.width, sx + simg.width) - ox, max(raster.height, sy + simg.height) - oy), (0, 0, 0, 0))
+            comp.alpha_composite(simg, (sx - ox, sy - oy))
+            comp.alpha_composite(raster, (-ox, -oy))
+            raster, X0, Y0 = comp, X0 + ox, Y0 + oy
+        quad = dev.screen_quad()
+        op = {"op": "device3d", "img": raster, "at": (X0, Y0), "src": img, "H": dev.H(), "quad": quad, "box": dev.bbox()}
+        self.common(L, op, dev.bbox())
+        ratio = dev.scale_min / dev.scale_max
+        op["meta"].update(role=L.get("role", "proof"), kind="screen", evidence=eid, sha256=item.get("sha256"), file=path,
+                          crop=[0.0, 0.0, 1.0, 1.0], screen_bbox=(min(p[0] for p in quad), min(p[1] for p in quad),
+                                                                 max(p[0] for p in quad), max(p[1] for p in quad)),
+                          px_scale=dev.scale_max, foreshortening=ratio, angles=dev.angles, model=model,
+                          camera={"fov": float(dev.cam["fov"]), "light": [round(v, 3) for v in dev.light]}, shadow=bool(sh))
+        if ratio < d3.READABLE:
+            self.warnings.append(f"the 3D device {eid!r} shrinks the far side of its screen to {ratio:.0%} of the near side - "
+                                 "turn it less (or use a smaller fov) so the UI still reads")
+        if not sh:
+            self.warnings.append(f"the 3D device {eid!r} has no shadow, so it floats - give it a \"shadow\" that agrees with "
+                                 "the light")
         ops.append(op)
 
     def image(self, L, ops):
@@ -793,14 +867,20 @@ class Scene:
         bx = None
         if "on" in L:
             src = self.by_id.get(L["on"])
-            if not src or src["op"] != "image":
-                raise SceneError('mark: "on" must name an earlier screen layer')
-            r = L.get("region") or src["crop"]
-            sr, sb = src["crop"], src["src_box"]
-            pts = [(sb[0] + (px - sr[0]) / (sr[2] - sr[0]) * (sb[2] - sb[0]), sb[1] + (py - sr[1]) / (sr[3] - sr[1]) * (sb[3] - sb[1]))
-                   for px, py in ((r[0], r[1]), (r[2], r[3]))]
-            pts = [rot_point(p, src["rotate"], src["centre"]) for p in pts]
-            bx = [min(pts[0][0], pts[1][0]), min(pts[0][1], pts[1][1]), max(pts[0][0], pts[1][0]), max(pts[0][1], pts[1][1])]
+            if not src or src["op"] not in ("image", "device3d"):
+                raise SceneError('mark: "on" must name an earlier screen or device3d layer')
+            if src["op"] == "device3d":  # through the device's perspective
+                r = L.get("region") or [0, 0, 1, 1]
+                w, h = src["src"].size
+                pts = [d3.hmap(src["H"], u * w, v * h) for u, v in ((r[0], r[1]), (r[2], r[1]), (r[2], r[3]), (r[0], r[3]))]
+                bx = [min(p[0] for p in pts), min(p[1] for p in pts), max(p[0] for p in pts), max(p[1] for p in pts)]
+            else:
+                r = L.get("region") or src["crop"]
+                sr, sb = src["crop"], src["src_box"]
+                pts = [(sb[0] + (px - sr[0]) / (sr[2] - sr[0]) * (sb[2] - sb[0]), sb[1] + (py - sr[1]) / (sr[3] - sr[1]) * (sb[3] - sb[1]))
+                       for px, py in ((r[0], r[1]), (r[2], r[3]))]
+                pts = [rot_point(p, src["rotate"], src["centre"]) for p in pts]
+                bx = [min(pts[0][0], pts[1][0]), min(pts[0][1], pts[1][1]), max(pts[0][0], pts[1][0]), max(pts[0][1], pts[1][1])]
         elif "box" in L:
             b = L["box"]
             bx = [c.len_x(b[0]), c.len_y(b[1]), c.len_x(b[2]), c.len_y(b[3])]
@@ -882,10 +962,19 @@ def draw_shadow(layer, box, radius, sh):
     layer.alpha_composite(Image.composite(Image.new("RGBA", (w, h), rgba(sh["color"])), Image.new("RGBA", (w, h), (0, 0, 0, 0)), m))
 
 
+def paste_rgba(canvas, img, x, y):
+    """alpha_composite that accepts a source reaching past the canvas edges."""
+    x, y = int(x), int(y)
+    sx0, sy0 = max(0, -x), max(0, -y)
+    sx1, sy1 = min(img.width, canvas.width - x), min(img.height, canvas.height - y)
+    if sx1 > sx0 and sy1 > sy0:
+        canvas.alpha_composite(img.crop((sx0, sy0, sx1, sy1)), (x + sx0, y + sy0))
+
+
 def pil_op(canvas, op, fonts):
     W, H = canvas.size
     o = op["op"]
-    needs_layer = op.get("rotate") or op.get("opacity", 1) < 1 or o in ("group", "text", "lines", "image", "rect", "ellipse", "path", "svg")
+    needs_layer = op.get("rotate") or op.get("opacity", 1) < 1 or o in ("group", "text", "lines", "image", "rect", "ellipse", "path", "svg", "device3d")
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0)) if needs_layer else None
     tgt = layer
     if o == "rect" or o == "ellipse":
@@ -972,6 +1061,8 @@ def pil_op(canvas, op, fonts):
             d.line(ln["points"], fill=rgba(ln["color"]), width=ln["width"], joint="curve")
     elif o == "svg":
         tgt.alpha_composite(op["img"])
+    elif o == "device3d":
+        paste_rgba(tgt, op["img"], *op["at"])
     elif o == "group":
         for child in op["ops"]:
             tgt = pil_op(tgt, child, fonts)
@@ -998,7 +1089,7 @@ def render_pillow(scene, fonts):
 def _img_href(img, lossless):
     buf = io.BytesIO()
     if lossless or img.mode == "RGBA":
-        img.save(buf, "PNG", optimize=True)
+        img.save(buf, "PNG", optimize=img.width * img.height < 1_000_000)
         mime = "image/png"
     else:
         img.convert("RGB").save(buf, "JPEG", quality=94)
@@ -1117,6 +1208,11 @@ class SVGWriter:
                 inner.append(self.polyline(ln))
         elif o == "svg":
             inner.append(op["markup"])
+        elif o == "device3d":
+            x0, y0 = op["at"]
+            ev = op["meta"].get("evidence") or ""
+            inner.append(f'<image x="{x0}" y="{y0}" width="{op["img"].width}" height="{op["img"].height}" data-evidence="{escape(str(ev))}" '
+                         f'xlink:href="{_img_href(op["img"], True)}"/>')
         elif o == "group":
             for child in op["ops"]:
                 self.op(child, inner)

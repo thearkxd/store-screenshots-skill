@@ -37,7 +37,9 @@ Originality never costs the truth. Breaking a truth rule isn't a design choice.
 - place it on any ground;
 - lift a region forward, larger, over its own place;
 - point at it with a hand mark;
-- put several crops of one screen side by side.
+- put several crops of one screen side by side;
+- turn the whole screen in 3D on a device body (`device3d`), within the angle limits. That is a rigid object
+  photographed at an angle, not a distortion: the renderer maps it with the camera's exact perspective.
 
 **Never:**
 - stretch it (a screen takes `w` or `h`, never both);
@@ -196,8 +198,20 @@ Let the message decide the composition:
   bar track"). Without a motive it's AI decoration - delete it. At most a few per shot.
 - **Gradients** only when the app has them, or they come from the app's own colours (`"sample"`), never the
   default purple-to-blue.
+- **3D devices** (`device3d`, `scene-format.md` §5) only where depth means something:
+  - a phone in a hand-held or on-the-table moment;
+  - two devices in conversation;
+  - the shot that turns the product into an object.
+
+  Rules:
+  - Keep the angle moderate (yaw 10-25°), so the UI still reads.
+  - Use one camera (lens and light) for the whole set, from the campaign.
+  - Give every device a shadow that agrees with the light.
+  - Use turned phones in at most two shots; the rest stay flat. A tilted phone in every shot is the template
+    look this skill exists to avoid.
+  - No 3D on Google Play (device imagery).
 - **Free vector work** (a motif, a pattern, a drawn shape) goes in an `svg` layer, written in u. For something
-  no layer can do - perspective, complex illustration - use the HTML route (`layouts.md` §6). The truth rules
+  no layer can do - complex illustration - use the HTML route (`layouts.md` §6). The truth rules
   still apply: screens are `<img>` tags of the evidence files, never redrawn, and the result is checked with
   `check_set.py`.
 - Don't center everything, and don't give every shot the same scale or the same phone in the middle. A layout

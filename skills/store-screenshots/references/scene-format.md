@@ -126,6 +126,7 @@ Common keys:
 |---|---|
 | `text` | `text` (with `*emphasis*` and `\n`), `style`, `w` (default 86 %), optional `h`, any type-style key (§3) |
 | `screen` | `evidence` (screen id), `crop` `[x0, y0, x1, y1]` fractions or a region name, **`w` or `h` - never both**, `radius`, `frame`, `shadow`, `lift` |
+| `device3d` | a whole screen on a phone body turned in space: `evidence`, `w` or `h` (the body as if it faced you), placement on its silhouette, `rotate3d` `{"yaw", "pitch", "roll"}`, `model`, `body`, `camera`, `shadow` - see below |
 | `image` | `asset` (a registered brand image: icon, logo, photo), same sizing as `screen`; `opacity` allowed |
 | `rect` / `ellipse` | `w`, `h`, `radius` (rect), `fill` (colour or gradient), `stroke`, `stroke_width`, `shadow` |
 | `path` | `d` in u (M L H V C S Q T Z, absolute and relative; no arcs), offset `x`/`y`, `fill`, `stroke`, `stroke_width`, `cap` |
@@ -151,6 +152,44 @@ Screen options:
 - **Crops end in gaps:** put a crop's edges between components, or at the screen's own edge, never through a
   card, a row or a word.
 
+### 3D devices (`device3d`)
+
+```json
+{"type": "device3d", "id": "phone", "evidence": "home", "w": 0.8, "cx": "50%", "y": 0.62,
+ "rotate3d": {"yaw": -18, "pitch": 6, "roll": 0}, "model": "island", "body": {"color": "titanium"}}
+```
+
+**How it draws:**
+- The screen is mapped onto the front of the body with the exact perspective a camera gives a flat object (a
+  homography). Every pixel of the UI is there, in its own proportions.
+- The body is drawn in the same camera and lit by one light: glass, rounded slab, metal band, keys, island or
+  punch hole.
+
+**Settings:**
+- **`rotate3d`** (degrees):
+  - `yaw` > 0 turns the face to the viewer's right, `pitch` > 0 tilts it up, `roll` > 0 turns it clockwise;
+  - limits: yaw ±40, pitch ±30, roll ±25.
+- **`model`:**
+  - `island` (iPhone-like, the default);
+  - `punch` (Android, the default on android sizes);
+  - `slab` (no cutout, no keys; the default for iPad/Duo).
+- **`body`**: `color` (`titanium`, `graphite`, `silver`, `black`, `white`, a hex or a `$token`), and optionally
+  `radius`, `bezel`, `thickness` (fractions of the body width).
+- **`camera`**: `{"fov": 22, "light": [-0.45, -0.75, -0.5]}`.
+  - Put it in the **campaign** (`"campaign": {"camera": …}`), so every device in the set shares one lens and
+    one light.
+  - `fov` 6-60: smaller is flatter, like a long lens.
+  - `light` points from the device towards the light (x right, y down, z away from the viewer).
+- **`shadow`**: `"auto"` (the default) falls away from the light; a preset or `{…}` as for screens; `"none"`.
+
+**Not on a device3d:**
+- `crop` (use a flat screen);
+- `rotate` (use `rotate3d`);
+- `frame`, `radius`;
+- filters or `opacity`.
+
+You can't lift from a 3D device, but a `mark` `on` it follows its perspective.
+
 ## 6. Sizes, stores and locales
 
 Any value can vary by size or locale, at any depth:
@@ -173,7 +212,8 @@ screens captured on that device, given per size.
 - a screen file that changed since the manifest was built (SHA-256);
 - `w` and `h` together on a screen (it would stretch);
 - `filter`, `blur`, `tint`, `recolor`, `saturation`, `brightness` or `opacity` on a screen;
-- `<text>` or `<image>` inside an `svg` layer.
+- `<text>` or `<image>` inside an `svg` layer;
+- a `device3d` turned past its limits, with a crop, a 2D `rotate`, a filter, or lifted from.
 
 **Warned** (printed, stored in `_render.json`, reprinted by `check_set.py`):
 
@@ -206,6 +246,12 @@ screens captured on that device, given per size.
 - fonts outside the campaign;
 - more than one headline font in the set.
 
+*3D:*
+- a device whose far side shrinks below 72 % of its near side, so the UI stops reading;
+- a device without a shadow (it floats);
+- devices in one set with different lenses or lights;
+- turned phones in more than two shots, or in most of the set.
+
 *Set:*
 - three or more shots with the same composition (headline and main visual in the same place and scale);
 - none of the first three headlines uses a promise word;
@@ -213,5 +259,5 @@ screens captured on that device, given per size.
 - only one iPhone size.
 
 *Google Play:*
-- a device frame;
+- a device frame, or a 3D device;
 - captions over 20 % of the height.
