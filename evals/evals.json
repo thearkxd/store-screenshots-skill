@@ -1,53 +1,65 @@
 {
-  "skill_name": "store-screenshots",
-  "evals": [
-    {
-      "id": 1,
-      "prompt": "Seenfy diye bir dizi/film takip uygulamam var (iPhone + Android). Ekteki 6 ekran görüntüsünden App Store için Türkçe mağaza görselleri hazırla. Marka rengi #6C2BD9.",
-      "expected_output": "A short brief with assumptions, category research from the library (entertainment + related), a storyboard table with Turkish headlines that pass the swap test (no banned phrases, 3-6 words, sen form), a render spec using only the provided screens, PNGs at 1206x2622 checked with check_set.py, a search-preview and peer-test image that were actually viewed, and notes on what to verify.",
-      "files": []
-    },
-    {
-      "id": 2,
-      "prompt": "Critique these App Store screenshots for my budgeting app and tell me what to change first.",
-      "expected_output": "A scorecard from references/critique.md with a total, the three highest-impact fixes quoting current headlines with rewritten alternatives, a shot-by-shot table, comparison to exemplary finance sets in the library (e.g. Cash App, PayPal, Kalshi), and no invented facts about the app.",
-      "files": []
-    },
-    {
-      "id": 3,
-      "prompt": "Write headlines for 6 Google Play screenshots for a parking app. We're the #1 parking app in Istanbul and the first hour is free.",
-      "expected_output": "Six concrete headlines plus sub-lines, with a clear note that Google Play disallows ranking claims (#1) and price/promo text (first hour free) in screenshots, offering compliant alternatives; uses library navigation examples (Waze, ParkMobile) for patterns, not copy.",
-      "files": []
-    },
-    {
-      "id": 4,
-      "prompt": "What do the best weather apps do in their first screenshot? Show me examples.",
-      "expected_output": "Uses search_library.py on weather/position 1, quotes only verified headlines (HIRKA, WeatherX, The Weather Channel), shows or lists the images, and summarises the patterns with the honesty caveat that quality labels are reviewer judgement.",
-      "files": []
-    },
-    {
-      "id": 5,
-      "prompt": "Localise my English App Store screenshot headlines into Turkish: 'Never miss an episode', 'Track everything you watch', 'See what friends are watching'.",
-      "expected_output": "Rewritten (not literal) Turkish headlines with a consistent sen/siz choice, notes on Turkish capitals if caps are used, a reminder that the UI in the screenshots must also be Turkish, and no banned phrases.",
-      "files": []
-    },
-    {
-      "id": 6,
-      "prompt": "Uygulamam için mağaza görselleri hazırlar mısın?",
-      "expected_output": "Before anything else, asks whether the app is live on the App Store / Google Play and for the store link(s), offering the short form if it isn't. Does not ask the full questionnaire when a link would answer it, and does not start designing.",
-      "files": []
-    },
-    {
-      "id": 7,
-      "prompt": "https://apps.apple.com/tr/app/seenfy-ne-izlesem-film-dizi/id6764370964 için yeni mağaza görselleri yap.",
-      "expected_output": "Runs fetch_listing.py (or falls back to a web fetch / asks to paste the listing if blocked), drafts the brief from the description, scores the current set with the critique scorecard and keeps its good lines, asks whether the set is for the current version or an update, proposes a storyboard, then asks for the specific raw screens per shot. Does not crop UI out of the current marketing screenshots and does not render before raw screens arrive.",
-      "files": []
-    },
-    {
-      "id": 8,
-      "prompt": "Henüz yayında olmayan bir bütçe uygulaması yapıyorum, adı Kumbara. Görselleri hazırla.",
-      "expected_output": "Asks the short form in one message (what it does in one sentence and for whom, 2-3 differentiators, brand colours/font or a website/Figma, stores and languages) without re-asking the name, then brief, storyboard and a raw-screen request.",
-      "files": []
-    }
-  ]
+ "skill_name": "store-screenshots",
+ "evals": [
+  {
+   "id": 1,
+   "prompt": "Seenfy diye bir dizi/film takip uygulamam var (iPhone + Android). Ekteki 6 ekran görüntüsünden App Store için Türkçe mağaza görselleri hazırla. Marka rengi #6C2BD9.",
+   "expected_output": "A short brief with assumptions, category research from the library (entertainment + related), a storyboard table with Turkish headlines that pass the swap test (no banned phrases, 3-6 words, sen form), a render spec using only the provided screens, PNGs at 1206x2622 checked with check_set.py, a search-preview and peer-test image that were actually viewed, and notes on what to verify.",
+   "files": []
+  },
+  {
+   "id": 2,
+   "prompt": "Critique these App Store screenshots for my budgeting app and tell me what to change first.",
+   "expected_output": "A scorecard from references/critique.md with a total, the three highest-impact fixes quoting current headlines with rewritten alternatives, a shot-by-shot table, comparison to exemplary finance sets in the library (e.g. Cash App, PayPal, Kalshi), and no invented facts about the app.",
+   "files": []
+  },
+  {
+   "id": 3,
+   "prompt": "Write headlines for 6 Google Play screenshots for a parking app. We're the #1 parking app in Istanbul and the first hour is free.",
+   "expected_output": "Six concrete headlines plus sub-lines, with a clear note that Google Play disallows ranking claims (#1) and price/promo text (first hour free) in screenshots, offering compliant alternatives; uses library navigation examples (Waze, ParkMobile) for patterns, not copy.",
+   "files": []
+  },
+  {
+   "id": 4,
+   "prompt": "What do the best weather apps do in their first screenshot? Show me examples.",
+   "expected_output": "Uses search_library.py on weather/position 1, quotes only verified headlines (HIRKA, WeatherX, The Weather Channel), shows or lists the images, and summarises the patterns with the honesty caveat that quality labels are reviewer judgement.",
+   "files": []
+  },
+  {
+   "id": 5,
+   "prompt": "Localise my English App Store screenshot headlines into Turkish: 'Never miss an episode', 'Track everything you watch', 'See what friends are watching'.",
+   "expected_output": "Rewritten (not literal) Turkish headlines with a consistent sen/siz choice, notes on Turkish capitals if caps are used, a reminder that the UI in the screenshots must also be Turkish, and no banned phrases.",
+   "files": []
+  },
+  {
+   "id": 6,
+   "prompt": "Uygulamam için mağaza görselleri hazırlar mısın?",
+   "expected_output": "Before anything else, asks whether the app is live on the App Store / Google Play and for the store link(s), offering the short form if it isn't. Does not ask the full questionnaire when a link would answer it, and does not start designing.",
+   "files": []
+  },
+  {
+   "id": 7,
+   "prompt": "https://apps.apple.com/tr/app/seenfy-ne-izlesem-film-dizi/id6764370964 için yeni mağaza görselleri yap.",
+   "expected_output": "Runs fetch_listing.py (or falls back to a web fetch / asks to paste the listing if blocked), drafts the brief from the description, scores the current set with the critique scorecard and keeps its good lines, asks whether the set is for the current version or an update, proposes a storyboard, then asks for the specific raw screens per shot. Does not crop UI out of the current marketing screenshots and does not render before raw screens arrive.",
+   "files": []
+  },
+  {
+   "id": 8,
+   "prompt": "Henüz yayında olmayan bir bütçe uygulaması yapıyorum, adı Kumbara. Görselleri hazırla.",
+   "expected_output": "Asks the short form in one message (what it does in one sentence and for whom, 2-3 differentiators, brand colours/font or a website/Figma, stores and languages) without re-asking the name, then brief, storyboard and a raw-screen request.",
+   "files": []
+  },
+  {
+   "id": 9,
+   "prompt": "Here are 5 raw screens of my weather app 'Drizzle' (brand: #2F6BFF, white UI). Make the App Store set - I want it to stand out from the usual weather apps.",
+   "expected_output": "Writes the brief plus three candidate angles of different types (e.g. a decision instead of a number, a ritual) and picks one the screens prove; reads the weather playbook in categories.md (clichés: 'most accurate', thin centred superlatives); writes the spec with the brand and category, runs concepts.py for three directions (crafted · utility · cinematic or similar) and shows the sheet with one line per direction tied to the angle before rendering the full set.",
+   "files": []
+  },
+  {
+   "id": 10,
+   "prompt": "Bu konsept sayfasından B'yi (poster) seçtim ama yazı tipi bizim marka fontumuz olsun: fonts/Marka-Black.ttf",
+   "expected_output": "Sets \"direction\": \"poster\" in the spec and overrides only the font in \"style\" (\"font\": \"fonts/Marka-Black.ttf\"), keeps the brand tokens, renders the set, reports any missing-glyph warning for Turkish characters, and runs check_set.py.",
+   "files": []
+  }
+ ]
 }

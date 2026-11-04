@@ -1,0 +1,81 @@
+{
+ "label": "Utility / data",
+ "summary": "Dark ground with a faint grid, a technical grotesk set flush left, a mono overline numbering each shot, label-then-specifics headlines, zoom cards of real numbers. For tools whose proof is data.",
+ "references": [
+  "WeatherX",
+  "Working Copy",
+  "Cleanup",
+  "ParkMobile",
+  "Device Monitor",
+  "Oura"
+ ],
+ "fits": [
+  "developer-tools",
+  "utilities",
+  "weather",
+  "finance",
+  "productivity",
+  "health-fitness",
+  "sports"
+ ],
+ "personality": [
+  "precise",
+  "technical",
+  "powerful",
+  "no-nonsense"
+ ],
+ "avoid": "Emotional consumer products, kids, food.",
+ "style": {
+  "background": {
+   "color": "$dark"
+  },
+  "text_color": "#F2F4F5",
+  "sub_color": "#9AA3A8",
+  "font": "grotesk",
+  "tracking": -0.03,
+  "headline_size": 0.098,
+  "min_headline_size": 0.064,
+  "line_height": 1.02,
+  "max_lines": 2,
+  "align": "left",
+  "text_x": 0.075,
+  "text_width": 0.85,
+  "caption_top": 0.1,
+  "emphasis": {
+   "style": "color",
+   "color": "$primary_light"
+  },
+  "overline_style": {
+   "font": "mono",
+   "size": 0.027,
+   "color": "$primary_light",
+   "tracking": 0.06,
+   "case": "upper",
+   "gap": 0.03
+  },
+  "device": {
+   "style": "phone",
+   "width": 0.82,
+   "border_color": "#000000",
+   "gap": 0.075,
+   "shadow": true
+  },
+  "shapes": [
+   {
+    "type": "grid",
+    "color": "$primary_light",
+    "opacity": 0.07,
+    "step": 0.083,
+    "width": 0.0016
+   }
+  ],
+  "poster_size": 0.19,
+  "overline_prefix": "{n:02d} — "
+ },
+ "poster_defaults": {
+  "background": {
+   "color": "$primary_shade"
+  },
+  "text_color": "#FFFFFF"
+ }
+}

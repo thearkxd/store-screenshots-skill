@@ -71,6 +71,25 @@ def main():
         run(s("crop_helper.py"), "grid", os.path.join(prep, "01-kesfet.png"))
         run(s("crop_helper.py"), "check", os.path.join(ROOT, "examples", "seenfy", "set.json"), "-o", os.path.join(tmp, "crops.jpg"))
         run(s("search_library.py"), "--source", "challenger", "--quality", "exemplary", "--format", "apps")
+        # design directions: every preset renders the demo set, no missing glyphs, concept sheet for a category
+        out = run(s("concepts.py"), "--list")
+        names = sorted(f[:-5] for f in os.listdir(os.path.join(SKILL, "assets", "directions")) if f.endswith(".json"))
+        assert len(names) >= 7 and all(n in out for n in names), out
+        out = run(s("concepts.py"), os.path.join(SKILL, "templates", "set.example.json"), "--directions", *names,
+                  "--shots", "1", "2", "-o", os.path.join(tmp, "concepts-all.jpg"))
+        assert "lacks glyphs" not in out, out
+        out = run(s("concepts.py"), os.path.join(ROOT, "examples", "seenfy", "set.json"), "--locale", "tr",
+                  "-o", os.path.join(tmp, "concepts.jpg"))
+        assert "cinematic" in out and "lacks glyphs" not in out, out
+        assert os.path.getsize(os.path.join(tmp, "concepts.jpg")) > 20000
+        # every bundled font covers Turkish
+        sys.path.insert(0, SCRIPTS)
+        import render_set
+        for alias, (fname, _) in render_set.FONT_ALIASES.items():
+            cmap = render_set.font_cmap(os.path.join(SKILL, "assets", "fonts", fname))
+            if cmap is not None:
+                miss = [ch for ch in "İıŞşĞğÜüÖöÇç" if ord(ch) not in cmap]
+                assert not miss, f"{alias} ({fname}) lacks {''.join(miss)}"
         # copy checks must catch an obviously bad headline
         out = run(s("check_set.py"), os.path.join(tmp, "android"), "--store", "android", "--lang", "tr",
                   "--headlines", "Kusursuz Dizi Deneyimi", "#1 dizi uygulaması!", "a", "b", "c")

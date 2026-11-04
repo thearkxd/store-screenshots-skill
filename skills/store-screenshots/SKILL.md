@@ -1,6 +1,6 @@
 ---
 name: store-screenshots
-description: Plans, writes and produces App Store and Google Play screenshots that explain what an app does and don't look AI-generated - story, headline copy, layout and pixel-exact PNG export from the app's real screens. Includes a classified library of 1,300+ real top-chart screenshots (25 categories, Turkey and US stores) with searchable headlines and good/bad verdicts, plus scripts for search, rendering, store-spec checks and a peer test. Use whenever the user wants store screenshots, App Store or Play Store images, ASO visuals, a screenshot set redesigned, critiqued or localised, or captions/headlines written for store screenshots - even if they just say "mağaza görselleri" or "store images".
+description: Plans, writes and produces App Store and Google Play screenshots that explain what an app does and don't look AI-generated - story, headline copy, layout and pixel-exact PNG export from the app's real screens. Includes a classified library of 1,700+ real top-chart screenshots (25 categories, Turkey and US stores) with searchable headlines and good/bad verdicts, category playbooks, seven design directions with a concept checkpoint, plus scripts for search, rendering, store-spec checks and a peer test. Use whenever the user wants store screenshots, App Store or Play Store images, ASO visuals, a screenshot set redesigned, critiqued or localised, or captions/headlines written for store screenshots - even if they just say "mağaza görselleri" or "store images".
 ---
 
 # Store Screenshots
@@ -48,7 +48,8 @@ rendering. Run with `python3 <skill-dir>/scripts/<name>.py` (`python` on Windows
 | `search_library.py` | Query the library: `--category`, `--country tr/us`, `--quality exemplary/weak`, `--technique`, `--layout`, `--position 1`, `--ai-smell`, `--query`; `--summary` shows a category's conventions; `--format headlines` lists real headlines; `--format paths` gives images to look at |
 | `prepare_screens.py` | Check incoming raw screens (resolution, ratio, JPEG, mismatched status bars), repaint a clean status bar (`--status-bar 9:41`), cover debug UI (`--cover`) |
 | `crop_helper.py` | `grid` draws a labelled coordinate grid on a screen; `check` previews every callout/zoom crop of a spec |
-| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; Android punch-hole frame for Android sizes; Google Play feature graphic (1024×500); every locale from one spec (`"locales"`); bundled fonts, tracking, Turkish-safe capitals |
+| `concepts.py` | **Concept checkpoint:** shots 1–3 rendered in three design directions side by side (`--category` picks safe · bold · unexpected; `--list` shows all seven) - show it before rendering the set |
+| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; Android punch-hole frame for Android sizes; Google Play feature graphic (1024×500); every locale from one spec (`"locales"`); a `"direction"` preset with brand tokens; overlines, stickers, hand-drawn annotations, motif shapes; bundled fonts, tracking, Turkish-safe capitals |
 | `check_set.py` | Check finished PNGs: exact store sizes, no alpha, count limits, headline length, banned phrases; writes a **search-result preview** (first 3 shots at thumbnail size) and an overview sheet |
 | `peer_test.py` | Put your set next to 2–3 exemplary sets from the same category at the same size |
 | `make_sheet.py` | Contact sheets of any folders of screenshots |
@@ -70,10 +71,13 @@ link(s).** Skip anything they've already given you.
 - **Not live:** ask the short form in one message: name, what it does in one sentence and for whom, the 2–3
   things it does better, brand (colours, font, website/Figma), stores and languages.
 
-### Phase 1 - Brief (and critique, if live)
-Write a 5-line brief - **promise · audience · proof points (3–6) · tone · constraints** - from the listing or
-the answers, and confirm it with the user. If the app is live, critique the current set
-(`references/critique.md`): score, top three fixes, and which lines are worth keeping.
+### Phase 1 - Brief, angle (and critique, if live)
+Write a short brief - **promise · audience · proof points (3–6) · tone · constraints** - from the listing or
+the answers. Then find the **angle** (`references/angle.md`): write three one-line angles of different types
+(the exact person, the enemy, the ritual, the insider word, the proof only you have), pick the one the
+screens can prove and competitors can't say, and add it as `Angle:` to the brief. Confirm brief + angle with
+the user. If the app is live, critique the current set (`references/critique.md`): score, top three fixes,
+and which lines are worth keeping.
 
 ### Phase 2 - Research the category (5 minutes, not an hour)
 ```bash
@@ -81,24 +85,38 @@ python3 scripts/search_library.py --category <closest> --summary
 python3 scripts/search_library.py --category <closest> --quality exemplary --position 1 --format headlines
 python3 scripts/search_library.py --category <closest> --ai-smell --format headlines     # what to avoid
 ```
-Look at 2–3 exemplary sets (`--format paths`, open the images). Write down the category's clichés - the
+Read the category's playbook in `references/categories.md` (norm, best, clichés, where to stand out, three
+directions). Look at 2–3 exemplary sets (`--format paths`, open the images). Write down the clichés - the
 headline everyone uses, the default colour, the stock layout - and decide where to depart. Categories map
 to App Store categories; see `references/library-guide.md` for the list and the library's limits.
 
 ### Phase 3 - Story and copy
 - Order the proof points by what the *user* cares about, not by the app's menu (`references/storytelling.md`).
 - Draft **2–3 headline options per shot** in the user's language, 3–6 words each, verb-led or spoken,
-  with one concrete detail (a number, a real moment, a named pain). Rules and banned words:
-  `references/copy-rules.md`.
+  with one concrete detail (a number, a real moment, a named pain). Shot 1 states the angle; use the
+  audience's insider words in at least two. Rules and banned words: `references/copy-rules.md`.
 - Pick the strongest option per shot and show the user the **storyboard as a table** (shot · headline · sub-line ·
   which screen · layout) before rendering, unless they asked you to just deliver.
 - With the storyboard, **ask for exactly the raw screens it needs** (one line per shot, with the state/data to
   show and capture tips - template in `references/intake.md` §5). Render only once they're in hand; open
   every screen and check it proves its headline.
 
-### Phase 4 - Design and render
-- Choose one visual system for the whole set: background colour from the brand (not a default gradient), one
-  type family, one emphasis device (colour word, highlight box, or italic) - `references/layouts.md`.
+### Phase 4 - Direction: three concepts, one choice (`references/directions.md`)
+Don't default to one look. Write the spec (copy, screens, `"brand"`, `"category"`), then render the
+**concept sheet** - shots 1–3 in three directions (safe · bold · unexpected for the category):
+```bash
+python3 scripts/concepts.py set.json -o concepts.jpg            # or --directions editorial poster cinematic
+```
+Open it, check each row at a glance, and show it with one line per direction on why it fits the angle. Let
+the user pick (or mix); then set `"direction"` in the spec. Add **one ownable detail** that repeats across the
+set - a motif from the product, the app's own badge as a sticker, a hand mark on the key element
+(`angle.md` §4). Skip the sheet only if the brand already has a screenshot system or the user said "just
+deliver" - then name the direction you chose and why.
+
+### Phase 5 - Render
+- A direction sets the system (ground, type, emphasis, device, rotation); keep it consistent and override
+  only what the brand needs (`references/directions.md` §6). Without a direction: one brand ground, one type
+  family, one emphasis device - `references/layouts.md`.
 - Choose a layout per shot from the recipes (device frame, full-bleed, zoom card, pulled-out callout, photo-led,
   one poster shot at most). Keep the UI big: the phone is the product.
 - Prepare the screens, place the crops, write the spec and render:
@@ -112,12 +130,12 @@ python3 scripts/render_set.py set.json --out out/
 - Several languages: `"locales": ["tr", "en"]` and `{"tr": "…", "en": "…"}` for any headline, sub or screen;
   output goes to `out/<locale>/<preset>/`. Google Play: add `"feature_graphic"` (headline + screen) - it's
   required on Play and rendered at 1024×500. Android presets get a punch-hole frame automatically.
-Use the user's brand font if they provide a `.ttf/.otf`; otherwise the bundled OFL fonts (`sans` headline,
-`text` sub-line, `serif-italic` for one emphasis word - `assets/fonts/FONTS.md`). Seed the screens with
+Use the user's brand font if they provide a `.ttf/.otf`; otherwise the direction's bundled OFL fonts
+(`assets/fonts/FONTS.md`). Seed the screens with
 realistic data first: the renderer can't fix thin or empty UI. For layouts the renderer can't do, write
 HTML/CSS and screenshot it at the exact pixel size with a headless browser if one is available (`references/layouts.md` §6).
 
-### Phase 5 - Check, compare, fix (loop at least once)
+### Phase 6 - Check, compare, fix (loop at least once)
 ```bash
 python3 scripts/check_set.py out/ios --store ios --lang tr        # render_set writes out/<preset>/
 python3 scripts/check_set.py out/android --store android --lang tr
@@ -129,14 +147,17 @@ Open `out/ios/_search-preview.jpg`, `out/ios/_overview.jpg` and `peer.jpg` and a
 - Does it look equally resolved next to the peers? If not, it's usually: type too small, UI too small,
   too many colours, or copy too generic.
 
-### Phase 6 - Deliver
-Show the overview image, the storyboard table and one line per shot on why it's there. Deliver the PNGs at
+### Phase 7 - Deliver
+Show the overview image, the storyboard table, the angle and direction, and one line per shot on why it's
+there. Deliver the PNGs at
 store sizes (plus the spec JSON so the user can re-render). Mention anything you assumed and anything the user
 must verify (claims, numbers, legal lines).
 
 ## Red flags - fix before showing anything
 
 - A headline that passes for any app in the category, or uses a banned phrase.
+- A set that would look the same for any app in the category: no angle, no ownable detail, the category's
+  default look (`references/categories.md` clichés).
 - Logo, splash, login, onboarding or "we renewed the app" as shot 1; more than one non-UI shot in a set
   (Apple wants most screenshots to show the app in use).
 - Paragraphs, exclamation marks on every shot, Title Case Slogans, three different type sizes in one caption.
@@ -161,6 +182,9 @@ must verify (claims, numbers, legal lines).
 | Read | When |
 |---|---|
 | `references/intake.md` | Start of every job: live-app vs new-app flow, listing fetch and fallbacks, brief, screen request |
+| `references/angle.md` | Finding the niche angle (five types), from angle to direction, ownable visual details |
+| `references/categories.md` | Per-category playbook: norm, best sets, clichés, where to stand out, three directions |
+| `references/directions.md` | The seven design directions, `concepts.py`, brand tokens, overlines, stickers, annotations, shapes |
 | `references/copy-rules.md` | Writing or judging any headline (patterns, banned words EN/TR, swap test) |
 | `references/storytelling.md` | Ordering the set, first three shots, set structures |
 | `references/layouts.md` | Layout recipes, type, colour, emphasis devices, HTML route |

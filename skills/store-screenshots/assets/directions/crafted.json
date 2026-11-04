@@ -1,0 +1,106 @@
+{
+ "label": "Crafted motif",
+ "summary": "Warm paper ground, a soft display serif, and one ownable motif - a ribbon that runs continuously behind every phone across the whole set. Human and specific, like HIRKA's knitted rope or Moovit's transit lines.",
+ "references": [
+  "HIRKA",
+  "Moovit",
+  "Bible",
+  "CAVA",
+  "Walgreens"
+ ],
+ "fits": [
+  "weather",
+  "lifestyle",
+  "health-fitness",
+  "navigation",
+  "travel",
+  "food-drink",
+  "reference",
+  "medical"
+ ],
+ "personality": [
+  "warm",
+  "local",
+  "handmade",
+  "caring"
+ ],
+ "avoid": "Tech-forward or very data-heavy products.",
+ "style": {
+  "background": {
+   "color": "$paper",
+   "grain": 0.03
+  },
+  "text_color": "$primary_shade",
+  "sub_color": "$ink_soft",
+  "font": "display",
+  "tracking": -0.02,
+  "headline_size": 0.1,
+  "min_headline_size": 0.066,
+  "line_height": 1.02,
+  "max_lines": 2,
+  "align": "center",
+  "caption_top": 0.1,
+  "emphasis": {
+   "style": "font",
+   "font": "display-italic",
+   "scale": 1.04,
+   "color": "$primary"
+  },
+  "overline_style": {
+   "font": "sans-medium",
+   "size": 0.032,
+   "color": "$primary",
+   "tracking": 0.16,
+   "case": "upper",
+   "gap": 0.03
+  },
+  "device": {
+   "style": "phone",
+   "width": 0.78,
+   "border_color": "$primary_shade",
+   "gap": 0.1,
+   "shadow": true
+  },
+  "shapes": [
+   {
+    "type": "wave",
+    "y": 0.235,
+    "amp": 0.035,
+    "period": 1.7,
+    "width": 0.065,
+    "color": "$primary",
+    "opacity": 1.0
+   },
+   {
+    "type": "wave",
+    "y": 0.262,
+    "amp": 0.035,
+    "period": 1.7,
+    "phase": 0.5,
+    "width": 0.02,
+    "color": "$secondary",
+    "opacity": 1.0
+   }
+  ],
+  "poster_size": 0.19
+ },
+ "rotation": [
+  {},
+  {
+   "background": {
+    "color": "$primary_tint",
+    "grain": 0.03
+   }
+  }
+ ],
+ "poster_defaults": {
+  "background": {
+   "color": "$primary",
+   "grain": 0.03
+  },
+  "text_color": "$paper",
+  "emphasis": {
+   "color": "$secondary"
+  }
+ }
+}

@@ -1,0 +1,101 @@
+{
+ "label": "Cinematic dark",
+ "summary": "The ground is sampled from the app's own hero content - blurred, darkened, grained - so every shot takes its colour from the screen. Light type with a serif italic accent, a big straight phone. Feels like a title sequence.",
+ "references": [
+  "Angel",
+  "Suno",
+  "Claude",
+  "Spotify",
+  "Prequel",
+  "Oura"
+ ],
+ "fits": [
+  "entertainment",
+  "music",
+  "photo-video",
+  "books",
+  "games",
+  "health-fitness"
+ ],
+ "personality": [
+  "immersive",
+  "moody",
+  "premium",
+  "content-first"
+ ],
+ "avoid": "Apps with plain white UIs and no imagery - there's nothing to sample.",
+ "style": {
+  "background": {
+   "sample": true,
+   "box": [
+    0,
+    0.08,
+    1,
+    0.55
+   ],
+   "darken": [
+    0.58,
+    0.84
+   ],
+   "tint": "$dark",
+   "grain": 0.045,
+   "light": {
+    "color": "$primary",
+    "x": 0.88,
+    "y": 0.06,
+    "r": 0.8,
+    "opacity": 0.16
+   }
+  },
+  "text_color": "#F6F3EE",
+  "sub_color": "#BDB7AE",
+  "font": "sans-medium",
+  "tracking": -0.024,
+  "headline_size": 0.104,
+  "min_headline_size": 0.066,
+  "line_height": 1.02,
+  "max_lines": 2,
+  "align": "center",
+  "caption_top": 0.105,
+  "emphasis": {
+   "style": "font",
+   "font": "elegant-italic",
+   "scale": 1.14,
+   "color": "$primary_light"
+  },
+  "overline_style": {
+   "font": "sans-medium",
+   "size": 0.032,
+   "color": "$primary_light",
+   "tracking": 0.2,
+   "case": "upper",
+   "gap": 0.034
+  },
+  "device": {
+   "style": "phone",
+   "width": 0.8,
+   "border_color": "#050506",
+   "gap": 0.08,
+   "shadow": true
+  },
+  "card": {
+   "radius": 0.05,
+   "shadow": true,
+   "width": 0.88
+  },
+  "poster_size": 0.22
+ },
+ "poster_defaults": {
+  "background": {
+   "color": "$dark",
+   "grain": 0.045,
+   "light": {
+    "color": "$primary",
+    "x": 0.5,
+    "y": 0.45,
+    "r": 0.9,
+    "opacity": 0.22
+   }
+  }
+ }
+}

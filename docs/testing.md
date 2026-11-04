@@ -38,6 +38,9 @@ Tick each expected behaviour. The prompts match `evals/evals.json`.
       re-asked.
 
 **D. Render** (attach 4–6 raw screens)
+- [ ] The brief has an `Angle:` line chosen from three candidates; the category playbook is used.
+- [ ] Before the full set, `concepts.py` runs and the reply shows the concept sheet (three directions) and
+      asks which one - unless you said "just deliver".
 - [ ] `prepare_screens.py` runs and its report is summarised (resolution, status bars).
 - [ ] Renders at 1206×2622 and 1080×1920; `check_set.py` runs; the reply shows the overview and search preview
       images, not just file paths.

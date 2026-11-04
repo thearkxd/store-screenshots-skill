@@ -1,0 +1,92 @@
+{
+ "label": "Editorial",
+ "summary": "Paper ground with grain, a large serif headline with one italic word, a small-caps overline naming the feature, a straight phone. Reads like a magazine page: calm, confident, grown-up.",
+ "references": [
+  "The Economist",
+  "The New York Times",
+  "Kindle",
+  "Substack",
+  "Ground News",
+  "Tinder",
+  "Vinted"
+ ],
+ "fits": [
+  "news",
+  "magazines-newspapers",
+  "books",
+  "reference",
+  "finance",
+  "productivity",
+  "lifestyle",
+  "entertainment"
+ ],
+ "personality": [
+  "considered",
+  "curated",
+  "trustworthy",
+  "taste-driven"
+ ],
+ "avoid": "Kids, casual games, loud offers - it whispers.",
+ "style": {
+  "background": {
+   "color": "$paper",
+   "grain": 0.035
+  },
+  "text_color": "$ink",
+  "sub_color": "$ink_soft",
+  "font": "elegant",
+  "sub_font": "text",
+  "tracking": -0.01,
+  "headline_size": 0.136,
+  "min_headline_size": 0.085,
+  "line_height": 0.94,
+  "max_lines": 2,
+  "align": "left",
+  "text_x": 0.08,
+  "text_width": 0.84,
+  "caption_top": 0.1,
+  "emphasis": {
+   "style": "font",
+   "font": "elegant-italic",
+   "scale": 1.0,
+   "color": "$primary"
+  },
+  "overline_style": {
+   "font": "sans-medium",
+   "size": 0.032,
+   "color": "$primary",
+   "tracking": 0.16,
+   "case": "upper",
+   "gap": 0.032
+  },
+  "device": {
+   "style": "phone",
+   "width": 0.8,
+   "border_color": "$ink",
+   "gap": 0.075,
+   "shadow": true
+  },
+  "poster_size": 0.2,
+  "poster_line_height": 0.95
+ },
+ "rotation": [
+  {},
+  {
+   "background": {
+    "color": "$paper_shade",
+    "grain": 0.035
+   }
+  }
+ ],
+ "poster_defaults": {
+  "background": {
+   "color": "$ink",
+   "grain": 0.03
+  },
+  "text_color": "$paper",
+  "sub_color": "$paper_shade",
+  "emphasis": {
+   "color": "$primary_light"
+  }
+ }
+}

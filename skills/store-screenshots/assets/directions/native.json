@@ -1,0 +1,76 @@
+{
+ "label": "Clean native",
+ "summary": "Near-white ground, a neutral sans headline with one word in the brand colour, the biggest possible UI. Lets a polished interface speak - the default for tools and AI apps.",
+ "references": [
+  "ChatGPT",
+  "Google Gemini",
+  "Waze",
+  "Flo",
+  "Structured",
+  "Pixelcut"
+ ],
+ "fits": [
+  "productivity",
+  "utilities",
+  "business",
+  "developer-tools",
+  "health-fitness",
+  "medical",
+  "education",
+  "navigation"
+ ],
+ "personality": [
+  "clear",
+  "competent",
+  "modern",
+  "quiet"
+ ],
+ "avoid": "Apps whose UI is plain or busy - it hides nothing.",
+ "style": {
+  "background": {
+   "gradient": [
+    "#F7F7F9",
+    "$primary_tint"
+   ]
+  },
+  "text_color": "$ink",
+  "sub_color": "$ink_soft",
+  "font": "sans",
+  "tracking": -0.024,
+  "headline_size": 0.094,
+  "min_headline_size": 0.064,
+  "line_height": 1.04,
+  "max_lines": 2,
+  "align": "center",
+  "caption_top": 0.105,
+  "emphasis": {
+   "style": "color",
+   "color": "$primary"
+  },
+  "overline_style": {
+   "font": "sans-medium",
+   "size": 0.034,
+   "color": "$primary",
+   "tracking": 0.02,
+   "case": "none",
+   "gap": 0.026
+  },
+  "device": {
+   "style": "phone",
+   "width": 0.84,
+   "border_color": "#111114",
+   "gap": 0.07,
+   "shadow": true
+  },
+  "poster_size": 0.19
+ },
+ "poster_defaults": {
+  "background": {
+   "color": "$primary"
+  },
+  "text_color": "#FFFFFF",
+  "emphasis": {
+   "color": "$ink"
+  }
+ }
+}

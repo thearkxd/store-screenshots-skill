@@ -1,77 +1,147 @@
 {
-  "_doc": "Example spec for render_set.py. Paths are relative to this file; keys starting with _ are ignored. Headline emphasis: wrap words in *asterisks*; \\n forces a line break. Layouts: device (default), zoom, full, poster. Sizes: render_set.py --presets. The screens are a fictional app built by tools/demo_screens/build.py; example-screens/regions.json lists exact element boxes for crops.",
-  "app": "Dizilog (fictional example)",
-  "lang": "tr",
-  "sizes": ["ios", "android"],
-
-  "style": {
-    "_doc_background": "{\"color\": \"#hex\"} | {\"gradient\": [\"#top\", \"#bottom\"]} | {\"image\": \"photo.jpg\", \"overlay\": \"#00000066\"}",
-    "background": {"color": "#F3EEE6"},
-    "text_color": "#141414",
-    "sub_color": "#5E5A55",
-    "_doc_font": "alias (sans, sans-bold, sans-medium, serif, serif-italic, text…) or a path to the brand .ttf/.otf",
-    "font": "sans",
-    "sub_font": "text",
-    "tracking": -0.018,
-    "align": "center",
-    "case": "none",
-    "headline_size": 0.1,
-    "min_headline_size": 0.062,
-    "max_lines": 2,
-    "line_height": 1.04,
-    "text_width": 0.86,
-    "caption_top": 0.11,
-    "sub_scale": 0.4,
-    "_doc_emphasis": "style: color (color) | box (color, text_color) | marker (color) | font (font, weight, scale, color)",
-    "emphasis": {"style": "font", "font": "serif-italic", "weight": 500, "scale": 1.1, "color": "#E8462B"},
-    "_doc_device": "style phone|none; width = fraction of canvas width; radius/border = fraction of device width; bleed lets it run off the edge",
-    "device": {"style": "phone", "width": 0.8, "radius": 0.15, "border": 0.022, "border_color": "#0E0E10", "island": true, "shadow": true, "gap": 0.08, "bleed": true},
-    "card": {"radius": 0.05, "shadow": true, "width": 0.88}
+ "_doc": "Example spec for render_set.py. Paths are relative to this file; keys starting with _ are ignored. Headline emphasis: wrap words in *asterisks*; \\n forces a line break. Layouts: device (default), zoom, full, poster. Sizes: render_set.py --presets. The screens are a fictional app built by tools/demo_screens/build.py; example-screens/regions.json lists exact element boxes for crops.",
+ "app": "Dizilog (fictional example)",
+ "lang": "tr",
+ "sizes": [
+  "ios",
+  "android"
+ ],
+ "category": "entertainment",
+ "_doc_direction": "Optional: \"direction\": \"editorial\" | \"poster\" | \"playful\" | \"cinematic\" | \"crafted\" | \"native\" | \"utility\" (concepts.py --list). The direction becomes the base look and \"style\" overrides it, so with a direction keep only the style keys you want to change. See references/directions.md.",
+ "brand": {
+  "primary": "#E8462B",
+  "secondary": "#FFB547",
+  "ink": "#141414",
+  "paper": "#F3EEE6",
+  "dark": "#12100F"
+ },
+ "_doc_brand": "Colour tokens for directions ($primary, $ink, $paper…). Or \"brand_from\": [\"icon.png\", \"screens/01.png\"] to guess them.",
+ "style": {
+  "_doc_background": "{\"color\": \"#hex\"} | {\"gradient\": [\"#top\", \"#bottom\"]} | {\"image\": \"photo.jpg\", \"overlay\": \"#00000066\"}",
+  "background": {
+   "color": "#F3EEE6"
   },
-
-  "shots": [
+  "text_color": "#141414",
+  "sub_color": "#5E5A55",
+  "_doc_font": "alias (sans, sans-bold, sans-medium, serif, serif-italic, text…) or a path to the brand .ttf/.otf",
+  "font": "sans",
+  "sub_font": "text",
+  "tracking": -0.018,
+  "align": "center",
+  "case": "none",
+  "headline_size": 0.1,
+  "min_headline_size": 0.062,
+  "max_lines": 2,
+  "line_height": 1.04,
+  "text_width": 0.86,
+  "caption_top": 0.11,
+  "sub_scale": 0.4,
+  "_doc_emphasis": "style: color (color) | box (color, text_color) | marker (color) | font (font, weight, scale, color)",
+  "emphasis": {
+   "style": "font",
+   "font": "serif-italic",
+   "weight": 500,
+   "scale": 1.1,
+   "color": "#E8462B"
+  },
+  "_doc_device": "style phone|none; width = fraction of canvas width; radius/border = fraction of device width; bleed lets it run off the edge",
+  "device": {
+   "style": "phone",
+   "width": 0.8,
+   "radius": 0.15,
+   "border": 0.022,
+   "border_color": "#0E0E10",
+   "island": true,
+   "shadow": true,
+   "gap": 0.08,
+   "bleed": true
+  },
+  "card": {
+   "radius": 0.05,
+   "shadow": true,
+   "width": 0.88
+  }
+ },
+ "shots": [
+  {
+   "_role": "promise",
+   "headline": "Kaldığın bölüm\n*hep hazır*",
+   "screen": "example-screens/01-home.jpg"
+  },
+  {
+   "_role": "differentiator - the key card pulled out of the screen",
+   "headline": "Yeni bölüm çıkınca\n*ilk sen* bil",
+   "screen": "example-screens/02-calendar.jpg",
+   "callouts": [
     {
-      "_role": "promise",
-      "headline": "Kaldığın bölüm\n*hep hazır*",
-      "screen": "example-screens/01-home.jpg"
-    },
-    {
-      "_role": "differentiator - the key card pulled out of the screen",
-      "headline": "Yeni bölüm çıkınca\n*ilk sen* bil",
-      "screen": "example-screens/02-calendar.jpg",
-      "callouts": [{"crop": [0.036, 0.267, 0.964, 0.427], "scale": 1.14}]
-    },
-    {
-      "_role": "proof - a zoomed card on the brand's dark colour",
-      "headline": "Bu yıl *312 saat*\ndizi izledin",
-      "sub": "Ay ay izleme süren, türlerin ve favorilerin",
-      "screen": "example-screens/03-stats.jpg",
-      "layout": "zoom",
-      "crops": [[0.03, 0.15, 0.97, 0.51], [0.03, 0.51, 0.97, 0.652], [0.03, 0.75, 0.97, 0.873]],
-      "card_gap": 0.035,
-      "background": {"color": "#141414"},
-      "text_color": "#F3EEE6",
-      "sub_color": "#A9A39B",
-      "emphasis": {"color": "#FF6A4D"}
-    },
-    {
-      "_role": "social",
-      "headline": "Arkadaşların\n*ne izliyor?*",
-      "screen": "example-screens/04-friends.jpg"
-    },
-    {
-      "_role": "control",
-      "headline": "Bölüm bölüm\n*işaretle*",
-      "screen": "example-screens/05-detail.jpg"
-    },
-    {
-      "_role": "poster - one per set at most",
-      "headline": "*Spoiler* yok.\nSöz.",
-      "layout": "poster",
-      "poster_size": 0.22,
-      "background": {"color": "#E8462B"},
-      "text_color": "#F3EEE6",
-      "emphasis": {"color": "#141414"}
+     "crop": [
+      0.036,
+      0.267,
+      0.964,
+      0.427
+     ],
+     "scale": 1.14
     }
-  ]
+   ]
+  },
+  {
+   "_role": "proof - a zoomed card on the brand's dark colour",
+   "headline": "Bu yıl *312 saat*\ndizi izledin",
+   "sub": "Ay ay izleme süren, türlerin ve favorilerin",
+   "screen": "example-screens/03-stats.jpg",
+   "layout": "zoom",
+   "crops": [
+    [
+     0.03,
+     0.15,
+     0.97,
+     0.51
+    ],
+    [
+     0.03,
+     0.51,
+     0.97,
+     0.652
+    ],
+    [
+     0.03,
+     0.75,
+     0.97,
+     0.873
+    ]
+   ],
+   "card_gap": 0.035,
+   "background": {
+    "color": "#141414"
+   },
+   "text_color": "#F3EEE6",
+   "sub_color": "#A9A39B",
+   "emphasis": {
+    "color": "#FF6A4D"
+   }
+  },
+  {
+   "_role": "social",
+   "headline": "Arkadaşların\n*ne izliyor?*",
+   "screen": "example-screens/04-friends.jpg"
+  },
+  {
+   "_role": "control",
+   "headline": "Bölüm bölüm\n*işaretle*",
+   "screen": "example-screens/05-detail.jpg"
+  },
+  {
+   "_role": "poster - one per set at most",
+   "headline": "*Spoiler* yok.\nSöz.",
+   "layout": "poster",
+   "poster_size": 0.22,
+   "background": {
+    "color": "#E8462B"
+   },
+   "text_color": "#F3EEE6",
+   "emphasis": {
+    "color": "#141414"
+   }
+  }
+ ]
 }

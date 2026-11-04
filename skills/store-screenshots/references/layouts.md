@@ -12,7 +12,8 @@
 
 ## 1. One visual system per set
 
-Decide these once and keep them for every shot:
+A `"direction"` preset (`directions.md`) decides all of these at once from the brand colours; use this
+section to judge or adjust it. Decide these once and keep them for every shot:
 - **Background rule:** one brand colour for all shots, *or* a fixed rotation of 2–4 brand colours
   (Storytel, Cash App, Duolingo). Not a new gradient per shot.
 - **Type:** one family, two weights at most. Same size and position for every headline.
@@ -51,7 +52,7 @@ Rules of thumb:
 
 - Use the **brand's font** if it has one (`"font": "fonts/Brand-Bold.ttf"`). Otherwise use the bundled,
   OFL-licensed defaults (`assets/fonts/FONTS.md`): `sans` (Inter Display SemiBold) for headlines, `text`
-  (Inter) for sub-lines, `serif` / `serif-italic` (Lora) for an editorial emphasis word. Never fall back to a
+  (Inter) for sub-lines, `serif` / `serif-italic` (Store Serif, a Lora subset) or `elegant-italic` (Instrument Serif) for an editorial emphasis word; a `"direction"` picks a full pairing for you (`directions.md`). Never fall back to a
   system default like DejaVu or Arial for headlines - it's the fastest way to look unfinished.
 - A serif can make a set feel editorial and human (Kindle, NYT, Tinder, Vinted, Suno - serif appears in
   7 exemplary apps vs 1 weak). A sans headline with one **serif-italic emphasis word** is a strong default.

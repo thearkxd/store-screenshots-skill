@@ -1,0 +1,112 @@
+{
+ "label": "Playful",
+ "summary": "Rounded type, a pastel ground per shot, a flat phone with a thick outline and an offset shadow, sticker labels with a slight tilt. Friendly and social without looking like a template.",
+ "references": [
+  "Tunesimo",
+  "Reddit",
+  "Duolingo",
+  "Widgetable",
+  "Trendyol Go",
+  "Elfster"
+ ],
+ "fits": [
+  "social-networking",
+  "games",
+  "education",
+  "lifestyle",
+  "music",
+  "photo-video",
+  "entertainment"
+ ],
+ "personality": [
+  "friendly",
+  "young",
+  "social",
+  "fun"
+ ],
+ "avoid": "Finance, health and anything where trust beats charm.",
+ "style": {
+  "background": {
+   "color": "$primary_tint"
+  },
+  "text_color": "$ink",
+  "sub_color": "$ink_soft",
+  "font": "rounded",
+  "tracking": -0.01,
+  "headline_size": 0.104,
+  "min_headline_size": 0.068,
+  "line_height": 1.12,
+  "max_lines": 2,
+  "align": "center",
+  "caption_top": 0.1,
+  "emphasis": {
+   "style": "box",
+   "color": "$primary",
+   "text_color": "$paper"
+  },
+  "overline_style": {
+   "font": "rounded",
+   "size": 0.032,
+   "color": "$paper",
+   "tracking": 0.04,
+   "case": "none",
+   "gap": 0.04,
+   "pill": "$ink"
+  },
+  "device": {
+   "style": "flat",
+   "width": 0.78,
+   "border": 0.03,
+   "border_color": "$ink",
+   "flat_radius": 0.14,
+   "offset_shadow": 0.035,
+   "offset_color": "$ink",
+   "gap": 0.08
+  },
+  "stickers_style": {
+   "font": "rounded",
+   "size": 0.044,
+   "bg": "$secondary",
+   "color": "$ink",
+   "rotate": -6
+  },
+  "shapes": [
+   {
+    "type": "dots",
+    "color": "$primary",
+    "opacity": 0.14,
+    "step": 0.055,
+    "r": 0.0045
+   }
+  ],
+  "poster_size": 0.2
+ },
+ "rotation": [
+  {},
+  {
+   "background": {
+    "color": "$secondary_tint"
+   },
+   "emphasis": {
+    "color": "$ink"
+   }
+  },
+  {
+   "background": {
+    "color": "$paper"
+   }
+  }
+ ],
+ "poster_defaults": {
+  "background": {
+   "color": "$primary"
+  },
+  "text_color": "$paper",
+  "emphasis": {
+   "style": "box",
+   "color": "$secondary",
+   "text_color": "$ink"
+  },
+  "shapes": []
+ }
+}

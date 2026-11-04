@@ -1,0 +1,25 @@
+{
+ "label": "Bold poster",
+ "summary": "Brand colour floods the canvas, huge condensed caps set flush left, the phone runs big and off the edge, colours rotate through the set. Loud, fast, unmistakable at thumbnail size.",
+ "references": ["DoorDash", "Cash App", "Kalshi", "GetYourGuide", "Uber", "Five Guys", "CAVA"],
+ "fits": ["food-drink", "finance", "shopping", "travel", "sports", "entertainment", "navigation", "health-fitness"],
+ "personality": ["bold", "energetic", "direct", "consumer"],
+ "avoid": "Calm/clinical products (medical, meditation) and long headlines - condensed caps need 2-5 words.",
+ "style": {
+  "background": {"color": "$primary"},
+  "text_color": "$on_primary", "sub_color": "$on_primary",
+  "font": "condensed", "case": "upper", "tracking": 0.0,
+  "headline_size": 0.17, "min_headline_size": 0.1, "line_height": 0.92, "max_lines": 3,
+  "align": "left", "text_x": 0.07, "text_width": 0.86, "caption_top": 0.09,
+  "emphasis": {"style": "color", "color": "$secondary"},
+  "overline_style": {"font": "sans-bold", "size": 0.03, "color": null, "tracking": 0.14, "case": "upper", "gap": 0.02},
+  "device": {"style": "phone", "width": 0.9, "x": 0.6, "border_color": "$ink", "gap": 0.06, "shadow": true},
+  "poster_size": 0.3, "poster_line_height": 0.9, "poster_text_width": 0.86
+ },
+ "rotation": [
+  {},
+  {"background": {"color": "$ink"}, "text_color": "$paper", "sub_color": "$paper", "emphasis": {"color": "$primary_light"}, "device": {"x": 0.4, "border_color": "#000000"}},
+  {"background": {"color": "$paper"}, "text_color": "$ink", "sub_color": "$ink", "emphasis": {"color": "$primary"}, "device": {"x": 0.6}}
+ ],
+ "poster_defaults": {"background": {"color": "$secondary"}, "text_color": "$ink", "emphasis": {"color": "$paper"}}
+}
