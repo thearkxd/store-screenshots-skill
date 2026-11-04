@@ -32,7 +32,7 @@ section to judge or adjust it. Decide these once and keep them for every shot:
 | **Pulled-out callout** | `device` + `callouts` (`crop`, `scale`, optional `dx`/`dy`) | Device plus one UI element lifted out, larger, with a soft shadow, centred on its own position | Make the key element readable at thumbnail size | Indeed, Moovit ("Your bus is arriving NOW"), Gmail (Undo) |
 | **Photo-led** | `device` + `background.image` | Real photo of the moment of use behind the device | Lifestyle, mobility, food, dating | Lyft, Tinder, Pinterest |
 | **Poster** | `poster` | Giant type, no device | Max one per set, as a rhythm breaker | Uber "GO ANY-WHERE", Temu |
-| **Panorama** | (design by hand) | One image continues across shots | Only if shot 1 still works alone | Bubilet, Garanti BBVA |
+| **Span pair** | `"span": 2` (§2b) | One picture over two slots, drawn on one double-width canvas and cut down the middle: a phone across the seam, or a shared ground behind two shots | Once per set (twice only in 8+), when width adds meaning | Bubilet, Garanti BBVA; MARTI shows the failure (panorama, then plain white) |
 
 Rules of thumb:
 - The **UI must stay big**: in exemplary sets the device usually spans 70–85 % of the canvas width.
@@ -47,6 +47,31 @@ Rules of thumb:
   writes `example-screens/regions.json`). End a crop between rows, never through one.
 - Alternate caption position top/bottom only to make room for a photo or a tall element (Chick-fil-A,
   TaraGör), not for variety's sake.
+
+## 2b. Span pairs (one picture across two slots)
+
+The renderer draws a span on **one** canvas two slots wide and cuts it in half, so the two PNGs always line
+up. Two kinds (spec details in `directions.md` §8):
+- **Bridge** - one phone sits across the seam, centred on it to the pixel: half the phone in one
+  screenshot, the other half in the next. Each half has its own caption at the top.
+- **Pair** - one ground (colour, gradient, sampled screen, photo, a motif line) runs behind two ordinary
+  shots; each half has its own screen and caption.
+
+Rules (the renderer warns on each):
+- **Nothing readable crosses the seam.** The stores put a gap between screenshots: text, stickers, callouts,
+  hand marks and the UI that proves the headline stay on one side. The phone's body, a motif or a photo may
+  cross.
+- **The seam runs down the phone's middle**, so choose a screen whose proof sits in its left or right half
+  (or lift it out as a callout on one side), not dead centre. `"device": {"x": …}` (0..2, 1 = the seam)
+  moves the phone off centre only if a design really needs it.
+- **Each half works alone** - while swiping and in Google Play's promo formats people see one at a time, so
+  each half gets a headline (the right one can continue the left, but must make sense by itself).
+- **Where:** shots 1-2 or 2-3 show complete in search results; a span on 3-4 is cut there. With an app
+  preview video the video takes slot 1 in search, so prefer 1-2 only when there's no video.
+- **How often:** one per set; two only in sets of 8 or more. Each span counts as two of the 10 (iOS) /
+  8 (Play) screenshots.
+- **When it earns its place:** a before/after, a journey or flow, a wide content wall (posters, photos, a
+  map), or the main promise with a big phone. Not for variety.
 
 ## 3. Typography
 
@@ -93,7 +118,7 @@ Pick one per set. Spec syntax: wrap the word(s) in `*asterisks*` inside `headlin
 
 ## 6. When the renderer isn't enough: the HTML route
 
-For hand-drawn annotations, custom shapes, panoramas or brand motifs, build the shot as an HTML page at the
+For effects the renderer doesn't have (3D/perspective devices, complex illustration), build the shot as an HTML page at the
 exact pixel size and screenshot it with a headless browser (Playwright or Chrome) if the environment has one:
 
 ```html

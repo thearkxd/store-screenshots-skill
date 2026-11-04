@@ -53,6 +53,11 @@ the widget, a sentence that completes the set).
 Mix at most two structures. The series system plus one poster shot (Uber's "GO ANY-WHERE") is a strong
 default for most apps.
 
+**A span pair** (one picture over two slots, `layouts.md` §2b) can carry the moment where width means
+something: a before/after, two steps of one flow, a content wall, the promise on a big phone. Use one per
+set at most (two only in 8+), at 1-2 or 2-3, and give each half its own headline. Mark it in the storyboard
+as one row covering two shot numbers (e.g. "02-03 · span · bridge").
+
 ## 4. Choosing which screens to show
 
 - Start from the proof points, then find the screen that proves each one. If no screen proves it, either

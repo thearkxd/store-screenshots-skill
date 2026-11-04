@@ -13,6 +13,7 @@ direction. The brand's colours flow in through tokens, so every direction is sti
 5. Brand tokens
 6. Overriding and extending
 7. Extra spec features (overline, stickers, annotations, shapes, device)
+8. Span pairs (one picture across two slots)
 
 ---
 
@@ -146,3 +147,44 @@ weak-set signal (`anti-ai.md`); if you use it, ±3° on a single shot at most.
 `{"sample": true, "box": [x0, y0, x1, y1], "blur", "darken": [top, bottom], "tint"}` (blurs a part of the
 shot's own screen into the ground). Add `"grain": 0.03` for paper/film texture and
 `"light": {"color", "x", "y", "r", "opacity"}` for one soft glow.
+
+**Motifs that clear the caption** - `"clear_caption": 0.012` on a `wave` or `line` keeps its top below the
+lowest caption in the whole set (the same shift on every shot, so it still lines up from shot to shot). The
+crafted direction's ribbon uses it.
+
+## 8. Span pairs
+
+One spec entry, two slots. Rules and when to use one: `layouts.md` §2b. Inside a span every x runs **0..2**
+(1 = the seam): `device.x`, sticker and annotation positions, shape x, `line` points (in set space, like every
+line). y and sizes are as in one shot. The halves are ordinary shots: any caption keys, `screen`, `layout`
+(device, zoom, full, poster), `callouts`, `stickers`, `annotations` - with half-local coordinates.
+
+**Bridge** - one phone across the seam (top-level `screen`):
+```json
+{"span": 2, "screen": "screens/02-calendar.png",
+ "headline": "Know the moment\n*it drops*",
+ "halves": [{"overline": "Calendar"}, {"headline": "The calendar\n*fills itself*"}],
+ "annotations": [{"type": "circle", "screen_box": [0.74, 0.33, 0.92, 0.36]}]}
+```
+The phone is centred on the seam by default (`device.x` 1.0, an even width so both halves get the same
+pixels). Top-level `headline`/`sub`/`overline` belong to the left half. `callouts` and `annotations` with
+`screen_box` follow the shared phone. Captions sit at the top in both halves (no posters or zooms beside a
+bridge phone); the phone starts below the taller caption.
+
+**Pair** - a shared ground behind two shots (no top-level `screen`):
+```json
+{"span": 2, "background": {"gradient": ["$paper", "$primary_tint"], "grain": 0.03},
+ "shapes": [{"type": "line", "points": [[5.05, 0.9], [5.6, 0.84], [6.3, 0.9], [6.95, 0.86]], "color": "$primary"}],
+ "halves": [{"headline": "Check off\n*every episode*", "screen": "screens/05-detail.png"},
+            {"headline": "*No* spoilers.\nPromise.", "layout": "poster"}]}
+```
+A sampled ground (`cinematic`) samples the bridge screen, or the first half's screen.
+
+Output: the span writes two consecutive files (`02.png`, `03.png`); `_render.json` marks both with
+`"span": "02-03"`, and `concepts.py` shows both halves with the store gap. A direction treats a span as one
+entry: one ground colour from the rotation, the next entry changes colour.
+
+Errors (render stops): `"span"` other than 2, `"halves"` without a span or with more than two entries, a
+shared `screen` plus a half's own `screen`, crops or callouts on a pair span (put them in the half), bottom
+captions/posters/zooms beside a bridge phone. Warnings: the phone doesn't cross the seam (an explicit `device.x` too far off 1.0), a sticker/callout/annotation crosses the seam, a half without a headline, a span on 3-4, more
+than one span (two in sets under 8), too many screenshots.

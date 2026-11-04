@@ -141,6 +141,7 @@ def apply_direction(spec):
             if s.get("layout") == "poster":
                 base = deep_merge(base, d.get("poster_defaults", {}))
             elif rot:
+                # by spec entry, not slot: a span reads as one picture, so the next entry must change colour
                 base = deep_merge(base, rot[i % len(rot)])
             if i == n - 1 and d.get("last_defaults"):
                 base = deep_merge(base, d["last_defaults"])
@@ -148,15 +149,34 @@ def apply_direction(spec):
                 base["sub_color"] = base["text_color"]  # a new ground for the headline is a new ground for the sub
             # the spec's own "style" beats the direction's per-shot defaults for the keys it sets
             base = deep_merge(base, {k: user_style[k] for k in base if k in user_style})
+            if s.get("span", 1) != 1 and isinstance(base.get("device"), dict):
+                # a direction's device "x" is a position within one slot; a span's x runs 0..2 and is the spec's own
+                base["device"] = {k: v for k, v in base["device"].items() if k != "x"}
             # shot keys win; a shot "style" dict also wins
             merged = deep_merge(base, {k: v for k, v in s.items()})
             shots[i] = merged
     style = resolve_tokens(style, tok)
     shots = [resolve_tokens(s, tok) for s in shots]
-    for i, s in enumerate(shots):
-        s["_index"] = i
-        s["_count"] = len(shots)
+    # _index is the slot (store position): a span occupies two
+    slots = slot_positions(shots)
+    total = slots[-1] + span_of(shots[-1]) if shots else 0
+    for s, slot in zip(shots, slots):
+        s["_index"] = slot
+        s["_count"] = total
     return style, shots, tok
+
+
+def span_of(shot):
+    v = shot.get("span", 1)
+    return v if isinstance(v, int) and not isinstance(v, bool) and v > 0 else 1
+
+
+def slot_positions(shots):
+    out, slot = [], 0
+    for s in shots:
+        out.append(slot)
+        slot += span_of(s)
+    return out
 
 
 # ------------------------------------------------------------------ backgrounds
@@ -199,8 +219,11 @@ def add_grain(img, amount, seed=7):
     if not amount:
         return img
     W, H = img.size
-    noise = Image.effect_noise((W // 2, H // 2), 64).resize((W, H), Image.NEAREST)
-    noise = noise.point(lambda v: 128 + (v - 128))
+    w, h = max(1, W // 2), max(1, H // 2)
+    # seeded, so the same spec renders the same pixels every time (effect_noise is random per call)
+    rnd = random.Random(seed)
+    data = rnd.randbytes(w * h) if hasattr(rnd, "randbytes") else rnd.getrandbits(8 * w * h).to_bytes(w * h, "little")
+    noise = Image.frombytes("L", (w, h), data).resize((W, H), Image.NEAREST)
     grey = Image.merge("RGB", (noise, noise, noise))
     return Image.blend(img, Image.composite(grey, img, Image.new("L", (W, H), 255)), amount)
 
@@ -212,14 +235,20 @@ def _rgba(c, a=1.0):
     return (r, g, b, int(255 * a))
 
 
-def draw_shapes(img, shapes, index, W, H):
-    """Shapes behind the device. Coordinates are fractions of the canvas; "line" points use set space
-    (x = shot index + fraction), so a motif can run continuously across the whole set."""
+def draw_shapes(img, shapes, index, W, H, floor=None):
+    """Shapes behind the device. W is one slot's width: coordinates are fractions of a slot, so on a span
+    (a canvas two slots wide) x runs 0..2. "line" points and "wave" use set space (x = slot index +
+    fraction), so a motif can run continuously across the whole set."""
     if not shapes:
         return img
-    layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    CW = img.width                     # canvas width: W, or 2W for a span
+    units = CW / W
+    layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
+    shift = max([caption_shift(sh, floor, W, H) for sh in shapes] + [0])  # one shift for the whole motif
     for sh in shapes:
+        if shift and sh.get("clear_caption") is not None:
+            sh = shifted(sh, shift)
         t = sh.get("type")
         col = _rgba(sh.get("color", "#FFFFFF"), sh.get("opacity", 1.0))
         if t == "circle":
@@ -235,13 +264,13 @@ def draw_shapes(img, shapes, index, W, H):
             d.rounded_rectangle([sh["x"] * W, sh["y"] * H, (sh["x"] + sh["w"]) * W, (sh["y"] + sh["h"]) * H],
                                 radius=int(sh.get("radius", 0) * W), fill=col)
         elif t == "band":
-            band = Image.new("RGBA", (W * 3, int(sh.get("h", 0.08) * H)), col)
+            band = Image.new("RGBA", (CW * 3, int(sh.get("h", 0.08) * H)), col)
             band = band.rotate(sh.get("angle", -12), expand=True, resample=Image.BICUBIC)
-            layer.alpha_composite(band, (int(W / 2 - band.width / 2), int(sh.get("y", 0.5) * H - band.height / 2)))
+            layer.alpha_composite(band, (int(CW / 2 - band.width / 2), int(sh.get("y", 0.5) * H - band.height / 2)))
         elif t == "grid":
             step = int(sh.get("step", 0.08) * W)
             wdt = max(1, int(sh.get("width", 0.0015) * W))
-            for x in range(step // 2, W, step):
+            for x in range(step // 2, CW, step):
                 d.line([(x, 0), (x, H)], fill=col, width=wdt)
             for y in range(step // 2, H, step):
                 d.line([(0, y), (W, y)], fill=col, width=wdt)
@@ -249,13 +278,14 @@ def draw_shapes(img, shapes, index, W, H):
             step = int(sh.get("step", 0.05) * W)
             r = max(1, int(sh.get("r", 0.004) * W))
             for y in range(step // 2, H, step):
-                for x in range(step // 2, W, step):
+                for x in range(step // 2, CW, step):
                     d.ellipse([x - r, y - r, x + r, y + r], fill=col)
         elif t == "wave":
             # continuous across the set: y(x) = y + amp * sin(2pi * (index + x) / period + phase)
             pts = []
-            for i in range(0, 61):
-                xs = i / 60
+            n_pts = int(60 * units)
+            for i in range(0, n_pts + 1):
+                xs = i / n_pts * units
                 xg = index + xs
                 yy = sh.get("y", 0.5) + sh.get("amp", 0.04) * math.sin(2 * math.pi * xg / sh.get("period", 1.4) + sh.get("phase", 0))
                 pts.append((xs * W, yy * H))
@@ -274,6 +304,29 @@ def draw_shapes(img, shapes, index, W, H):
     img = img.convert("RGBA")
     img.alpha_composite(layer)
     return img.convert("RGB")
+
+
+def caption_shift(sh, floor, W, H):
+    """"clear_caption": gap (fraction of H) - how far a wave/line must move down so its top stays below the
+    set's lowest caption. draw_shapes moves every marked shape by the largest of these, and the floor is the
+    same for the whole set, so a motif that runs across the set still lines up."""
+    gap = sh.get("clear_caption")
+    if gap is None or floor is None or sh.get("type") not in ("wave", "line"):
+        return 0
+    half_w = sh.get("width", 0.03 if sh.get("type") == "wave" else 0.02) * W / H / 2
+    if sh["type"] == "wave":
+        top = sh.get("y", 0.5) - sh.get("amp", 0.04) - half_w
+    else:
+        top = min(p[1] for p in sh["points"]) - half_w
+    return max(0.0, floor + gap - top)
+
+
+def shifted(sh, dy):
+    if sh.get("type") == "wave":
+        return dict(sh, y=sh.get("y", 0.5) + dy)
+    if sh.get("type") == "line":
+        return dict(sh, points=[[p[0], p[1] + dy] for p in sh["points"]])
+    return dict(sh, y=sh["y"] + dy) if "y" in sh else sh
 
 
 def smooth(points, steps=24):

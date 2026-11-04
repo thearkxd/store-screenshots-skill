@@ -479,10 +479,11 @@ class Caption:
 
 # ------------------------------------------------------------------ images
 
-def background(W, H, bg, spec_dir, screen=None):
+def background(W, H, bg, spec_dir, screen=None, unit=None):
+    """unit = one slot's width when the canvas is a span (2 slots wide): light x/r are in slot units."""
     img = _background(W, H, bg, spec_dir, screen)
     for light in ([bg["light"]] if isinstance(bg.get("light"), dict) else bg.get("light") or []):
-        img = design.add_light(img, light, W, H)
+        img = design.add_light(img, light, unit or W, H)
     return design.add_grain(img, bg.get("grain", 0))
 
 
@@ -560,8 +561,10 @@ def crop_frac(img, box):
 FRAMED = ("phone", "android", "flat")
 
 
-def device_geometry(screen, dv, W):
+def device_geometry(screen, dv, W, even=False):
     dw = int(W * dv["width"])
+    if even and dw % 2:
+        dw += 1  # a span's phone centred on the seam: equal halves to the pixel
     k = {"android": 0.8, "flat": dv.get("flat_border", 1.6)}.get(dv.get("style"), 1)
     border = int(dw * dv["border"] * k) if dv.get("style", "phone") in FRAMED else 0
     sw = dw - 2 * border
@@ -569,15 +572,15 @@ def device_geometry(screen, dv, W):
     return dw, border, sw, sh, sh + 2 * border
 
 
-def draw_device(canvas, screen, s, W, H, top, bottom_limit=None, cx=None):
+def draw_device(canvas, screen, s, W, H, top, bottom_limit=None, cx=None, even=False):
     dv = s["device"]
     style = dv.get("style", "phone")
-    dw, border, sw, sh, dh = device_geometry(screen, dv, W)
+    dw, border, sw, sh, dh = device_geometry(screen, dv, W, even)
     limit = bottom_limit if bottom_limit is not None else H - W * 0.06
     if not dv.get("bleed", True) and top + dh > limit:
         k = (limit - top) / dh
         dv = dict(dv, width=dv["width"] * k)
-        dw, border, sw, sh, dh = device_geometry(screen, dv, W)
+        dw, border, sw, sh, dh = device_geometry(screen, dv, W, even)
     scr = screen.resize((sw, sh), Image.LANCZOS)
     if cx is None:
         cx = W * dv.get("x", 0.5)
@@ -638,26 +641,77 @@ def layout_has_caption(shot):
     return shot.get("layout", "device") != "poster"
 
 
-def render_shot(shot, style, W, H, fonts, spec_dir, lang):
+STYLE_SHOT_KEYS = design.SHOT_KEYS + ("sub_color", "weight", "text_x", "text_width", "headline_size", "line_height",
+                                      "caption_top", "max_lines")
+MERGEABLE = ("emphasis", "device", "card", "overline_style", "stickers_style", "annotation_style")
+
+
+def shot_style(style, shot):
+    """The set's style with this shot's own look keys applied."""
     s = merge(style, shot.get("style"))
-    for k in design.SHOT_KEYS + ("sub_color", "weight", "text_x", "text_width", "headline_size", "line_height",
-                                 "caption_top", "max_lines"):
+    for k in STYLE_SHOT_KEYS:
         if k in shot and k != "shapes":
-            mergeable = k in ("emphasis", "device", "card", "overline_style", "stickers_style", "annotation_style") \
-                and isinstance(shot[k], dict) and isinstance(s.get(k), dict)
+            mergeable = k in MERGEABLE and isinstance(shot[k], dict) and isinstance(s.get(k), dict)
             s[k] = merge(s[k], shot[k]) if mergeable else shot[k]
-    layout = shot.get("layout", "device")
-    warnings = []
-    screen = load_screen(spec_dir, shot["screen"]) if shot.get("screen") else None
-    canvas = background(W, H, s["background"], spec_dir, screen)
-    canvas = design.draw_shapes(canvas, shot.get("shapes") or s.get("shapes"), shot.get("_index", 0), W, H)
-    cap = Caption(fonts, s, W, lang)
-    headline = shot.get("headline", "")
-    sub = shot.get("sub")
+    return s
+
+
+def overline_text(shot, s):
     overline = shot.get("overline") if s.get("show_overline", True) else None
     if s.get("overline_prefix") and layout_has_caption(shot):
         prefix = s["overline_prefix"].format(n=shot.get("_index", 0) + 1, total=shot.get("_count", 1))
         overline = prefix + overline if overline else prefix.rstrip(" —–-:·/")
+    return overline
+
+
+def caption_bottom(shot, s, W, fonts, lang):
+    """Where a top caption ends (px), measured without drawing; None for posters and bottom captions."""
+    if shot.get("layout", "device") == "poster" or shot.get("caption_position", "top") != "top":
+        return None
+    headline, sub, overline = shot.get("headline", ""), shot.get("sub"), overline_text(shot, s)
+    if not (headline or sub or overline):
+        return None
+    cap = Caption(fonts, s, W, lang)
+    block, _ = cap.block_height(headline, sub) if (headline or sub) else (0, 0)
+    return W * s["caption_top"] + block + cap.overline_height(overline)
+
+
+def caption_floor(shots, style, W, H, fonts, lang):
+    """The lowest top-caption bottom in the whole set, as a fraction of H. Motifs marked "clear_caption" stay
+    below it on every shot, so they never run into a tall caption and still line up from shot to shot."""
+    lows = []
+    for sh in shots:
+        s = shot_style(style, sh)
+        units = span_halves(sh) if sh.get("span") == 2 else [sh]
+        for u in units:
+            b = caption_bottom(u, shot_style(s, u) if u is not sh else s, W, fonts, lang)
+            if b is not None:
+                lows.append(b / H)
+    return max(lows) if lows else None
+
+
+def render_shot(shot, style, W, H, fonts, spec_dir, lang, base=None, info=None, caption_only=False):
+    """One slot. base: a ready-made ground (a span half) - no background or shapes are drawn then.
+    caption_only: a shot without a screen draws just its caption (span halves around a shared phone)."""
+    s = shot_style(style, shot)
+    layout = shot.get("layout", "device")
+    if layout not in ("device", "zoom", "full", "poster"):
+        raise ValueError(f"unknown layout {layout!r} (device, zoom, full, poster)")
+    info = info if info is not None else {}
+    warnings = []
+    screen = load_screen(spec_dir, shot["screen"]) if shot.get("screen") else None
+    if screen is None and layout != "poster" and not caption_only:
+        raise ValueError(f"layout {layout!r} needs a \"screen\" (or use \"layout\": \"poster\")")
+    if base is not None:
+        canvas = base.copy()
+    else:
+        canvas = background(W, H, s["background"], spec_dir, screen)
+        canvas = design.draw_shapes(canvas, shot.get("shapes") or s.get("shapes"), shot.get("_index", 0), W, H,
+                                    floor=s.get("_caption_floor"))
+    cap = Caption(fonts, s, W, lang)
+    headline = shot.get("headline", "")
+    sub = shot.get("sub")
+    overline = overline_text(shot, s)
     pos = shot.get("caption_position", "top")
 
     def finish(img, xf=None):
@@ -685,7 +739,7 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang):
             warnings.append(f"low sub-line contrast {contrast(hexrgb(s.get('sub_color') or s['text_color']), ref):.1f}:1 (aim ≥ 4.5)")
         return finish(canvas), warnings + pcap.warnings, size
 
-    if layout == "full":
+    if layout == "full" and screen is not None:
         k = max(W / screen.width, H / screen.height)
         scr = screen.resize((int(screen.width * k + 1), int(screen.height * k + 1)), Image.LANCZOS)
         canvas.paste(scr.crop(((scr.width - W) // 2, 0, (scr.width - W) // 2 + W, H)), (0, 0))
@@ -718,12 +772,15 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang):
     if sub:
         bottom = cap.draw_sub(canvas, sub, bottom + size * s["sub_gap"], size)
     warnings += cap.warnings
+    info.update(caption_top=top, caption_bottom=bottom if headline or sub or overline else None, caption_pos=pos)
     ref = bg_reference_color(s["background"], pos == "bottom")
     need = 3.0 if size >= 0.075 * W else 4.5  # WCAG: large display type needs 3:1
     if ref and contrast(hexrgb(s["text_color"]), ref) < need:
         warnings.append(f"low headline contrast {contrast(hexrgb(s['text_color']), ref):.1f}:1 (aim ≥ {need})")
     if ref and sub and contrast(hexrgb(s.get("sub_color") or s["text_color"]), ref) < 4.5:
         warnings.append(f"low sub-line contrast {contrast(hexrgb(s.get('sub_color') or s['text_color']), ref):.1f}:1 (aim ≥ 4.5)")
+    if screen is None:  # caption only (a span half next to a shared phone)
+        return finish(canvas), warnings, size
 
     if layout == "zoom":
         # one or more crops of the screen, stacked as cards ("crops": [[x0,y0,x1,y1], ...])
@@ -759,7 +816,14 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang):
             dev_top = max(dev_top, int(W * 0.06))
         limit = top - W * dv["gap"]
     canvas, xf = draw_device(canvas, screen, s, W, H, dev_top, limit)
+    canvas, _ = draw_callouts(canvas, screen, shot, s, W, H, xf)
+    return finish(canvas, xf), warnings, size
+
+
+def draw_callouts(canvas, screen, shot, s, W, H, xf):
+    """UI pieces lifted out of the screen, larger. Returns the canvas and each callout's pixel box."""
     sx, sy, k = xf[0], xf[1], xf[2]
+    boxes = []
     for co in shot.get("callouts", []):
         piece = crop_frac(screen, co["crop"])
         width_px = piece.width * k * co.get("scale", 1.12)
@@ -769,7 +833,169 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang):
         cx += W * co.get("dx", 0)
         cy += H * co.get("dy", 0)
         canvas = draw_card(canvas, piece, s, W, cx, cy, width_px)
-    return finish(canvas, xf), warnings, size
+        h_px = piece.height * width_px / max(1, piece.width)
+        boxes.append((cx - width_px / 2, cy - h_px / 2, cx + width_px / 2, cy + h_px / 2))
+    return canvas, boxes
+
+
+# ------------------------------------------------------------------ spans (one picture across two slots)
+
+SPAN_CAPTION_KEYS = ("headline", "sub", "overline")
+SPAN_HALF_KEYS = SPAN_CAPTION_KEYS + ("screen", "layout", "crop", "crops", "callouts", "caption_position", "caption_style",
+                                      "card_gap", "card_align", "poster_size", "center", "max_lines", "stickers",
+                                      "annotations", "style") + STYLE_SHOT_KEYS
+SEAM_PAD = 0.012  # of a slot's width: how close to the seam something may come before it counts as crossing
+
+
+def span_halves(shot):
+    halves = shot.get("halves") or []
+    if not isinstance(halves, list) or len(halves) > 2 or not all(isinstance(h, dict) for h in halves):
+        raise ValueError('"halves" must be a list of at most two shot objects (left, right)')
+    halves = [dict(h) for h in halves] + [{} for _ in range(2 - len(halves))]
+    for k in SPAN_CAPTION_KEYS:  # top-level caption = the left half's
+        if k in shot and k not in halves[0]:
+            halves[0][k] = shot[k]
+    for i, h in enumerate(halves, start=1):
+        if h.get("span") or h.get("halves"):
+            raise ValueError(f"half {i}: a half can't contain another span")
+    return halves
+
+
+def crosses(x0, x1, seam, pad):
+    return x0 < seam - pad and x1 > seam + pad
+
+
+def render_span(shot, style, W, H, fonts, spec_dir, lang, keep=None):
+    """A picture two slots wide, drawn on ONE canvas and cut down the middle, so the halves always line up.
+    Without a top-level "screen" each half is an ordinary shot on a shared ground ("pair"); with one, a single
+    phone sits across the seam - by default exactly centred on it, half in each slot - and the halves carry
+    only captions ("bridge"). Every x in a span runs 0..2
+    (1 = the seam); y and sizes are as in a single shot. Returns ([left, right], warnings, headline_px)."""
+    if shot.get("span") != 2:
+        raise ValueError(f'"span" must be 2 (two slots); got {shot.get("span")!r}')
+    s = shot_style(style, shot)
+    # halves are single slots: the span's own device "x" (0..2) must not move their phones
+    span_dv = shot.get("device") if isinstance(shot.get("device"), dict) else {}
+    s_half = shot_style(style, dict({k: v for k, v in shot.items() if k != "device"},
+                                    device={k: v for k, v in span_dv.items() if k != "x"}))
+    warnings = []
+    halves = span_halves(shot)
+    screen = load_screen(spec_dir, shot["screen"]) if shot.get("screen") else None
+    bridge = screen is not None
+    if not bridge:
+        for k in ("callouts", "crop", "crops"):
+            if shot.get(k):
+                raise ValueError(f'"{k}" on a span without a shared "screen" has nothing to crop - put it inside the half')
+        if shot.get("layout", "device") != "device":
+            raise ValueError('a span\'s halves choose their own layout - put "layout" inside the half')
+    if bridge:
+        if shot.get("layout", "device") != "device":
+            raise ValueError('a span with a shared "screen" draws one phone across the seam: its layout must be "device"')
+        for i, h in enumerate(halves, start=1):
+            if h.get("screen"):
+                raise ValueError(f'half {i} has its own "screen", but the span already has a shared one - use one or the other')
+            if h.get("caption_position", "top") != "top" or h.get("layout", "device") != "device":
+                raise ValueError(f"half {i}: next to a phone across the seam, captions go at the top (no bottom captions, posters or zooms)")
+    sample = screen
+    if sample is None:
+        first = next((h["screen"] for h in halves if h.get("screen")), None)
+        sample = load_screen(spec_dir, first) if first else None
+    W2 = 2 * W
+    canvas = background(W2, H, s["background"], spec_dir, sample, unit=W)
+    canvas = design.draw_shapes(canvas, shot.get("shapes") or s.get("shapes"), shot.get("_index", 0), W, H,
+                                floor=s.get("_caption_floor"))
+    idx = shot.get("_index", 0)
+    size = 0
+    bottoms = []
+    for h, half in enumerate(halves):
+        hs = {k: v for k, v in half.items()}
+        hs["_index"], hs["_count"] = idx + h, shot.get("_count", idx + 2)
+        if not (hs.get("headline") or "").strip():
+            warnings.append(f"half {h + 1} has no headline - each half is also seen on its own (while swiping, in Play's promo formats)")
+        info = {}
+        img, w, sz = render_shot(hs, s_half, W, H, fonts, spec_dir, lang, base=canvas.crop((h * W, 0, (h + 1) * W, H)),
+                                 info=info, caption_only=bridge)
+        canvas.paste(img, (h * W, 0))
+        warnings += [f"half {h + 1}: {x}" for x in w]
+        size = max(size, sz or 0)
+        if info.get("caption_bottom") is not None:
+            bottoms.append(info["caption_bottom"])
+    xf = None
+    pad = W * SEAM_PAD
+    if bridge:
+        dv = s["device"]
+        dev_top = int((max(bottoms) if bottoms else W * 0.12) + W * dv["gap"] + H * dv.get("dy", 0))
+        x = (shot.get("device") or {}).get("x", 1.0)  # default: centred on the seam, half the phone in each slot
+        canvas, xf = draw_device(canvas, screen, s, W, H, dev_top, cx=W * x, even=(x == 1.0))
+        if keep is not None:
+            keep["device"] = xf
+        canvas, boxes = draw_callouts(canvas, screen, shot, s, W, H, xf)
+        sx, sw = xf[0], xf[3]
+        if not crosses(sx, sx + sw, W, pad):
+            warnings.append("the phone doesn't cross the seam - set device x to 1.0 (centred on the seam), "
+                            "or make it two ordinary shots")
+        for i, b in enumerate(boxes, start=1):
+            if crosses(b[0], b[2], W, pad):
+                warnings.append(f"callout {i} crosses the seam - the gap between screenshots will cut it")
+    # span-level stickers and annotations are in span space (x 0..2)
+    canvas = design.draw_stickers(canvas, shot.get("stickers"), fonts, W, H, s.get("stickers_style"))
+    canvas = design.draw_annotations(canvas, shot.get("annotations"), fonts, W, H, xf, s.get("annotation_style"))
+    for i, st in enumerate(shot.get("stickers") or [], start=1):
+        o = design.deep_merge(s.get("stickers_style") or {}, st)
+        f = fonts.get(o.get("font", "rounded"), int(W * o.get("size", 0.042)))
+        half_w = f.getlength(o.get("text", "")) / 2 + f.size * 0.6
+        if crosses(W * o["x"] - half_w, W * o["x"] + half_w, W, pad):
+            warnings.append(f"sticker {i} ({o.get('text', '')!r}) crosses the seam - keep text on one side")
+    for i, n in enumerate(shot.get("annotations") or [], start=1):
+        xs = []
+        if "screen_box" in n and xf:
+            b = design.map_screen_box(n["screen_box"], xf)
+            xs += [b[0], b[2]]
+        elif "box" in n:
+            xs += [n["box"][0] * W, n["box"][2] * W]
+        for key in ("from", "to", "text_at"):
+            if key in n:
+                xs.append(n[key][0] * W)
+        if xs and crosses(min(xs), max(xs), W, pad):
+            warnings.append(f"annotation {i} crosses the seam - the gap between screenshots will break it")
+    if keep is not None:
+        keep["canvas"] = canvas  # tests: the halves must re-join to exactly this
+    return [canvas.crop((0, 0, W, H)), canvas.crop((W, 0, W2, H))], warnings, size
+
+
+def render_any(shot, style, W, H, fonts, spec_dir, lang):
+    """Render one spec entry: ([image], ...) for a shot, ([left, right], ...) for a span."""
+    span = shot.get("span", 1)
+    if span == 1 and not shot.get("halves"):
+        img, warnings, size = render_shot(shot, style, W, H, fonts, spec_dir, lang)
+        return [img], warnings, size
+    if shot.get("halves") and span != 2:
+        raise ValueError('"halves" belongs to a span: add "span": 2')
+    return render_span(shot, style, W, H, fonts, spec_dir, lang)
+
+
+def set_warnings(shots, store):
+    """Rules for the whole set: how many spans, where they sit, how many slots."""
+    out, slot, spans = [], 0, []
+    for i, sh in enumerate(shots, start=1):
+        n = sh.get("span", 1)
+        if sh.get("halves") and n == 1:
+            n = 2
+        if n == 2:
+            spans.append(slot + 1)
+        slot += n if n in (1, 2) else 1
+    limit = 8 if store == "android" else 10
+    if slot > limit:
+        out.append(f"{slot} screenshots ({len(spans)} span pair(s) count twice) - {store} allows at most {limit}")
+    if len(spans) > 2:
+        out.append(f"{len(spans)} span pairs - use one (two only in sets of 8+); they stop being special")
+    elif len(spans) == 2 and slot < 8:
+        out.append(f"2 span pairs in a set of {slot} - use one; two only in sets of 8 or more")
+    for start in spans:
+        if start == 3:
+            out.append("a span on shots 3-4 is cut in half in search results (only shots 1-3 show) - "
+                       "move it to 1-2 or 2-3, or after shot 4")
+    return out
 
 
 LOCALE_KEY = re.compile(r"^[a-z]{2}(-[A-Za-z]{2,4})?$")
@@ -863,25 +1089,41 @@ def main():
             style = base_style
             if name.startswith("android") and base_style["device"].get("style") == "phone" and base_style["device"].get("android_style"):
                 style = merge(base_style, {"device": {"style": base_style["device"]["android_style"]}})
+            style = merge(style, {"_caption_floor": caption_floor(spec["shots"], style, W, H, fonts, lang)})
             out_dir = os.path.join(out_root, name)
             os.makedirs(out_dir, exist_ok=True)
-            report = {"preset": name, "size": [W, H], "lang": lang, "locale": loc, "shots": []}
+            report = {"preset": name, "size": [W, H], "lang": lang, "locale": loc, "shots": [], "set_warnings": []}
+            for w in set_warnings(spec["shots"], "android" if name.startswith("android") else "ios"):
+                report["set_warnings"].append(w)
+                print(f"! {loc or ''} {name} set: {w}")
+            slot = 0
             for i, shot in enumerate(spec["shots"], start=1):
                 if name.startswith("android") and isinstance(shot.get("device"), dict) and shot["device"].get("style") == "phone":
                     shot = merge(shot, {"device": {"style": style["device"]["style"]}})
+                n_slots = 2 if (shot.get("span", 1) == 2 or shot.get("halves")) else 1
                 try:
-                    img, warnings, size = render_shot(shot, style, W, H, fonts, spec_dir, lang)
-                except FileNotFoundError as e:
+                    imgs, warnings, size = render_any(shot, style, W, H, fonts, spec_dir, lang)
+                except (FileNotFoundError, ValueError) as e:
                     print(f"x shot {i}: {e}", file=sys.stderr)
                     exit_code = 1
+                    slot += n_slots
                     continue
-                path = os.path.join(out_dir, f"{i:02d}.png")
-                img.convert("RGB").save(path, optimize=True)
-                report["shots"].append({"file": os.path.basename(path), "headline": shot.get("headline", "").replace("*", "").replace("\n", " "),
-                                        "sub": shot.get("sub", ""), "layout": shot.get("layout", "device"),
-                                        "headline_px": size, "warnings": warnings})
+                heads = ([h.get("headline", "") for h in span_halves(shot)] if len(imgs) == 2 else [shot.get("headline", "")])
+                subs = ([h.get("sub", "") for h in span_halves(shot)] if len(imgs) == 2 else [shot.get("sub", "")])
+                label = f"{slot + 1:02d}" + (f"-{slot + len(imgs):02d}" if len(imgs) > 1 else "")
+                for j, img in enumerate(imgs):
+                    slot += 1
+                    path = os.path.join(out_dir, f"{slot:02d}.png")
+                    img.convert("RGB").save(path, optimize=True)
+                    entry = {"file": os.path.basename(path), "shot": i,
+                             "headline": (heads[j] or "").replace("*", "").replace("\n", " "),
+                             "sub": subs[j] or "", "layout": shot.get("layout", "device"),
+                             "headline_px": size, "warnings": warnings if j == 0 else []}
+                    if len(imgs) > 1:
+                        entry["span"] = label
+                    report["shots"].append(entry)
                 for w in warnings:
-                    print(f"! {loc or ''} {name} {i:02d}: {w}")
+                    print(f"! {loc or ''} {name} {label}: {w}")
             report["fonts"] = sorted(fonts.used)
             with open(os.path.join(out_dir, "_render.json"), "w", encoding="utf-8") as f:
                 json.dump(report, f, ensure_ascii=False, indent=1)

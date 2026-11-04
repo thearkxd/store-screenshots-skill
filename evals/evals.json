@@ -60,6 +60,12 @@
    "prompt": "Bu konsept sayfasından B'yi (poster) seçtim ama yazı tipi bizim marka fontumuz olsun: fonts/Marka-Black.ttf",
    "expected_output": "Sets \"direction\": \"poster\" in the spec and overrides only the font in \"style\" (\"font\": \"fonts/Marka-Black.ttf\"), keeps the brand tokens, renders the set, reports any missing-glyph warning for Turkish characters, and runs check_set.py.",
    "files": []
+  },
+  {
+   "id": 11,
+   "prompt": "2. ve 3. görsel tek bir görsel gibi dursun, telefon ikisinin ortasında olsun.",
+   "expected_output": "Turns shots 2-3 into one span entry (\"span\": 2, bridge: a shared screen, phone centred on the seam so each screenshot holds exactly half) instead of designing two separate shots; picks a screen whose proof isn't dead centre (or lifts it out as a callout on one side), gives each half its own headline at the top, keeps text and callouts off the seam, renders, and reports any seam warnings from render_set/check_set.",
+   "files": []
   }
  ]
 }

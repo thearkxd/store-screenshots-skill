@@ -20,6 +20,10 @@ as AI-generated.
   editorial, poster, playful, cinematic, crafted, native, utility - each a full visual system driven by the
   app's brand colours. A concept sheet shows the first three shots in three directions before anything is
   rendered, so the look is a choice, not a template.
+- **Span pairs** - one picture across two screenshots (a phone cut exactly in half by the seam, or one ground
+  behind two shots), drawn on a single double-width canvas and split down the middle so the halves always
+  line up; the renderer warns when text or a callout crosses the seam, a half has no headline or the pair
+  sits where search results cut it. Used once per set, twice only in sets of 8+.
 - **Scripts** (Python 3 + Pillow) - read a live store listing, check and clean raw screens (status bar, debug
   UI), place crops on a grid, render a whole set from one JSON spec at exact store sizes (every locale at once,
   iPhone and Android frames, Google Play feature graphic, bundled OFL fonts, emphasis words, zoom cards,
@@ -81,6 +85,11 @@ Watch, like, check it off · Stop wondering what to watch · No spoilers. Promis
 Reproduce everything (TR + EN, iOS + Android + feature graphic) from one spec:
 `python3 skills/store-screenshots/scripts/render_set.py examples/seenfy/set.json --out out/` → `out/tr/…`,
 `out/en/…`. The spec and screens are in `examples/seenfy/`.
+
+**Span pairs** - shots 2-3 share one phone across the seam (bridge), 6-7 share one ground and a motif line
+(pair). The gap between them is the gap the store shows (`tools/fixtures/span-set.json`, demo app):
+
+![Span pairs: a phone across the seam at 2-3 and a shared ground at 6-7](docs/images/span-example.jpg)
 
 <details><summary>The skill's own demo set (fictional app, from <code>templates/set.example.json</code>)</summary>
 
@@ -222,6 +231,9 @@ uygulamaların 1.718 mağaza görseli var; her uygulama iyi/kötü ve nedeniyle 
 oyun kitabı, uygulamanın niş "açısını" bulan bir adım ve yedi tasarım yönü (editoryal, poster, oyuncu,
 sinematik, el yapımı, native, veri) var: render'dan önce ilk üç görsel üç farklı yönde yan yana gösterilir. claude.ai ve ChatGPT
 için 20 MB altındaki **lite** paketi, Claude Code ve diğer ajanlar için **tam** paketi kullanın.
+
+İki görselin tek görsel gibi durduğu "span" çiftleri de var: çift genişlikte tek tuval çizilip ortadan
+bölünür, böylece iki yarı her zaman hizalı olur; sette en fazla bir (8+ görselde iki) kez kullanılır.
 
 Gerçek örnek: yukarıdaki Seenfy seti skill ile baştan sona üretildi (mağaza sayfası okundu, eski set 13/20
 aldı, storyboard çıkarıldı, 6 ham ekranla render edildi). Türkçe ve İngilizce spec'ler `examples/seenfy/`

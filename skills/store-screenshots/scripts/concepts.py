@@ -7,7 +7,7 @@ Show this to the user BEFORE rendering the whole set, so the look is a choice, n
   python3 concepts.py set.json --directions cinematic poster editorial -o concepts.jpg
   python3 concepts.py set.json --shots 1 2 3 --locale tr --list         # --list shows every direction
 
-The spec's "brand" tokens are used; its "style" and per-shot look keys (background, colours, fonts,
+--shots counts spec entries: a span (two slots) shows as both halves. The spec's "brand" tokens are used; its "style" and per-shot look keys (background, colours, fonts,
 emphasis, device) are dropped so each direction shows its own system. Copy, screens, crops, callouts,
 annotations and stickers are kept. Pick a direction, then set "direction" in the spec and render it.
 """
@@ -93,7 +93,14 @@ def strip_look(spec, direction):
     sp = copy.deepcopy(spec)
     sp["direction"] = direction
     sp["style"] = {k: v for k, v in (spec.get("style") or {}).items() if k in ("sub_font",)}
-    sp["shots"] = [{k: v for k, v in s.items() if k not in LOOK_KEYS} for s in spec["shots"]]
+    def strip(shot):
+        out = {k: v for k, v in shot.items() if k not in LOOK_KEYS}
+        if isinstance(out.get("halves"), list):
+            out["halves"] = [{k: v for k, v in h.items() if k not in LOOK_KEYS} for h in out["halves"]]
+        if isinstance(shot.get("device"), dict) and "x" in shot["device"] and shot.get("span") == 2:
+            out["device"] = {"x": shot["device"]["x"]}  # where the phone crosses the seam is content, not look
+        return out
+    sp["shots"] = [strip(s) for s in spec["shots"]]
     sp.pop("feature_graphic", None)
     return sp
 
@@ -135,14 +142,16 @@ def main():
         sp = strip_look(spec, name)
         style, shots, _ = design.apply_direction(sp)
         style = rs.merge(rs.DEFAULT_STYLE, style)
+        style = rs.merge(style, {"_caption_floor": rs.caption_floor(shots, style, W, H, fonts, lang)})
         thumbs = []
         for i in a.shots:
             if i - 1 >= len(shots):
                 continue
-            img, warns, _ = rs.render_shot(shots[i - 1], style, W, H, fonts, spec_dir, lang)
+            imgs, warns, _ = rs.render_any(shots[i - 1], style, W, H, fonts, spec_dir, lang)
             for w in warns:
                 print(f"! {name} shot {i}: {w}")
-            thumbs.append(img.resize((a.width, round(H * a.width / W)), Image.LANCZOS))
+            # a span shows as its two halves, with the same gap the store puts between screenshots
+            thumbs += [img.resize((a.width, round(H * a.width / W)), Image.LANCZOS) for img in imgs]
         rows.append((name, dirs[name], thumbs))
     th = rows[0][2][0].height
     gap, label_h = 18, 64

@@ -71,7 +71,12 @@ def check(spec_path, out):
     with open(spec_path, encoding="utf-8") as f:
         spec = json.load(f)
     rows = []
+    units = []
     for i, shot in enumerate(spec["shots"], start=1):
+        units.append((str(i), shot))
+        for h, half in enumerate(shot.get("halves") or []):  # span halves have their own screens and crops
+            units.append((f"{i}{'ab'[h] if h < 2 else h}", half))
+    for i, shot in units:
         boxes = boxes_of(shot)
         screen = shot.get("screen")
         if isinstance(screen, dict):  # multi-locale: show the first locale's screen

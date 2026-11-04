@@ -69,7 +69,8 @@
     "period": 1.7,
     "width": 0.065,
     "color": "$primary",
-    "opacity": 1.0
+    "opacity": 1.0,
+    "clear_caption": 0.012
    },
    {
     "type": "wave",
@@ -79,7 +80,8 @@
     "phase": 0.5,
     "width": 0.02,
     "color": "$secondary",
-    "opacity": 1.0
+    "opacity": 1.0,
+    "clear_caption": 0.012
    }
   ],
   "poster_size": 0.19

@@ -182,15 +182,20 @@ def main():
     # copy
     if heads:
         for i, h in enumerate(heads, start=1):
+            if not (h or "").strip():  # e.g. the right half of a span that continues the picture
+                continue
             for msg in copy_checks(h, lang, a.store):
                 warns.append(f"{i:02d} \"{h}\": {msg}")
-        if len(set(h.lower() for h in heads)) < len(heads):
+        filled = [h.lower() for h in heads if (h or "").strip()]
+        if len(set(filled)) < len(filled):
             warns.append("duplicate headlines in the set")
     else:
         warns.append("no headlines given (no _render.json, no --headlines): copy checks skipped")
+    for w in render.get("set_warnings", []):
+        warns.append(f"set: {w}")
     for s in render.get("shots", []):
         for w in s.get("warnings", []):
-            warns.append(f"{s['file']}: {w}")
+            warns.append(f"{s.get('span', s['file'])}: {w}")
 
     sheet(files[:3], 200, "Search-result size: does the app make sense from these three?",
           os.path.join(a.folder, "_search-preview.jpg"))

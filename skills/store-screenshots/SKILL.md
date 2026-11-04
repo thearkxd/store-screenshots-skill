@@ -49,7 +49,7 @@ rendering. Run with `python3 <skill-dir>/scripts/<name>.py` (`python` on Windows
 | `prepare_screens.py` | Check incoming raw screens (resolution, ratio, JPEG, mismatched status bars), repaint a clean status bar (`--status-bar 9:41`), cover debug UI (`--cover`) |
 | `crop_helper.py` | `grid` draws a labelled coordinate grid on a screen; `check` previews every callout/zoom crop of a spec |
 | `concepts.py` | **Concept checkpoint:** shots 1–3 rendered in three design directions side by side (`--category` picks safe · bold · unexpected; `--list` shows all seven) - show it before rendering the set |
-| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; Android punch-hole frame for Android sizes; Google Play feature graphic (1024×500); every locale from one spec (`"locales"`); a `"direction"` preset with brand tokens; overlines, stickers, hand-drawn annotations, motif shapes; bundled fonts, tracking, Turkish-safe capitals |
+| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; Android punch-hole frame for Android sizes; Google Play feature graphic (1024×500); every locale from one spec (`"locales"`); a `"direction"` preset with brand tokens; overlines, stickers, hand-drawn annotations, motif shapes; **span pairs** (`"span": 2`: one picture across two slots - a phone over the seam or a shared ground - cut into two PNGs that always line up, with seam/placement warnings); bundled fonts, tracking, Turkish-safe capitals |
 | `check_set.py` | Check finished PNGs: exact store sizes, no alpha, count limits, headline length, banned phrases; writes a **search-result preview** (first 3 shots at thumbnail size) and an overview sheet |
 | `peer_test.py` | Put your set next to 2–3 exemplary sets from the same category at the same size |
 | `make_sheet.py` | Contact sheets of any folders of screenshots |
@@ -119,6 +119,10 @@ deliver" - then name the direction you chose and why.
   family, one emphasis device - `references/layouts.md`.
 - Choose a layout per shot from the recipes (device frame, full-bleed, zoom card, pulled-out callout, photo-led,
   one poster shot at most). Keep the UI big: the phone is the product.
+- **Span pair** (`"span": 2`, one picture across two slots, `references/layouts.md` §2b): make one when the
+  user asks, or when you judge width adds meaning (before/after, a flow, a content wall, the promise on a big
+  phone) - and then show it in the storyboard and the concept sheet, never add it silently. One per set, two
+  only in sets of 8+, at 1-2 or 2-3; nothing readable across the seam; each half has its own headline.
 - Prepare the screens, place the crops, write the spec and render:
 ```bash
 python3 scripts/prepare_screens.py screens/ --out prepared/ --status-bar 9:41   # read the report it prints
@@ -184,7 +188,7 @@ must verify (claims, numbers, legal lines).
 | `references/intake.md` | Start of every job: live-app vs new-app flow, listing fetch and fallbacks, brief, screen request |
 | `references/angle.md` | Finding the niche angle (five types), from angle to direction, ownable visual details |
 | `references/categories.md` | Per-category playbook: norm, best sets, clichés, where to stand out, three directions |
-| `references/directions.md` | The seven design directions, `concepts.py`, brand tokens, overlines, stickers, annotations, shapes |
+| `references/directions.md` | The seven design directions, `concepts.py`, brand tokens, overlines, stickers, annotations, shapes, span pairs (§8) |
 | `references/copy-rules.md` | Writing or judging any headline (patterns, banned words EN/TR, swap test) |
 | `references/storytelling.md` | Ordering the set, first three shots, set structures |
 | `references/layouts.md` | Layout recipes, type, colour, emphasis devices, HTML route |

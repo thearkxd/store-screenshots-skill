@@ -14,18 +14,122 @@ SCRIPTS = os.path.join(SKILL, "scripts")
 PY = sys.executable
 
 
-def run(*args, expect=0):
+def run(*args, expect=0, both=False):
     cmd = [PY, "-I", *args]
     print("$", " ".join(os.path.relpath(a, ROOT) if os.path.isabs(a) else a for a in cmd[2:]), flush=True)
     p = subprocess.run(cmd, capture_output=True, text=True)
     if p.returncode != expect:
         print(p.stdout[-3000:], p.stderr[-3000:], sep="\n")
         sys.exit(f"FAILED (exit {p.returncode}, expected {expect})")
-    return p.stdout
+    return p.stdout + p.stderr if both else p.stdout
 
 
 def s(name):
     return os.path.join(SCRIPTS, name)
+
+
+DEMO = os.path.join(SKILL, "templates", "example-screens")
+
+
+def span_tests(tmp):
+    """Span pairs (one picture over two slots) must never misalign, misnumber or slip past a rule."""
+    import json
+    from PIL import Image, ImageChops
+    fx = os.path.join(ROOT, "tools", "fixtures", "span-set.json")
+    out_dir = os.path.join(tmp, "span")
+    run(s("render_set.py"), fx, "--out", out_dir)
+    sizes = {"ios": (1206, 2622), "android": (1080, 1920)}
+    for loc in ("tr", "en"):
+        for preset, (W, H) in sizes.items():
+            folder = os.path.join(out_dir, loc, preset)
+            files = sorted(f for f in os.listdir(folder) if f.endswith(".png"))
+            assert files == [f"{i:02d}.png" for i in range(1, 9)], (loc, preset, files)  # 6 entries, 2 spans = 8 slots
+            for f in files:
+                im = Image.open(os.path.join(folder, f))
+                assert im.size == (W, H) and im.mode == "RGB", (loc, preset, f, im.size, im.mode)
+            rep = json.load(open(os.path.join(folder, "_render.json"), encoding="utf-8"))
+            assert [e.get("span") for e in rep["shots"]] == [None, "02-03", "02-03", None, None, "06-07", "06-07", None], rep["shots"]
+            assert not rep["set_warnings"], rep["set_warnings"]
+            out = run(s("check_set.py"), folder, "--store", "android" if preset == "android" else "ios")
+            assert "ERROR" not in out, out
+    # the halves re-join to exactly the one canvas they were cut from, and the files on disk are those halves
+    sys.path.insert(0, SCRIPTS)
+    import design
+    import render_set as rs
+    raw = json.load(open(fx, encoding="utf-8"))
+    spec_dir = os.path.dirname(fx)
+    fonts = rs.Fonts(spec_dir)
+    for loc in ("tr", "en"):
+        spec = rs.localize(raw, loc, raw["locales"])
+        d_style, shots, _ = design.apply_direction(spec)
+        for preset, (W, H) in sizes.items():
+            style = rs.merge(rs.DEFAULT_STYLE, d_style)
+            if preset == "android" and style["device"].get("android_style"):
+                style = rs.merge(style, {"device": {"style": style["device"]["android_style"]}})
+            style = rs.merge(style, {"_caption_floor": rs.caption_floor(shots, style, W, H, fonts, loc)})
+            for shot in shots:
+                if shot.get("span") != 2:
+                    continue
+                keep = {}
+                halves, warns, _ = rs.render_span(shot, style, W, H, fonts, spec_dir, loc, keep=keep)
+                assert not warns, (loc, preset, warns)
+                if shot.get("screen"):  # bridge: the phone's screen is cut exactly in half by the seam
+                    sx, sw = keep["device"][0], keep["device"][3]
+                    assert W - sx == sx + sw - W, f"{loc} {preset}: phone not centred on the seam ({W - sx} vs {sx + sw - W} px)"
+                joined = Image.new("RGB", (2 * W, H))
+                joined.paste(halves[0], (0, 0))
+                joined.paste(halves[1], (W, 0))
+                assert ImageChops.difference(joined, keep["canvas"].convert("RGB")).getbbox() is None, "halves don't re-join"
+                for j, half in enumerate(halves):
+                    on_disk = Image.open(os.path.join(out_dir, loc, preset, f"{shot['_index'] + j + 1:02d}.png")).convert("RGB")
+                    assert ImageChops.difference(on_disk, half.convert("RGB")).getbbox() is None, \
+                        f"{loc} {preset} slot {shot['_index'] + j + 1}: file differs from a fresh render (not deterministic?)"
+    # broken specs fail loudly, with a message that says what to do
+    def spec_with(shots, name):
+        path = os.path.join(tmp, f"span-{name}.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump({"lang": "tr", "sizes": ["ios"], "shots": shots}, f)
+        return path
+    scr = lambda n: os.path.join(DEMO, n)  # noqa: E731
+    one = {"headline": "Kaldığın bölüm *hep hazır*", "screen": scr("01-home.jpg")}
+    bad = {
+        "span3": ({"span": 3, "headline": "a b c", "screen": scr("01-home.jpg")}, '"span" must be 2'),
+        "halves-no-span": ({"halves": [{"headline": "a"}, {"headline": "b"}]}, 'add "span": 2'),
+        "two-screens": ({"span": 2, "screen": scr("02-calendar.jpg"), "halves": [{"headline": "a"}, {"headline": "b", "screen": scr("01-home.jpg")}]},
+                        "use one or the other"),
+        "pair-callouts": ({"span": 2, "callouts": [{"crop": [0, 0, 1, 0.2]}], "halves": [{"headline": "a", "screen": scr("01-home.jpg")}, {"headline": "b"}]},
+                          "put it inside the half"),
+        "bridge-bottom": ({"span": 2, "screen": scr("02-calendar.jpg"), "halves": [{"headline": "a", "caption_position": "bottom"}, {"headline": "b"}]},
+                          "captions go at the top"),
+        "three-halves": ({"span": 2, "halves": [{}, {}, {}]}, "at most two"),
+        "no-screen": ({"headline": "a b c"}, 'needs a "screen"'),
+    }
+    for name, (shot, msg) in bad.items():
+        out = run(s("render_set.py"), spec_with([one, shot], name), "--out", os.path.join(tmp, "bad", name), expect=1, both=True)
+        assert msg in out, (name, out)
+    # rule breaks render, but warn
+    bridge = lambda x: {"span": 2, "screen": scr("02-calendar.jpg"), "device": {"x": x},  # noqa: E731
+                        "halves": [{"headline": "Yeni bölüm çıkınca"}, {"headline": "Takvim kendini doldurur"}]}
+    pair = {"span": 2, "halves": [{"headline": "Arkadaşların ne izliyor?", "screen": scr("04-friends.jpg")},
+                                  {"headline": "Bölüm bölüm işaretle", "screen": scr("05-detail.jpg")}]}
+    warn_cases = {
+        "no-cross": ([one, bridge(0.5)], "doesn't cross the seam"),
+        "sticker": ([one, dict(pair, stickers=[{"text": "%88 match", "x": 1.0, "y": 0.5}])], "crosses the seam"),
+        "no-headline": ([one, dict(pair, halves=[pair["halves"][0], {"screen": scr("05-detail.jpg")}])], "half 2 has no headline"),
+        "search-cut": ([one, one, pair, one], "cut in half in search results"),
+        "too-many": ([pair, pair, pair, one], "span pairs - use one"),
+        "two-in-short": ([pair, one, pair], "two only in sets of 8"),
+    }
+    for name, (shots, msg) in warn_cases.items():
+        out = run(s("render_set.py"), spec_with(shots, name), "--out", os.path.join(tmp, "warn", name), both=True)
+        assert msg in out, (name, out)
+    # concept sheets and crop previews understand spans, in every direction
+    names = sorted(f[:-5] for f in os.listdir(os.path.join(SKILL, "assets", "directions")) if f.endswith(".json"))
+    out = run(s("concepts.py"), fx, "--directions", *names, "--shots", "1", "2", "5", "-o", os.path.join(tmp, "span-concepts.jpg"))
+    assert "lacks glyphs" not in out and "crosses the seam" not in out, out
+    sheet = Image.open(os.path.join(tmp, "span-concepts.jpg"))
+    assert sheet.width > 5 * 260, sheet.size  # 3 entries -> 5 thumbnails per row
+    run(s("crop_helper.py"), "check", fx, "-o", os.path.join(tmp, "span-crops.jpg"))
 
 
 def main():
@@ -82,6 +186,7 @@ def main():
                   "-o", os.path.join(tmp, "concepts.jpg"))
         assert "cinematic" in out and "lacks glyphs" not in out, out
         assert os.path.getsize(os.path.join(tmp, "concepts.jpg")) > 20000
+        span_tests(tmp)
         # every bundled font covers Turkish
         sys.path.insert(0, SCRIPTS)
         import render_set
