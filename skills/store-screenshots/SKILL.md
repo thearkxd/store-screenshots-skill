@@ -44,7 +44,7 @@ rendering. Run with `python3 <skill-dir>/scripts/<name>.py` (`python` on Windows
 | Script | Use it to |
 |---|---|
 | `search_library.py` | Query the library: `--category`, `--country tr/us`, `--quality exemplary/weak`, `--technique`, `--layout`, `--position 1`, `--ai-smell`, `--query`; `--summary` shows a category's conventions; `--format headlines` lists real headlines; `--format paths` gives images to look at |
-| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word, sub-line, device/full-bleed/zoom card, pulled-out callouts; Turkish-safe capitals |
+| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; bundled fonts, tracking, Turkish-safe capitals |
 | `check_set.py` | Check finished PNGs: exact store sizes, no alpha, count limits, headline length, banned phrases; writes a **search-result preview** (first 3 shots at thumbnail size) and an overview sheet |
 | `peer_test.py` | Put your set next to 2–3 exemplary sets from the same category at the same size |
 | `make_sheet.py` | Contact sheets of any folders of screenshots |
@@ -88,8 +88,9 @@ to App Store categories; see `references/library-guide.md` for the list and the 
 cp templates/set.example.json set.json      # edit: size, colours, fonts, shots
 python3 scripts/render_set.py set.json --out out/
 ```
-Use the user's brand font if they provide a `.ttf/.otf`; otherwise a neutral sans that's installed (the script
-falls back and says which font it used). For layouts the renderer can't do, write HTML/CSS and screenshot it at
+Use the user's brand font if they provide a `.ttf/.otf`; otherwise the bundled OFL fonts (`sans` headline,
+`text` sub-line, `serif-italic` for one emphasis word - `assets/fonts/FONTS.md`). Seed the screens with
+realistic data first: the renderer can't fix thin or empty UI. For layouts the renderer can't do, write HTML/CSS and screenshot it at
 the exact pixel size with a headless browser if one is available (`references/layouts.md` §6).
 
 ### Phase 5 - Check, compare, fix (loop at least once)

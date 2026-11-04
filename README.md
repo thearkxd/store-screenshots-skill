@@ -5,7 +5,9 @@ designer for **App Store and Google Play screenshots**: from the app's promise t
 pixel-exact PNGs - built from the app's real screens, with copy that passes the "swap test" and doesn't read
 as AI-generated.
 
-![Example set rendered by render_set.py from placeholder screens](docs/images/example-set.jpg)
+![Example set rendered by render_set.py from the demo screens of a fictional app](docs/images/example-set.jpg)
+
+*The example set: `render_set.py` + `templates/set.example.json`, from the demo screens of a fictional TV tracker.*
 
 - **Process & craft** - brief, category research, story order, the first three shots, headline patterns,
   banned/tired phrases (EN + TR), layouts, type, colour, emphasis devices, localisation, critique scorecard,
@@ -15,8 +17,9 @@ as AI-generated.
   every screenshot has headline text (243 human-verified), position, language and colour data. Searchable
   from the command line.
 - **Scripts** (Python 3 + Pillow) - search the library, render a whole set from one JSON spec at exact store
-  sizes (Turkish-safe capitals, emphasis words, zoom cards, pulled-out callouts, posters), check a set against
-  store and copy rules with a search-result preview, and peer-test it next to exemplary sets.
+  sizes (bundled OFL fonts, tracking, emphasis words in a second font, phone frame, stacked zoom cards,
+  pulled-out callouts, posters, Turkish-safe capitals), check a set against store and copy rules with a
+  search-result preview, and peer-test it next to exemplary sets.
 
 ## Full vs lite
 
@@ -78,10 +81,13 @@ skills/store-screenshots/
                               critique · library-guide
   scripts/                    search_library · render_set · check_set · peer_test · make_sheet ·
                               collect_examples · build_catalog
-  templates/                  set.example.json + placeholder screens
+  templates/                  set.example.json + demo screens of a fictional app
+  assets/fonts/               Inter, Inter Display, Lora (OFL, subset to Latin + Turkish)
   assets/library/             catalog.json · classifications.json · stats.json · img/
 evals/evals.json              test prompts with expected behaviour
 tools/package_skill.py        builds the full and lite zips
+tools/smoke_test.py           what CI runs on every push
+tools/demo_screens/build.py   rebuilds the demo screens (HTML/CSS → Playwright)
 ```
 
 ## Library at a glance
@@ -109,7 +115,7 @@ build if the lite package grows past 20 MB. Pushes to `main` then publish a GitH
 
 ## License
 
-Code, reference texts and classification data: MIT. **The screenshots in the library belong to their
+Code, reference texts and classification data: MIT. Bundled fonts: SIL OFL 1.1 (`assets/fonts/`). **The screenshots in the library belong to their
 publishers** and are included for study only - see [NOTICE.md](NOTICE.md).
 
 ---

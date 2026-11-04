@@ -43,7 +43,7 @@ def main():
         run(s("render_set.py"), os.path.join(SKILL, "templates", "set.example.json"), "--out", tmp)
         for preset, store in (("ios", "ios"), ("android", "android")):
             folder = os.path.join(tmp, preset)
-            assert len([f for f in os.listdir(folder) if f.endswith(".png")]) == 5, f"{preset}: expected 5 PNGs"
+            assert len([f for f in os.listdir(folder) if f.endswith(".png")]) == 6, f"{preset}: expected 6 PNGs"
             run(s("check_set.py"), folder, "--store", store)
             assert os.path.exists(os.path.join(folder, "_search-preview.jpg"))
         run(s("peer_test.py"), os.path.join(tmp, "ios"), "--category", "navigation", "-o", os.path.join(tmp, "peer.jpg"))

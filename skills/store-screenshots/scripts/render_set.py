@@ -3,13 +3,14 @@
 
   python3 render_set.py set.json --out out/            # every preset listed in spec "sizes"
   python3 render_set.py set.json --out out/ --size ios # one preset
-  python3 render_set.py --presets                      # list sizes
+  python3 render_set.py --presets                      # list sizes and font aliases
 
 Writes out/<preset>/01.png … (RGB, no alpha, exact pixels) and out/<preset>/_render.json (headlines,
 fonts, warnings) that check_set.py reads. See templates/set.example.json for every option.
 
 Layouts per shot: "device" (default) · "zoom" (cropped card) · "full" (full-bleed screen + band/pill caption)
-· "poster" (type only). Headline emphasis: wrap words in *asterisks*.
+· "poster" (type only). Device styles: "phone" (thin bezel + island) · "none" (rounded screen, shadow).
+Headline emphasis: wrap words in *asterisks*; "\\n" forces a line break.
 """
 import argparse
 import json
@@ -22,6 +23,9 @@ try:
 except ImportError:  # pragma: no cover
     sys.exit("Pillow is required: pip install pillow")
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+FONT_DIR = os.path.normpath(os.path.join(HERE, "..", "assets", "fonts"))
+
 PRESETS = {  # checked 2026-11-04, see references/store-specs.md
     "ios": (1206, 2622),
     "ios-1179": (1179, 2556),
@@ -32,47 +36,51 @@ PRESETS = {  # checked 2026-11-04, see references/store-specs.md
     "android-tall": (1080, 2160),
 }
 
-FONT_CANDIDATES = {
-    "bold": [
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-        "/usr/share/fonts/truetype/noto/NotoSans-Bold.ttf",
-        "/usr/share/fonts/opentype/noto/NotoSans-Bold.ttf",
-        "/Library/Fonts/Arial Bold.ttf",
-        "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
-        "C:/Windows/Fonts/arialbd.ttf",
-    ],
-    "regular": [
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-        "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
-        "/usr/share/fonts/opentype/noto/NotoSans-Regular.ttf",
-        "/Library/Fonts/Arial.ttf",
-        "/System/Library/Fonts/Supplemental/Arial.ttf",
-        "C:/Windows/Fonts/arial.ttf",
-    ],
+FONT_ALIASES = {  # bundled, OFL - see assets/fonts/FONTS.md
+    "sans": ("InterDisplay-SemiBold.otf", None),
+    "sans-bold": ("InterDisplay-Bold.otf", None),
+    "sans-medium": ("InterDisplay-Medium.otf", None),
+    "sans-italic": ("InterDisplay-SemiBoldItalic.otf", None),
+    "text": ("Inter-Regular.otf", None),
+    "text-medium": ("Inter-Medium.otf", None),
+    "serif": ("Lora-Variable.ttf", 600),
+    "serif-bold": ("Lora-Variable.ttf", 700),
+    "serif-italic": ("Lora-Italic-Variable.ttf", 500),
 }
+SYSTEM_FALLBACK = [
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "/Library/Fonts/Arial Bold.ttf",
+    "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+    "C:/Windows/Fonts/arialbd.ttf",
+]
 
 DEFAULT_STYLE = {
-    "background": {"color": "#F4F1EA"},
-    "text_color": "#111111",
-    "sub_color": None,  # defaults to text_color at 75 % opacity look
-    "font": None,
-    "sub_font": None,
+    "background": {"color": "#F3EEE6"},
+    "text_color": "#151515",
+    "sub_color": None,
+    "font": "sans",
+    "sub_font": "text",
+    "weight": None,            # for variable fonts, e.g. 650
+    "tracking": -0.018,        # em; display type looks better slightly tight
+    "sub_tracking": -0.005,
     "align": "center",
     "case": "none",
-    "headline_size": 0.092,  # fraction of canvas width (upper bound; auto-fit shrinks)
-    "min_headline_size": 0.055,
+    "headline_size": 0.096,    # fraction of canvas width (upper bound; auto-fit shrinks)
+    "min_headline_size": 0.06,
     "max_lines": 2,
-    "line_height": 1.1,
+    "line_height": 1.06,
     "text_width": 0.84,
-    "caption_top": 0.085,  # fraction of width from the top edge
-    "sub_scale": 0.5,
-    "emphasis": {"style": "color", "color": "#E4572E"},
-    "device": {"width": 0.80, "radius": 0.11, "border": 0.016, "border_color": "#111111", "shadow": True, "gap": 0.07, "bleed": True},
+    "caption_top": 0.10,       # fraction of width from the top (or bottom) edge
+    "sub_scale": 0.42,
+    "sub_gap": 0.32,           # gap between headline and sub-line, in headline sizes
+    "emphasis": {"style": "color", "color": "#E5482D"},
+    "device": {"style": "phone", "width": 0.82, "radius": 0.15, "border": 0.022, "border_color": "#0E0E10",
+               "island": True, "shadow": True, "gap": 0.075, "bleed": True},
     "card": {"radius": 0.045, "shadow": True, "width": 0.86},
     "band_color": None,
 }
+
+REPLACE_KEYS = {"background"}  # replaced, not merged (a gradient must not inherit a colour)
 
 
 def hexrgb(h, alpha=False):
@@ -102,9 +110,6 @@ def tr_upper(s):
     return s.replace("i", "İ").replace("ı", "I").upper()
 
 
-REPLACE_KEYS = {"background"}  # these dicts are replaced, not merged (a gradient must not inherit a colour)
-
-
 def merge(base, over):
     out = dict(base)
     for k, v in (over or {}).items():
@@ -116,35 +121,56 @@ def merge(base, over):
 
 
 class Fonts:
+    """Resolves aliases, paths and variable weights; caches FreeType objects."""
+
     def __init__(self, spec_dir):
         self.spec_dir = spec_dir
         self.cache = {}
         self.used = set()
 
-    def resolve(self, path, kind):
-        if path:
-            p = path if os.path.isabs(path) else os.path.join(self.spec_dir, path)
+    def resolve(self, name):
+        weight = None
+        if isinstance(name, dict):
+            name, weight = name.get("path") or name.get("font"), name.get("weight")
+        if name in FONT_ALIASES:
+            f, w = FONT_ALIASES[name]
+            return os.path.join(FONT_DIR, f), weight or w
+        if name:
+            p = name if os.path.isabs(name) else os.path.join(self.spec_dir, name)
             if os.path.exists(p):
-                return p
-            print(f"! font not found: {path} - falling back", file=sys.stderr)
-        for c in FONT_CANDIDATES[kind]:
+                return p, weight
+            print(f"! font not found: {name} - using the bundled sans", file=sys.stderr)
+        p = os.path.join(FONT_DIR, FONT_ALIASES["sans"][0])
+        if os.path.exists(p):
+            return p, None
+        for c in SYSTEM_FALLBACK:
             if os.path.exists(c):
-                return c
-        return None
+                return c, None
+        return None, None
 
-    def get(self, path, kind, size):
-        p = self.resolve(path, kind)
-        key = (p, size)
+    def get(self, name, size, weight=None):
+        path, w = self.resolve(name)
+        w = weight or w
+        key = (path, size, w)
         if key not in self.cache:
-            self.cache[key] = ImageFont.truetype(p, size) if p else ImageFont.load_default()
-            self.used.add(p or "PIL default")
+            if path is None:
+                f = ImageFont.load_default()
+            else:
+                f = ImageFont.truetype(path, size)
+                if w:
+                    try:
+                        f.set_variation_by_axes([w])
+                    except Exception:
+                        pass
+            self.cache[key] = f
+            self.used.add(os.path.basename(path) if path else "PIL default")
         return self.cache[key]
 
 
 # ------------------------------------------------------------------ text
 
 def tokenize(text):
-    """'Kaldığın bölüm *hep hazır*.' -> [(word, emphasised, glued)], '\n' = forced break.
+    """'Kaldığın bölüm *hep hazır*.' -> [(word, emphasised, glued)], '\\n' = forced break.
     glued = no space before this token (punctuation right after an emphasis marker)."""
     out, emph, prev_text = [], False, " "
     for part in re.split(r"(\*|\n)", text):
@@ -155,8 +181,7 @@ def tokenize(text):
             out.append(("\n", False, False))
             prev_text = " "
             continue
-        words = part.split(" ")
-        for i, w in enumerate(words):
+        for i, w in enumerate(part.split(" ")):
             if w:
                 glued = i == 0 and bool(out) and out[-1][0] != "\n" and not prev_text.endswith(" ")
                 out.append((w, emph, glued))
@@ -183,6 +208,20 @@ def wrap(tokens, measure, max_w):
     return lines
 
 
+def text_width(font, text, track_px):
+    return font.getlength(text) + track_px * max(len(text) - 1, 0)
+
+
+def draw_tracked(d, xy, text, font, fill, track_px, anchor="ls"):
+    """Draw on a baseline with letter-spacing, keeping the font's kerning (advance = prefix width delta)."""
+    if abs(track_px) < 0.05:
+        d.text(xy, text, font=font, fill=fill, anchor=anchor)
+        return
+    x, y = xy
+    for i, ch in enumerate(text):
+        d.text((x + font.getlength(text[:i]) + track_px * i, y), ch, font=font, fill=fill, anchor=anchor)
+
+
 class Caption:
     def __init__(self, fonts, style, W, lang):
         self.fonts, self.s, self.W, self.lang = fonts, style, W, lang
@@ -195,13 +234,20 @@ class Caption:
     def font_for(self, size, emph):
         e = self.s["emphasis"]
         if emph and e.get("style") == "font" and e.get("font"):
-            return self.fonts.get(e["font"], "bold", size)
-        return self.fonts.get(self.s["font"], "bold", size)
+            # a second family often has a smaller x-height; "scale" evens it out (e.g. 1.08 for Lora next to Inter)
+            return self.fonts.get(e["font"], int(size * e.get("scale", 1.0)), e.get("weight"))
+        return self.fonts.get(self.s["font"], size, self.s.get("weight"))
+
+    def track(self, size):
+        return self.s["tracking"] * size
+
+    def word_w(self, tok, size):
+        return text_width(self.font_for(size, tok[1]), tok[0], self.track(size))
 
     def measure_line(self, line, size):
         space = self.font_for(size, False).getlength(" ")
         gaps = sum(1 for i, t in enumerate(line) if i > 0 and not t[2])
-        return sum(self.font_for(size, t[1]).getlength(t[0]) for t in line) + space * gaps
+        return sum(self.word_w(t, size) for t in line) + space * gaps
 
     def layout(self, text, max_lines, max_size, min_size):
         tokens = tokenize(self.prep(text))
@@ -212,7 +258,12 @@ class Caption:
             fits = len(lines) <= max_lines and all(self.measure_line(l, size) <= max_w for l in lines)
             if fits or size <= min_size:
                 return lines, size, fits
-            size = int(size * 0.95)
+            size = int(size * 0.96)
+
+    def x_for(self, lw):
+        if self.s["align"] == "center":
+            return (self.W - lw) / 2
+        return self.W * (1 - self.s["text_width"]) / 2
 
     def draw(self, img, text, top, max_lines=None, max_size=None, center_v=None, color=None):
         """Draw the headline; returns (bottom_y, size, warnings)."""
@@ -231,26 +282,26 @@ class Caption:
         color = hexrgb(color or s["text_color"])
         e = s["emphasis"]
         space = self.font_for(size, False).getlength(" ")
+        tr = self.track(size)
+        ascent = self.font_for(size, False).getmetrics()[0]
         y = top
         for line in lines:
-            lw = self.measure_line(line, size)
-            x = (self.W - lw) / 2 if s["align"] == "center" else self.W * (1 - s["text_width"]) / 2
-            # emphasis backgrounds first (contiguous runs)
+            x = self.x_for(self.measure_line(line, size))
             if e.get("style") in ("box", "marker"):
                 cx, run = x, None
-                for i, (w, em, g) in enumerate(line):
-                    if i > 0 and not g:
+                for i, tok in enumerate(line):
+                    if i > 0 and not tok[2]:
                         cx += space
-                    ww = self.font_for(size, em).getlength(w)
-                    if em:
+                    ww = self.word_w(tok, size)
+                    if tok[1]:
                         run = [cx, cx + ww] if run is None else [run[0], cx + ww]
-                    if (not em or i == len(line) - 1) and run:
-                        pad = size * 0.18
+                    if (not tok[1] or i == len(line) - 1) and run:
+                        pad = size * 0.16
                         if e["style"] == "box":
-                            d.rounded_rectangle([run[0] - pad, y - size * 0.02, run[1] + pad, y + size * 1.12],
-                                                radius=int(size * 0.14), fill=hexrgb(e.get("color", "#FFFFFF")))
+                            d.rounded_rectangle([run[0] - pad, y + size * 0.02, run[1] + pad, y + size * 1.1],
+                                                radius=int(size * 0.12), fill=hexrgb(e.get("color", "#FFFFFF")))
                         else:
-                            d.rectangle([run[0] - pad * 0.5, y + size * 0.45, run[1] + pad * 0.5, y + size * 1.08],
+                            d.rectangle([run[0] - pad * 0.4, y + size * 0.5, run[1] + pad * 0.4, y + size * 1.05],
                                         fill=hexrgb(e.get("color", "#FFE600")))
                         run = None
                     cx += ww
@@ -260,32 +311,45 @@ class Caption:
                     cx += space
                 f = self.font_for(size, em)
                 c = color
-                if em and e.get("style") == "color":
-                    c = hexrgb(e.get("color", "#E4572E"))
+                if em and e.get("color") and e.get("style") in ("color", "font"):
+                    c = hexrgb(e["color"])
                 if em and e.get("style") == "box" and e.get("text_color"):
                     c = hexrgb(e["text_color"])
-                d.text((cx, y), w, font=f, fill=c)
-                cx += f.getlength(w)
+                draw_tracked(d, (cx, y + ascent), w, f, c, tr)
+                cx += text_width(f, w, tr)
             y += lh
         return top + total_h, size, warnings
 
+    def sub_size(self, head_size):
+        return int(head_size * self.s["sub_scale"])
+
     def draw_sub(self, img, text, top, head_size, color=None):
         s = self.s
-        size = int(head_size * s["sub_scale"])
-        f = self.fonts.get(s["sub_font"], "regular", size)
+        size = self.sub_size(head_size)
+        f = self.fonts.get(s["sub_font"], size)
+        tr = s["sub_tracking"] * size
         max_w = self.W * s["text_width"]
         tokens = [(w, False, False) for w in self.prep(text).split()]
-        lines = wrap(tokens, lambda l: f.getlength(" ".join(t[0] for t in l)), max_w)[:3]
+        lines = wrap(tokens, lambda l: text_width(f, " ".join(t[0] for t in l), tr), max_w)[:3]
         d = ImageDraw.Draw(img)
         col = hexrgb(color or s["sub_color"] or s["text_color"])
+        ascent = f.getmetrics()[0]
         y = top
         for line in lines:
             t = " ".join(tok[0] for tok in line)
-            lw = f.getlength(t)
-            x = (self.W - lw) / 2 if s["align"] == "center" else self.W * (1 - s["text_width"]) / 2
-            d.text((x, y), t, font=f, fill=col)
-            y += int(size * 1.3)
+            draw_tracked(d, (self.x_for(text_width(f, t, tr)), y + ascent), t, f, col, tr)
+            y += int(size * 1.32)
         return y
+
+    def block_height(self, text, sub, max_lines=None):
+        tmp = Image.new("RGB", (self.W, 10))
+        b, size, _ = self.draw(tmp, text, 0, max_lines=max_lines)
+        if sub:
+            n = len(wrap([(w, False, False) for w in sub.split()],
+                         lambda l: self.fonts.get(self.s["sub_font"], self.sub_size(size)).getlength(" ".join(t[0] for t in l)),
+                         self.W * self.s["text_width"])[:3])
+            b += int(size * self.s["sub_gap"]) + int(self.sub_size(size) * 1.32) * n
+        return b, size
 
 
 # ------------------------------------------------------------------ images
@@ -323,20 +387,24 @@ def bg_reference_color(bg, caption_bottom=False):
 
 
 def rounded_mask(size, radius):
-    m = Image.new("L", size, 0)
-    ImageDraw.Draw(m).rounded_rectangle([0, 0, size[0] - 1, size[1] - 1], radius=radius, fill=255)
-    return m
+    scale = 3  # supersampled for smooth corners
+    m = Image.new("L", (size[0] * scale, size[1] * scale), 0)
+    ImageDraw.Draw(m).rounded_rectangle([0, 0, size[0] * scale - 1, size[1] * scale - 1], radius=radius * scale, fill=255)
+    return m.resize(size, Image.LANCZOS)
 
 
-def shadow(canvas, box, radius, strength=0.28):
+def shadow(canvas, box, radius, strength=0.22, spread=0.06):
     x0, y0, x1, y1 = [int(v) for v in box]
-    w, h = x1 - x0, y1 - y0
-    blur = max(8, int(w * 0.035))
-    sh = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
-    ImageDraw.Draw(sh).rounded_rectangle([x0, y0 + blur * 0.6, x1, y1 + blur * 0.6], radius=radius,
-                                         fill=(0, 0, 0, int(255 * strength)))
-    sh = sh.filter(ImageFilter.GaussianBlur(blur))
-    return Image.alpha_composite(canvas.convert("RGBA"), sh).convert("RGB")
+    w = x1 - x0
+    blur = max(10, int(w * spread))
+    pad = blur * 3
+    layer = Image.new("L", (x1 - x0 + 2 * pad, y1 - y0 + 2 * pad), 0)
+    ImageDraw.Draw(layer).rounded_rectangle([pad, pad + blur * 0.5, pad + x1 - x0, pad + y1 - y0 + blur * 0.5],
+                                            radius=radius, fill=int(255 * strength))
+    layer = layer.filter(ImageFilter.GaussianBlur(blur))
+    black = Image.new("RGB", layer.size, (0, 0, 0))
+    canvas.paste(black, (x0 - pad, y0 - pad), layer)
+    return canvas
 
 
 def paste_rounded(canvas, img, xy, radius):
@@ -355,40 +423,48 @@ def crop_frac(img, box):
     return img.crop((int(x0 * img.width), int(y0 * img.height), int(x1 * img.width), int(y1 * img.height)))
 
 
+def device_geometry(screen, dv, W):
+    dw = int(W * dv["width"])
+    border = int(dw * dv["border"]) if dv.get("style", "phone") == "phone" else 0
+    sw = dw - 2 * border
+    sh = int(screen.height * sw / screen.width)
+    return dw, border, sw, sh, sh + 2 * border
+
+
 def draw_device(canvas, screen, s, W, H, top, bottom_limit=None):
     dv = s["device"]
-    dw = int(W * dv["width"])
-    border = int(dw * dv["border"])
-    sw = dw - 2 * border
-    scr = screen.resize((sw, int(screen.height * sw / screen.width)), Image.LANCZOS)
-    dh = scr.height + 2 * border
+    style = dv.get("style", "phone")
+    dw, border, sw, sh, dh = device_geometry(screen, dv, W)
     limit = bottom_limit if bottom_limit is not None else H - W * 0.06
     if not dv.get("bleed", True) and top + dh > limit:
-        avail = limit - top
-        k = avail / dh
-        dw, border = int(dw * k), int(border * k)
-        sw = dw - 2 * border
-        scr = screen.resize((sw, int(screen.height * sw / screen.width)), Image.LANCZOS)
-        dh = scr.height + 2 * border
+        k = (limit - top) / dh
+        dv = dict(dv, width=dv["width"] * k)
+        dw, border, sw, sh, dh = device_geometry(screen, dv, W)
+    scr = screen.resize((sw, sh), Image.LANCZOS)
     x = (W - dw) // 2
-    r_out = int(dw * dv["radius"])
+    r_out = int(dw * (dv["radius"] if style == "phone" else dv.get("screen_radius", 0.07)))
     if dv.get("shadow", True):
         canvas = shadow(canvas, (x, top, x + dw, top + dh), r_out)
-    d = ImageDraw.Draw(canvas)
-    if border > 0:
-        d.rounded_rectangle([x, top, x + dw, top + dh], radius=r_out, fill=hexrgb(dv["border_color"]))
+    if style == "phone" and border > 0:
+        frame = Image.new("RGB", (dw, dh), hexrgb(dv["border_color"]))
+        paste_rounded(canvas, frame, (x, top), r_out)
     paste_rounded(canvas, scr, (x + border, top + border), max(r_out - border, 0))
+    if style == "phone" and dv.get("island", True):
+        d = ImageDraw.Draw(canvas)
+        iw, ih = sw * 0.305, sw * 0.088
+        cx, iy = x + dw / 2, top + border + sw * 0.028
+        d.rounded_rectangle([cx - iw / 2, iy, cx + iw / 2, iy + ih], radius=int(ih / 2), fill=(0, 0, 0))
     return canvas, (x + border, top + border, sw / screen.width)
 
 
 def draw_card(canvas, img, s, W, cx, cy, width_px):
     c = s["card"]
     k = width_px / img.width
-    card = img.resize((int(img.width * k), int(img.height * k)), Image.LANCZOS)
+    card = img.resize((max(1, int(img.width * k)), max(1, int(img.height * k))), Image.LANCZOS)
     r = int(W * c["radius"])
     x, y = int(cx - card.width / 2), int(cy - card.height / 2)
     if c.get("shadow", True):
-        canvas = shadow(canvas, (x, y, x + card.width, y + card.height), r, 0.32)
+        canvas = shadow(canvas, (x, y, x + card.width, y + card.height), r, 0.28, 0.05)
     paste_rounded(canvas, card, (x, y), r)
     return canvas
 
@@ -397,7 +473,8 @@ def draw_card(canvas, img, s, W, cx, cy, width_px):
 
 def render_shot(shot, style, W, H, fonts, spec_dir, lang):
     s = merge(style, shot.get("style"))
-    for k in ("background", "text_color", "sub_color", "align", "emphasis", "band_color", "device", "card", "case"):
+    for k in ("background", "text_color", "sub_color", "align", "emphasis", "band_color", "device", "card", "case",
+              "font", "weight", "tracking"):
         if k in shot:
             mergeable = k in ("emphasis", "device", "card") and isinstance(shot[k], dict) and isinstance(s.get(k), dict)
             s[k] = merge(s[k], shot[k]) if mergeable else shot[k]
@@ -406,14 +483,17 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang):
     canvas = background(W, H, s["background"], spec_dir)
     cap = Caption(fonts, s, W, lang)
     headline = shot.get("headline", "")
+    sub = shot.get("sub")
     pos = shot.get("caption_position", "top")
 
     if layout == "poster":
-        bottom, size, w = cap.draw(canvas, headline, 0, max_lines=shot.get("max_lines", 4),
-                                   max_size=W * shot.get("poster_size", 0.2), center_v=H * 0.45)
+        ps = merge(s, {"text_width": shot.get("text_width", 0.84), "line_height": shot.get("line_height", 1.0)})
+        pcap = Caption(fonts, ps, W, lang)
+        bottom, size, w = pcap.draw(canvas, headline, 0, max_lines=shot.get("max_lines", 4),
+                                    max_size=W * shot.get("poster_size", 0.2), center_v=H * shot.get("center", 0.46))
         warnings += w
-        if shot.get("sub"):
-            cap.draw_sub(canvas, shot["sub"], bottom + size * 0.4, size)
+        if sub:
+            pcap.draw_sub(canvas, sub, bottom + size * s["sub_gap"], size)
         return canvas, warnings, size
 
     if layout == "full":
@@ -422,78 +502,73 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang):
         scr = screen.resize((int(screen.width * k + 1), int(screen.height * k + 1)), Image.LANCZOS)
         canvas.paste(scr.crop(((scr.width - W) // 2, 0, (scr.width - W) // 2 + W, H)), (0, 0))
         mode = shot.get("caption_style", "band")
-        tmp = Image.new("RGB", (W, H))
-        b, size, w = cap.draw(tmp, headline, 0)
-        warnings += w
-        sub_h = int(size * s["sub_scale"] * 1.3 * 2) if shot.get("sub") else 0
-        block = b + sub_h
+        block, size = cap.block_height(headline, sub)
         pad = int(W * 0.055)
         y0 = int(W * s["caption_top"]) if pos == "top" else H - block - int(W * s["caption_top"])
         d = ImageDraw.Draw(canvas)
         fill = hexrgb(s.get("band_color") or s["background"].get("color", "#111111"))
         if mode == "pill":
             d.rounded_rectangle([W * 0.05, y0 - pad, W * 0.95, y0 + block + pad], radius=int(W * 0.05), fill=fill)
+        elif pos == "top":
+            d.rectangle([0, 0, W, y0 + block + pad], fill=fill)
         else:
-            if pos == "top":
-                d.rectangle([0, 0, W, y0 + block + pad], fill=fill)
-            else:
-                d.rectangle([0, y0 - pad, W, H], fill=fill)
+            d.rectangle([0, y0 - pad, W, H], fill=fill)
         bottom, size, _ = cap.draw(canvas, headline, y0)
-        if shot.get("sub"):
-            cap.draw_sub(canvas, shot["sub"], bottom + size * 0.25, size)
+        if sub:
+            cap.draw_sub(canvas, sub, bottom + size * s["sub_gap"], size)
         return canvas, warnings, size
 
-    # caption first (device / zoom)
-    top = int(W * s["caption_top"])
-    if pos == "bottom":
-        tmp = Image.new("RGB", (W, H))
-        b, size, w = cap.draw(tmp, headline, 0)
-        sub_h = int(size * s["sub_scale"] * 1.3 * 2 + size * 0.3) if shot.get("sub") else 0
-        top = H - int(W * s["caption_top"]) - b - sub_h
+    # caption (device / zoom)
+    block, size = cap.block_height(headline, sub)
+    top = int(W * s["caption_top"]) if pos == "top" else H - int(W * s["caption_top"]) - block
     bottom, size, w = cap.draw(canvas, headline, top)
     warnings += w
-    if shot.get("sub"):
-        bottom = cap.draw_sub(canvas, shot["sub"], bottom + size * 0.3, size)
+    if sub:
+        bottom = cap.draw_sub(canvas, sub, bottom + size * s["sub_gap"], size)
     ref = bg_reference_color(s["background"], pos == "bottom")
     if ref and contrast(hexrgb(s["text_color"]), ref) < 4.5:
         warnings.append(f"low headline contrast {contrast(hexrgb(s['text_color']), ref):.1f}:1 (aim ≥ 4.5)")
 
     if layout == "zoom":
+        # one or more crops of the screen, stacked as cards ("crops": [[x0,y0,x1,y1], ...])
         screen = load_screen(spec_dir, shot["screen"])
-        piece = crop_frac(screen, shot.get("crop", [0, 0, 1, 0.5]))
-        area_top = bottom + W * 0.05 if pos == "top" else W * 0.06
-        area_bot = H - W * 0.06 if pos == "top" else top - W * 0.05
+        boxes = shot.get("crops") or [shot.get("crop", [0, 0, 1, 0.5])]
+        pieces = [crop_frac(screen, b) for b in boxes]
+        area_top = bottom + W * 0.08 if pos == "top" else W * 0.07
+        area_bot = H - W * 0.07 if pos == "top" else top - W * 0.08
+        gap = W * shot.get("card_gap", 0.04)
         width_px = W * s["card"]["width"]
-        max_h = area_bot - area_top
-        if piece.height * width_px / piece.width > max_h:
-            width_px = max_h * piece.width / piece.height
-        canvas = draw_card(canvas, piece, s, W, W / 2, (area_top + area_bot) / 2, width_px)
+        # same scale for every card so the UI stays consistent; shrink to fit the free area
+        k = width_px / max(p.width for p in pieces)
+        total = sum(p.height for p in pieces) * k + gap * (len(pieces) - 1)
+        if total > area_bot - area_top:
+            k *= (area_bot - area_top - gap * (len(pieces) - 1)) / (sum(p.height for p in pieces) * k)
+            total = area_bot - area_top
+        y = (area_top + area_bot - total) / 2 if shot.get("card_align", "center") == "center" else area_top
+        for p_ in pieces:
+            h = p_.height * k
+            canvas = draw_card(canvas, p_, s, W, W / 2, y + h / 2, p_.width * k)
+            y += h + gap
         return canvas, warnings, size
 
     # device
     screen = load_screen(spec_dir, shot["screen"])
+    dv = s["device"]
     if pos == "top":
-        dev_top = int(bottom + W * s["device"]["gap"])
+        dev_top = int(bottom + W * dv["gap"])
+        limit = None
     else:
-        # caption at the bottom: the device ends above it and bleeds off the top edge if it's tall
-        dv = s["device"]
-        dw = int(W * dv["width"])
-        bw = int(dw * dv["border"])
-        dh = int(screen.height * (dw - 2 * bw) / screen.width) + 2 * bw
+        dh = device_geometry(screen, dv, W)[4]
         dev_top = int(top - W * dv["gap"] - dh)
         if not dv.get("bleed", True):
             dev_top = max(dev_top, int(W * 0.06))
-    limit = None if pos == "top" else top - W * s["device"]["gap"]
+        limit = top - W * dv["gap"]
     canvas, (sx, sy, k) = draw_device(canvas, screen, s, W, H, dev_top, limit)
     for co in shot.get("callouts", []):
         piece = crop_frac(screen, co["crop"])
-        scale = co.get("scale", 1.2)
-        width_px = piece.width * k * scale
+        width_px = piece.width * k * co.get("scale", 1.12)
         cx = W * co.get("x", 0.5)
-        if "y" in co:
-            cy = H * co["y"]
-        else:
-            cy = sy + (co["crop"][1] + co["crop"][3]) / 2 * screen.height * k
+        cy = H * co["y"] if "y" in co else sy + (co["crop"][1] + co["crop"][3]) / 2 * screen.height * k
         canvas = draw_card(canvas, piece, s, W, cx, cy, width_px)
     return canvas, warnings, size
 
@@ -508,6 +583,7 @@ def main():
     if a.presets:
         for k, (w, h) in PRESETS.items():
             print(f"{k:13} {w} x {h}")
+        print("\nfont aliases: " + ", ".join(FONT_ALIASES))
         return
     if not a.spec:
         p.error("spec is required")
@@ -538,7 +614,7 @@ def main():
                 continue
             path = os.path.join(out_dir, f"{i:02d}.png")
             img.convert("RGB").save(path, optimize=True)
-            report["shots"].append({"file": os.path.basename(path), "headline": shot.get("headline", "").replace("*", ""),
+            report["shots"].append({"file": os.path.basename(path), "headline": shot.get("headline", "").replace("*", "").replace("\n", " "),
                                     "sub": shot.get("sub", ""), "layout": shot.get("layout", "device"),
                                     "headline_px": size, "warnings": warnings})
             for w in warnings:
@@ -546,7 +622,7 @@ def main():
         report["fonts"] = sorted(fonts.used)
         with open(os.path.join(out_dir, "_render.json"), "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=1)
-        print(f"{name}: {len(report['shots'])} shots → {out_dir}   fonts: {', '.join(os.path.basename(x) for x in report['fonts'])}")
+        print(f"{name}: {len(report['shots'])} shots → {out_dir}   fonts: {', '.join(report['fonts'])}")
     sys.exit(exit_code)
 
 

@@ -27,7 +27,7 @@ Decide these once and keep them for every shot:
 |---|---|---|---|---|
 | **Device frame** | `device` | Headline top, real screen in a simple rounded frame, often bleeding off the bottom | Default for 70 % of shots | Waze, Kindle, Flo, ChatGPT |
 | **Full-bleed UI** | `full` | The screen fills the canvas; caption in a band or pill | Content-rich apps, games, when the UI is the hero | Duolingo (coloured pill), Gardenscapes (banner) |
-| **Zoom card** | `zoom` | A crop of the screen, enlarged as a card | The proof is one element on a busy screen | Flo, Capital One (720 score), ParkMobile (timer) |
+| **Zoom card(s)** | `zoom` + `crop` or `crops` | One crop, or 2–3 crops stacked at the same scale, as cards | The proof is one or two elements on a busy screen | Flo, Capital One (720 score), ParkMobile (timer), Cash App |
 | **Pulled-out callout** | `device` + `callouts` | Device plus one UI element lifted out, larger, with a soft shadow | Make the key element readable at thumbnail size | Indeed, Moovit ("Your bus is arriving NOW"), Gmail (Undo) |
 | **Photo-led** | `device` + `background.image` | Real photo of the moment of use behind the device | Lifestyle, mobility, food, dating | Lyft, Tinder, Pinterest |
 | **Poster** | `poster` | Giant type, no device | Max one per set, as a rhythm breaker | Uber "GO ANY-WHERE", Temu |
@@ -37,17 +37,28 @@ Rules of thumb:
 - The **UI must stay big**: in exemplary sets the device usually spans 70–85 % of the canvas width.
 - **Straight devices.** Tilted floating phones appear in 12 weak apps and 0 exemplary ones in the library.
   If you want energy, use a callout or a crop, not a 15° rotation.
-- Don't draw a branded device bezel (Apple's or anyone's hardware artwork). A neutral rounded frame, or no
-  frame, is cleaner and avoids trademark questions.
+- Don't draw a branded device bezel (Apple's or anyone's hardware artwork). The renderer's `"device":
+  {"style": "phone"}` is a neutral thin bezel with a pill cutout; `"style": "none"` is just the rounded screen
+  with a shadow.
+- **Crop boxes** are fractions of the screen image `[x0, y0, x1, y1]`. Get them right: open the screen, or, if
+  you built the screens from HTML, read element boxes with `getBoundingClientRect()` (the demo does this and
+  writes `example-screens/regions.json`). End a crop between rows, never through one.
 - Alternate caption position top/bottom only to make room for a photo or a tall element (Chick-fil-A,
   TaraGör), not for variety's sake.
 
 ## 3. Typography
 
-- Use the **brand's font** if it has one. Otherwise one well-made sans that's installed; a serif can make a set
-  feel editorial and human (Kindle, NYT, Tinder, Vinted, Suno - serif appears in 7 exemplary apps vs 1 weak).
-- Headline size: big enough that 3–6 words fill 2 lines across ~80 % of the width. At 1206 px wide that's
-  roughly 90–120 px. `render_set.py` auto-fits within your `max_lines`.
+- Use the **brand's font** if it has one (`"font": "fonts/Brand-Bold.ttf"`). Otherwise use the bundled,
+  OFL-licensed defaults (`assets/fonts/FONTS.md`): `sans` (Inter Display SemiBold) for headlines, `text`
+  (Inter) for sub-lines, `serif` / `serif-italic` (Lora) for an editorial emphasis word. Never fall back to a
+  system default like DejaVu or Arial for headlines - it's the fastest way to look unfinished.
+- A serif can make a set feel editorial and human (Kindle, NYT, Tinder, Vinted, Suno - serif appears in
+  7 exemplary apps vs 1 weak). A sans headline with one **serif-italic emphasis word** is a strong default.
+- Display type wants slightly tight tracking: `"tracking": -0.018` (em) is the default; go to -0.03 for very
+  large or condensed type, 0 for small caps labels.
+- Headline size: big enough that 3–6 words fill 2 lines across ~80 % of the width. Measured on the library,
+  exemplary headlines have a cap-to-descender height of ~34–47 ‰ of the image height (median 39 ‰); at
+  1206 × 2622 that's roughly 100–120 px type. `render_set.py` defaults to that and auto-fits within `max_lines`.
 - Line height 1.05–1.15 for headlines; never justify; centre or left-align consistently.
 - Left-aligned big headlines feel confident and modern (Cash App, Storytel); centred ones feel calm (Waze).
 - Sub-lines at ~45–55 % of the headline size, same family, lighter weight or colour.
@@ -75,7 +86,7 @@ Pick one per set. Spec syntax: wrap the word(s) in `*asterisks*` inside `headlin
 | Colour word | `color` | Gemini "Dive **deep** into any topic" in brand blue |
 | Highlight box | `box` | Flo "Predict your [next period]" white box on lilac |
 | Marker | `marker` | Threads yellow marker behind "conversation" |
-| Italic / second font | `font` (with `emphasis.font`) | Kindle serif italic "Build a *habit*." |
+| Italic / second font | `font` (`emphasis.font`, `weight`, `scale`, `color`) | Kindle serif italic "Build a *habit*."; demo: `serif-italic` at `scale` 1.1 in the accent colour |
 | Bold weight | `font` (bold file) | WhatsApp "**Message privately** with end-to-end encryption" |
 
 ## 6. When the renderer isn't enough: the HTML route
