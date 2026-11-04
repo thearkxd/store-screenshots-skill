@@ -225,6 +225,7 @@ def draw_tracked(d, xy, text, font, fill, track_px, anchor="ls"):
 class Caption:
     def __init__(self, fonts, style, W, lang):
         self.fonts, self.s, self.W, self.lang = fonts, style, W, lang
+        self.warnings = []
 
     def prep(self, text):
         if self.s["case"] == "upper":
@@ -321,7 +322,8 @@ class Caption:
         return top + total_h, size, warnings
 
     def sub_size(self, head_size):
-        return int(head_size * self.s["sub_scale"])
+        # follows the headline, but never larger than a readable sub-line (posters have huge headlines)
+        return int(min(head_size, self.W * self.s["headline_size"]) * self.s["sub_scale"])
 
     def draw_sub(self, img, text, top, head_size, color=None):
         s = self.s
@@ -330,7 +332,10 @@ class Caption:
         tr = s["sub_tracking"] * size
         max_w = self.W * s["text_width"]
         tokens = [(w, False, False) for w in self.prep(text).split()]
-        lines = wrap(tokens, lambda l: text_width(f, " ".join(t[0] for t in l), tr), max_w)[:3]
+        lines = wrap(tokens, lambda l: text_width(f, " ".join(t[0] for t in l), tr), max_w)
+        if len(lines) > 3:
+            self.warnings.append(f"sub-line needs {len(lines)} lines, only 3 are drawn - shorten it: {text!r}")
+            lines = lines[:3]
         d = ImageDraw.Draw(img)
         col = hexrgb(color or s["sub_color"] or s["text_color"])
         ascent = f.getmetrics()[0]
@@ -493,8 +498,8 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang):
                                     max_size=W * shot.get("poster_size", 0.2), center_v=H * shot.get("center", 0.46))
         warnings += w
         if sub:
-            pcap.draw_sub(canvas, sub, bottom + size * s["sub_gap"], size)
-        return canvas, warnings, size
+            pcap.draw_sub(canvas, sub, bottom + W * 0.05, size)
+        return canvas, warnings + pcap.warnings, size
 
     if layout == "full":
         screen = load_screen(spec_dir, shot["screen"])
@@ -525,6 +530,7 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang):
     warnings += w
     if sub:
         bottom = cap.draw_sub(canvas, sub, bottom + size * s["sub_gap"], size)
+    warnings += cap.warnings
     ref = bg_reference_color(s["background"], pos == "bottom")
     if ref and contrast(hexrgb(s["text_color"]), ref) < 4.5:
         warnings.append(f"low headline contrast {contrast(hexrgb(s['text_color']), ref):.1f}:1 (aim ≥ 4.5)")
@@ -567,8 +573,11 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang):
     for co in shot.get("callouts", []):
         piece = crop_frac(screen, co["crop"])
         width_px = piece.width * k * co.get("scale", 1.12)
-        cx = W * co.get("x", 0.5)
+        # default: centred on the element's own position in the screen, so it covers the original
+        cx = W * co["x"] if "x" in co else sx + (co["crop"][0] + co["crop"][2]) / 2 * screen.width * k
         cy = H * co["y"] if "y" in co else sy + (co["crop"][1] + co["crop"][3]) / 2 * screen.height * k
+        cx += W * co.get("dx", 0)
+        cy += H * co.get("dy", 0)
         canvas = draw_card(canvas, piece, s, W, cx, cy, width_px)
     return canvas, warnings, size
 

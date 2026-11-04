@@ -91,9 +91,18 @@ For the new set I need these raw screenshots (PNG, straight from the device or s
 1. <screen> - showing <state/data>, e.g. "Discover, with the 'Picked for you' row filled"
 2. …
 Capture tips: dark/light mode as in the design · app language = store language · realistic, filled data
-(no empty states, no real personal data) · clean status bar · iPhone (1179×2556 or 1206×2622) is ideal;
-simulator: `xcrun simctl io booted screenshot shot.png`; Android: `adb exec-out screencap -p > shot.png`.
+(no empty states, no real personal data) · same clean status bar on every screen · no debug UI (test
+buttons, dev banners) · full-resolution PNG, not a shared/compressed copy · iPhone 1179×2556 or 1206×2622.
+Simulator: `xcrun simctl status_bar booted override --time 9:41 --batteryState charged --batteryLevel 100`,
+then `xcrun simctl io booted screenshot shot.png`. Android: `adb exec-out screencap -p > shot.png`.
 ```
+
+When screens arrive, open each one and check: resolution (a 738-px-wide share is usable but soft; ask for
+the original if time allows), stray debug UI (cover it with the surrounding background colour - that's
+simplifying, not inventing), mismatched status bars, personal data. Measure crop boxes for callouts and zoom
+cards on the actual files and preview the crops before rendering. Callouts default to the element's own
+position (`dx`/`dy` nudge it); check that an enlarged callout fully covers the original and doesn't hide a
+section heading.
 
 Render only when real screens are in hand. If the user can't provide one, change that shot (another
 screen, a zoom card of a screen you have, or the one allowed poster shot), not the rule.

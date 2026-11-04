@@ -28,7 +28,7 @@ Decide these once and keep them for every shot:
 | **Device frame** | `device` | Headline top, real screen in a simple rounded frame, often bleeding off the bottom | Default for 70 % of shots | Waze, Kindle, Flo, ChatGPT |
 | **Full-bleed UI** | `full` | The screen fills the canvas; caption in a band or pill | Content-rich apps, games, when the UI is the hero | Duolingo (coloured pill), Gardenscapes (banner) |
 | **Zoom card(s)** | `zoom` + `crop` or `crops` | One crop, or 2–3 crops stacked at the same scale, as cards | The proof is one or two elements on a busy screen | Flo, Capital One (720 score), ParkMobile (timer), Cash App |
-| **Pulled-out callout** | `device` + `callouts` | Device plus one UI element lifted out, larger, with a soft shadow | Make the key element readable at thumbnail size | Indeed, Moovit ("Your bus is arriving NOW"), Gmail (Undo) |
+| **Pulled-out callout** | `device` + `callouts` (`crop`, `scale`, optional `dx`/`dy`) | Device plus one UI element lifted out, larger, with a soft shadow, centred on its own position | Make the key element readable at thumbnail size | Indeed, Moovit ("Your bus is arriving NOW"), Gmail (Undo) |
 | **Photo-led** | `device` + `background.image` | Real photo of the moment of use behind the device | Lifestyle, mobility, food, dating | Lyft, Tinder, Pinterest |
 | **Poster** | `poster` | Giant type, no device | Max one per set, as a rhythm breaker | Uber "GO ANY-WHERE", Temu |
 | **Panorama** | (design by hand) | One image continues across shots | Only if shot 1 still works alone | Bubilet, Garanti BBVA |

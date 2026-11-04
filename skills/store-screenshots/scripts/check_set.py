@@ -173,7 +173,7 @@ def main():
         for w in s.get("warnings", []):
             warns.append(f"{s['file']}: {w}")
 
-    sheet(files[:3], 200, "Search-result size (~200 px wide). Can you tell what the app does from these three?",
+    sheet(files[:3], 200, "Search-result size: does the app make sense from these three?",
           os.path.join(a.folder, "_search-preview.jpg"))
     sheet(files, 300, f"Overview - {len(files)} shots, {a.store}", os.path.join(a.folder, "_overview.jpg"), cols=min(len(files), 5))
 
