@@ -1,0 +1,74 @@
+name: Library refresh
+
+# Monthly: collect the current top-4 free apps per App Store category (TR + US), diff them against the library,
+# and open (or update) an issue listing new apps to classify. Labelling stays human-reviewed; this job never
+# changes the library itself. The collected screenshots and contact sheets are attached as an artifact.
+
+on:
+  schedule:
+    - cron: "23 5 3 * *"   # 3rd of every month, 05:23 UTC
+  workflow_dispatch:
+    inputs:
+      countries:
+        description: "Store countries"
+        default: "tr us"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-dejavu-core
+          python -m pip install --quiet pillow
+      - name: Collect current charts
+        run: |
+          python skills/store-screenshots/scripts/collect_examples.py \
+            --countries ${{ github.event.inputs.countries || 'tr us' }} --per-category 4 --out raw
+      - name: Diff against the library
+        run: python tools/library_diff.py --raw raw --out refresh
+      - name: Contact sheets of new apps
+        run: |
+          python - <<'EOF'
+          import json, os, sys
+          sys.path.insert(0, "skills/store-screenshots/scripts")
+          from make_sheet import build
+          new = json.load(open("refresh/new-apps.json"))
+          m = json.load(open("raw/manifest.json"))
+          rows, seen = [], set()
+          for r in m:
+              if any(n["app_id"] == r["app_id"] and n["country"] == r["country"] for n in new) and (r["country"], r["app_id"]) not in seen:
+                  seen.add((r["country"], r["app_id"]))
+                  rows.append((f"{r['country']} · {r['category']} · {r['app']}", os.path.join("raw", os.path.dirname(r["file"]))))
+          for k in range(0, len(rows), 4):
+              build(rows[k:k + 4], f"new apps {k // 4 + 1}", f"refresh/sheets/new-{k // 4 + 1:02d}.jpg", width=150)
+          print(len(rows), "new app sets")
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: library-refresh-${{ github.run_id }}
+          path: |
+            raw/
+            refresh/
+          retention-days: 30
+      - name: Open or update the refresh issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          N=$(python -c "import json;print(len(json.load(open('refresh/new-apps.json'))))")
+          { cat refresh/report.md; echo; echo "Artifact: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"; } > body.md
+          if [ "$N" = "0" ]; then echo "no new apps"; exit 0; fi
+          NUM=$(gh issue list --label library-refresh --state open --json number --jq '.[0].number // empty')
+          if [ -n "$NUM" ]; then
+            gh issue comment "$NUM" --body-file body.md
+          else
+            gh label create library-refresh --color 5B5BF5 --description "Monthly library refresh" 2>/dev/null || true
+            gh issue create --title "Library refresh: $N new apps to classify ($(date +%Y-%m))" --label library-refresh --body-file body.md
+          fi

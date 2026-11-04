@@ -228,6 +228,7 @@ def cmd_merge(a):
             "country": r["country"],
             "category": r["category"],
             "chart_rank": r["chart_rank"],
+            "source": r.get("source", "chart"),
             "app": r["app"],
             "app_id": r["app_id"],
             "seller": r["seller"],

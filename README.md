@@ -10,14 +10,15 @@ as AI-generated.
 - **Process & craft** - brief, category research, story order, the first three shots, headline patterns,
   banned/tired phrases (EN + TR), layouts, type, colour, emphasis devices, localisation, critique scorecard,
   and up-to-date store specs (checked 2026-11-04).
-- **A reference library of 1,366 real screenshots** - the top 4 free iPhone apps in 25 App Store categories,
-  Turkish and US stores. Every app is labelled (layout, techniques, first-shot type, quality, AI smell, why);
-  every screenshot has headline text (243 human-verified), position, language and colour data. Searchable
-  from the command line.
-- **Scripts** (Python 3 + Pillow) - search the library, render a whole set from one JSON spec at exact store
-  sizes (bundled OFL fonts, tracking, emphasis words in a second font, phone frame, stacked zoom cards,
-  pulled-out callouts, posters, Turkish-safe capitals), check a set against store and copy rules with a
-  search-result preview, and peer-test it next to exemplary sets.
+- **A reference library of 1,718 real screenshots** - the top 4 free iPhone apps in 25 App Store categories
+  (Turkish and US stores) plus 2 well-rated small/mid-size "challengers" per category. Every app is labelled
+  (layout, techniques, first-shot type, quality, AI smell, why); every screenshot has headline text (355
+  human-verified), position, language and colour data. Searchable from the command line; refreshed monthly.
+- **Scripts** (Python 3 + Pillow) - read a live store listing, check and clean raw screens (status bar, debug
+  UI), place crops on a grid, render a whole set from one JSON spec at exact store sizes (every locale at once,
+  iPhone and Android frames, Google Play feature graphic, bundled OFL fonts, emphasis words, zoom cards,
+  callouts, posters, Turkish-safe capitals), check it against store and copy rules with a search-result
+  preview, and peer-test it next to exemplary sets.
 
 ## Real example: Seenfy
 
@@ -32,9 +33,10 @@ above was made end to end with the skill:
 3. **Storyboard** - one promise per shot, taken from the listing's own proof points (personal picks, mood
    collections, continue watching, one-tap tracking, spoiler-free comments), then a request for exactly the
    raw screens each shot needs.
-4. **Render & check** - 6 raw iPhone screens → `render_set.py` (callouts for the match score, the
-   continue-watching card and the action buttons; a debug button covered), `check_set.py` for App Store and
-   Google Play sizes and copy rules, `peer_test.py` next to exemplary sets.
+4. **Render & check** - 6 raw iPhone screens → `prepare_screens.py` (low-res warning, debug button covered)
+   → `render_set.py` with one spec for both languages, App Store and Google Play sizes and a Play feature
+   graphic (callouts for the match score, the continue-watching card and the action buttons) →
+   `check_set.py` for store and copy rules, `peer_test.py` next to exemplary sets.
 
 **Turkish (App Store TR)**
 
@@ -54,11 +56,18 @@ above was made end to end with the skill:
 *Not what's popular. What you'll love. · In the mood for a plot twist? · Your next episode, always ready ·
 Watch, like, check it off · Stop wondering what to watch · No spoilers. Promise.*
 
+**Google Play** - same spec, Android frame, plus the required 1024×500 feature graphic:
+
+![Seenfy Google Play feature graphic](docs/images/seenfy-feature-graphic.jpg)
+
+![Seenfy Google Play screenshots with the Android frame](docs/images/seenfy-android.jpg)
+
 > The English set reuses the Turkish UI to show the copy side by side. For a real US listing, capture the
 > screens with the app in English - caption language should always match the UI (`references/localization.md`).
 
-Reproduce both: `python3 skills/store-screenshots/scripts/render_set.py examples/seenfy/set.tr.json --out out/tr`
-(and `set.en.json`). Specs and screens are in `examples/seenfy/`.
+Reproduce everything (TR + EN, iOS + Android + feature graphic) from one spec:
+`python3 skills/store-screenshots/scripts/render_set.py examples/seenfy/set.json --out out/` → `out/tr/…`,
+`out/en/…`. The spec and screens are in `examples/seenfy/`.
 
 <details><summary>The skill's own demo set (fictional app, from <code>templates/set.example.json</code>)</summary>
 
@@ -70,8 +79,8 @@ Reproduce both: `python3 skills/store-screenshots/scripts/render_set.py examples
 
 | Package | Contents | Size | Use for |
 |---|---|---|---|
-| `store-screenshots.zip` | everything, all 1,267 library images | ~36 MB | Claude Code, Codex, Cursor, Gemini CLI, cloning the repo |
-| `store-screenshots-lite.zip` | full text catalog + 549 images (every shot of the 42 exemplary apps, the first shot of every app, shots 1–3 of instructive bad ones) | ~16 MB (17 MB unpacked) | claude.ai and ChatGPT uploads |
+| `store-screenshots.zip` | everything, all 1,619 library images | ~46 MB | Claude Code, Codex, Cursor, Gemini CLI, cloning the repo |
+| `store-screenshots-lite.zip` | full text catalog + 661 images at 420 px (every shot of the exemplary apps, the first shot of every app, shots 1–3 of instructive bad ones) | ~16 MB (18 MB unpacked) | claude.ai and ChatGPT uploads |
 
 Both work the same way; the scripts only offer images that are on disk. Build them with
 `python3 tools/package_skill.py` (writes `dist/`).
@@ -97,7 +106,8 @@ availability depends on your ChatGPT plan and workspace settings.)
 **Codex CLI, Gemini CLI, Cursor and others** - copy `skills/store-screenshots` into your agent's skills folder
 (for example `~/.codex/skills/`, `~/.gemini/skills/` or `~/.agents/skills/`).
 
-Skills don't sync between products - install in each one you use.
+Skills don't sync between products - install in each one you use. After installing, run the checklist in
+[`docs/testing.md`](docs/testing.md) once to make sure the skill triggers and the scripts run there.
 
 ## Use
 
@@ -118,9 +128,13 @@ Or run the tools yourself:
 S=skills/store-screenshots/scripts
 python3 $S/search_library.py --category weather --summary
 python3 $S/search_library.py --quality exemplary --position 1 --verified --format headlines
-python3 $S/render_set.py skills/store-screenshots/templates/set.example.json --out out/
-python3 $S/check_set.py out/ios --store ios --lang tr
-python3 $S/peer_test.py out/ios --category entertainment -o peer.jpg
+python3 $S/fetch_listing.py https://apps.apple.com/tr/app/id6764370964 --search "film dizi takip"
+python3 $S/prepare_screens.py examples/seenfy/screens --out prepared --status-bar 9:41
+python3 $S/crop_helper.py check examples/seenfy/set.json -o crops.jpg
+python3 $S/render_set.py examples/seenfy/set.json --out out/
+python3 $S/check_set.py out/tr/ios --store ios --lang tr
+python3 $S/check_set.py out/tr/android --store android --lang tr
+python3 $S/peer_test.py out/tr/ios --category entertainment -o peer.jpg
 ```
 
 ## What's inside
@@ -130,22 +144,28 @@ skills/store-screenshots/
   SKILL.md                    workflow, non-negotiables, red flags, tool map
   references/                 intake · copy-rules · storytelling · layouts · anti-ai · localization ·
                               store-specs · critique · library-guide
-  scripts/                    fetch_listing · search_library · render_set · check_set · peer_test ·
-                              make_sheet · collect_examples · build_catalog
+  scripts/                    fetch_listing · prepare_screens · crop_helper · search_library · render_set ·
+                              check_set · peer_test · make_sheet · collect_examples · find_challengers ·
+                              build_catalog
   templates/                  set.example.json + demo screens of a fictional app
   assets/fonts/               Inter, Inter Display, Lora (OFL, subset to Latin + Turkish)
   assets/library/             catalog.json · classifications.json · stats.json · img/
-examples/seenfy/              a real set: specs (TR + EN) and the raw screens
+examples/seenfy/              a real set: one multi-locale spec (TR + EN) and the raw screens
 evals/evals.json              test prompts with expected behaviour
+docs/testing.md               manual checklist for claude.ai / ChatGPT / Claude Code
 tools/package_skill.py        builds the full and lite zips
 tools/smoke_test.py           what CI runs on every push
+tools/library_diff.py         monthly refresh: new / dropped chart apps vs. the library
 tools/demo_screens/build.py   rebuilds the demo screens (HTML/CSS → Playwright)
 ```
 
 ## Library at a glance
 
-- 25 categories × 4 apps × 2 stores, collected 2026-11-04 from the public App Store charts.
-- 42 apps rated exemplary, 79 solid, 52 weak; 22 flagged for AI/template smell.
+- 25 categories × 4 chart apps × 2 stores + 50 US challengers (rating ≥ 4.6, not a giant seller), collected
+  2026-11-04 from the public App Store.
+- Chart apps: 42 rated exemplary, 79 solid, 52 weak; 22 flagged for AI/template smell. Challengers: 9
+  exemplary (Working Copy, TickPick, CAVA, Tunesimo, Structured, GetYourGuide, Viator, Weather & Radar,
+  The Economist).
 - Strongest signals in the data: verb-led headlines (11 exemplary / 0 weak apps), one emphasised word (11/1),
   pulled-out UI cards (4/0) - versus generic claims (0/16), no captions (0/15), tilted floating phones (0/12).
 - Quality labels are a reviewer's judgement (made with Claude), not conversion data. See
@@ -153,6 +173,8 @@ tools/demo_screens/build.py   rebuilds the demo screens (HTML/CSS → Playwright
 
 Refresh or extend the library with `collect_examples.py` + `build_catalog.py` (needs access to
 `itunes.apple.com` and `is1-ssl.mzstatic.com`, Pillow and tesseract with `eng` + `tur`).
+`.github/workflows/library-refresh.yml` does the collecting on the 3rd of every month and opens an issue with
+the new apps to classify.
 
 ## Releases (CI/CD)
 
@@ -164,6 +186,8 @@ build if the lite package grows past 20 MB. Pushes to `main` then publish a GitH
   (`v1.0.7`, `v1.0.8`, …). Bump `version` there for a new minor/major line.
 - Other branches and pull requests: the zips are attached to the workflow run as artifacts (14 days).
 - Put `[skip release]` in a commit message to build without publishing.
+- `network-test.yml` fetches a real App Store and Google Play listing weekly (and when `fetch_listing.py`
+  changes), so parser breakage shows up without blocking releases.
 
 ## License
 

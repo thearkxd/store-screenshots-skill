@@ -114,7 +114,11 @@ def fetch_appstore(ref):
             sub = m.group(1)
             if sub.startswith("\\u") or "\\" in sub:
                 sub = json.loads(f'"{sub}"')
-            info["subtitle"] = html.unescape(re.sub(r"<[^>]+>", "", sub)).strip() or None
+            sub = html.unescape(re.sub(r"<[^>]+>", "", sub)).strip()
+            # the page also has category labels in "subtitle" fields - ignore those
+            bad = {(info.get("category") or "").lower(), (info.get("seller") or "").lower(),
+                   *[g.lower() for g in info.get("genres") or []]}
+            info["subtitle"] = sub if sub and sub.lower() not in bad else None
     except Exception:
         pass
     return info

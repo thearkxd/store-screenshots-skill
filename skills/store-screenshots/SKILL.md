@@ -46,12 +46,14 @@ rendering. Run with `python3 <skill-dir>/scripts/<name>.py` (`python` on Windows
 |---|---|
 | `fetch_listing.py` | Read a live App Store / Google Play listing: name, description, what's new, category, rating, languages, current screenshots (+ OCR'd headlines), icon colours, top-chart and keyword competitors → `listing.md` |
 | `search_library.py` | Query the library: `--category`, `--country tr/us`, `--quality exemplary/weak`, `--technique`, `--layout`, `--position 1`, `--ai-smell`, `--query`; `--summary` shows a category's conventions; `--format headlines` lists real headlines; `--format paths` gives images to look at |
-| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; bundled fonts, tracking, Turkish-safe capitals |
+| `prepare_screens.py` | Check incoming raw screens (resolution, ratio, JPEG, mismatched status bars), repaint a clean status bar (`--status-bar 9:41`), cover debug UI (`--cover`) |
+| `crop_helper.py` | `grid` draws a labelled coordinate grid on a screen; `check` previews every callout/zoom crop of a spec |
+| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; Android punch-hole frame for Android sizes; Google Play feature graphic (1024×500); every locale from one spec (`"locales"`); bundled fonts, tracking, Turkish-safe capitals |
 | `check_set.py` | Check finished PNGs: exact store sizes, no alpha, count limits, headline length, banned phrases; writes a **search-result preview** (first 3 shots at thumbnail size) and an overview sheet |
 | `peer_test.py` | Put your set next to 2–3 exemplary sets from the same category at the same size |
 | `make_sheet.py` | Contact sheets of any folders of screenshots |
 | `collect_examples.py` | Download any apps' store screenshots by id (competitors: `--app-ids … --label competitors`); maintainers use it for the library |
-| `build_catalog.py` | Maintainers: rebuild the library catalog |
+| `find_challengers.py`, `build_catalog.py` | Maintainers: pick well-rated small/mid-size apps per category; rebuild the library catalog |
 
 If the library images are missing (lite package), every script still works on the text catalog; only the
 images that ship are viewable (`search_library.py` marks them `img`).
@@ -99,11 +101,17 @@ to App Store categories; see `references/library-guide.md` for the list and the 
   type family, one emphasis device (colour word, highlight box, or italic) - `references/layouts.md`.
 - Choose a layout per shot from the recipes (device frame, full-bleed, zoom card, pulled-out callout, photo-led,
   one poster shot at most). Keep the UI big: the phone is the product.
-- Write the spec and render:
+- Prepare the screens, place the crops, write the spec and render:
 ```bash
-cp templates/set.example.json set.json      # edit: size, colours, fonts, shots
+python3 scripts/prepare_screens.py screens/ --out prepared/ --status-bar 9:41   # read the report it prints
+python3 scripts/crop_helper.py grid prepared/02-home.png                          # read crop boxes off the grid
+cp templates/set.example.json set.json      # edit: sizes, colours, fonts, shots (see examples/seenfy in the repo)
+python3 scripts/crop_helper.py check set.json -o crops.jpg                         # look before rendering
 python3 scripts/render_set.py set.json --out out/
 ```
+- Several languages: `"locales": ["tr", "en"]` and `{"tr": "…", "en": "…"}` for any headline, sub or screen;
+  output goes to `out/<locale>/<preset>/`. Google Play: add `"feature_graphic"` (headline + screen) - it's
+  required on Play and rendered at 1024×500. Android presets get a punch-hole frame automatically.
 Use the user's brand font if they provide a `.ttf/.otf`; otherwise the bundled OFL fonts (`sans` headline,
 `text` sub-line, `serif-italic` for one emphasis word - `assets/fonts/FONTS.md`). Seed the screens with
 realistic data first: the renderer can't fix thin or empty UI. For layouts the renderer can't do, write

@@ -54,6 +54,23 @@ def main():
             assert os.path.exists(os.path.join(folder, "_search-preview.jpg"))
         run(s("peer_test.py"), os.path.join(tmp, "ios"), "--category", "navigation", "-o", os.path.join(tmp, "peer.jpg"))
         run(s("make_sheet.py"), "--rows", os.path.join(tmp, "ios"), "-o", os.path.join(tmp, "sheet.jpg"))
+        # multi-locale spec with a feature graphic (the real Seenfy example)
+        ex = os.path.join(tmp, "seenfy")
+        run(s("render_set.py"), os.path.join(ROOT, "examples", "seenfy", "set.json"), "--out", ex, "--size", "android")
+        for loc in ("tr", "en"):
+            assert len([f for f in os.listdir(os.path.join(ex, loc, "android")) if f.endswith(".png")]) == 6, loc
+            from PIL import Image
+            assert Image.open(os.path.join(ex, loc, "feature-graphic.png")).size == (1024, 500)
+            out = run(s("check_set.py"), os.path.join(ex, loc, "android"), "--store", "android")
+            assert "Google Play disallows" not in out, out  # "Popüler olanı değil" / "Not what's popular" are negated
+        # screen preparation and crop helpers
+        prep = os.path.join(tmp, "prep")
+        run(s("prepare_screens.py"), os.path.join(ROOT, "examples", "seenfy", "screens"), "--out", prep, "--status-bar", "9:41",
+            "--cover", "05-anasayfa.png:0.626,0.086,0.878,0.13")
+        assert os.path.exists(os.path.join(prep, "report.json"))
+        run(s("crop_helper.py"), "grid", os.path.join(prep, "01-kesfet.png"))
+        run(s("crop_helper.py"), "check", os.path.join(ROOT, "examples", "seenfy", "set.json"), "-o", os.path.join(tmp, "crops.jpg"))
+        run(s("search_library.py"), "--source", "challenger", "--quality", "exemplary", "--format", "apps")
         # copy checks must catch an obviously bad headline
         out = run(s("check_set.py"), os.path.join(tmp, "android"), "--store", "android", "--lang", "tr",
                   "--headlines", "Kusursuz Dizi Deneyimi", "#1 dizi uygulaması!", "a", "b", "c")

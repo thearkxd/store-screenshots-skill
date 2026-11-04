@@ -1,10 +1,11 @@
 # The reference library - guide and insights
 
 The library holds the App Store screenshots of the **top 4 free iPhone apps in 25 App Store categories**, in
-the **Turkish (tr)** and **US (us)** stores, collected on 2026-11-04: **1,366 screenshot records**
-(1,267 unique images) from **197 chart slots / 173 unique apps**. Every app is classified by a reviewer
+the **Turkish (tr)** and **US (us)** stores, plus **2 "challengers" per category** - well-rated small/mid-size
+apps from the US top 100 (rating ≥ 4.6, not a giant seller) - collected on 2026-11-04: **1,718 screenshot
+records** (1,619 unique images) from **223 unique apps** (173 chart apps + 50 challengers). Every app is classified by a reviewer
 (layout, techniques, first-shot type, quality, AI smell, a note on why); every screenshot has OCR'd headline
-text, position, language, palette and background type. 243 lite screenshots have **human-verified headlines**.
+text, position, language, palette and background type. 355 screenshots have **human-verified headlines**.
 
 > **The screenshots are the property of their publishers.** They are included as study material only.
 > Never ship them, trace them, or copy a set's copy or design system closely.
@@ -41,9 +42,9 @@ utilities · weather. (Stickers has no iPhone screenshots and is absent.)
 | | Full | Lite |
 |---|---|---|
 | Text catalog (all 1,366 records, labels, notes, OCR headlines) | ✓ | ✓ |
-| Images | all 1,267 | 549: every shot of the 42 exemplary apps, the first shot of every app, and shots 1–3 of 26 instructive weak/AI-smell apps |
-| Verified headlines | 243 | same |
-| Size | ~36 MB zipped | ~16 MB zipped, ~17 MB unpacked (fits a 20 MB upload limit) |
+| Images | all 1,619 at 480 px | 661 at 420 px: every shot of the exemplary apps, the first shot of every app, and shots 1–3 of instructive weak/AI-smell apps |
+| Verified headlines | 355 | same |
+| Size | ~46 MB zipped | ~16 MB zipped, ~18 MB unpacked (fits a 20 MB upload limit) |
 
 Scripts detect missing images and only offer what's on disk (`img` column / `--has-image`).
 
@@ -51,6 +52,7 @@ Scripts detect missing images and only offer what's on disk (`img` column / `--h
 
 ```bash
 python3 scripts/search_library.py --list-values                  # categories, techniques, layouts…
+python3 scripts/search_library.py --source challenger --quality exemplary --format apps   # small apps done well
 python3 scripts/search_library.py --category navigation --summary   # conventions of a category
 python3 scripts/search_library.py --category finance --country tr --position 1 --format headlines
 python3 scripts/search_library.py --quality exemplary --technique stat-number --format headlines
@@ -116,7 +118,10 @@ and about one in eight Turkish top apps shows English captions or a foreign-lang
 ## 6. Limits and biases
 
 - Top charts = big brands. Big brands can rely on recognition (Google, YouTube, Instagram); a small app can't.
-  Weigh the exemplary sets of challengers (HIRKA, TaraGör, WeatherX, Ground News, The Pour Over) higher.
+  That's why the challengers exist (`--source challenger`): Working Copy, TickPick, CAVA, Tunesimo,
+  Structured, GetYourGuide, Viator, Weather & Radar, The Economist are exemplary ones. Among the chart apps,
+  weigh HIRKA, TaraGör, WeatherX, Ground News and The Pour Over higher for the same reason. Challengers are
+  US-store only.
 - iPhone screenshots only; no iPad, no Google Play images, no preview videos.
 - A single snapshot in time; seasonal campaigns (Pinterest's Halloween set, Hepsiburada's "Efsane Kasım") are
   included as they were that day.
@@ -131,7 +136,7 @@ Each record in `catalog.json`:
 | Field | Meaning |
 |---|---|
 | `id`, `image`, `image_id`, `in_lite` | identity, image path (relative to `assets/library/`), shipped in lite? |
-| `country`, `category`, `chart_rank`, `app`, `app_id`, `seller`, `position`, `shots_total`, `store_url` | where it came from |
+| `country`, `category`, `chart_rank`, `source`, `app`, `app_id`, `seller`, `position`, `shots_total`, `store_url` | where it came from (`source`: chart · challenger · curated) |
 | `headline`, `headline_verified`, `headline_words`, `headline_pos`, `headline_px`, `language` | caption text (OCR unless verified), position, size (‰ of height), language |
 | `text_chars`, `palette`, `dark`, `background` | visual features (`background`: flat · flat-top · gradient · image) |
 | `layout`, `techniques`, `first_shot`, `quality`, `ai_smell`, `note` | app-level labels (same for every shot of an app) |
@@ -140,6 +145,13 @@ Each record in `catalog.json`:
 `layout`: device-frame · full-bleed-ui · mixed · photo-led · illustration-led · panorama · type-led.
 `first_shot`: benefit · feature · brand · content · ui-only · social-proof · offer · hook.
 `quality`: exemplary · solid · weak.
+
+**Monthly refresh:** `.github/workflows/library-refresh.yml` collects the charts on the 3rd of every month,
+diffs them with `tools/library_diff.py` and opens an issue listing new apps to classify (with contact sheets
+and the raw screenshots as an artifact). Labelling stays human-reviewed.
+
+**Add challengers:** `python3 scripts/find_challengers.py --country us --per-category 2 > ch.json`, then
+`collect_examples.py --app-ids … --label <category> --source challenger --start-rank 11`.
 
 **Refresh or extend** (needs network access to `itunes.apple.com` and `is1-ssl.mzstatic.com`, Pillow and
 tesseract with `eng`+`tur`):

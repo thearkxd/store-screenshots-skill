@@ -113,7 +113,7 @@ def interleave(lists):
     return out
 
 
-def collect_app(app_id, country, category, rank, out_root, max_shots, width, records):
+def collect_app(app_id, country, category, rank, out_root, max_shots, width, records, source="chart"):
     info = lookup(app_id, country)
     if not info:
         print(f"    ! {app_id}: not found in {country}")
@@ -154,6 +154,7 @@ def collect_app(app_id, country, category, rank, out_root, max_shots, width, rec
             "position": pos,
             "shots_total": len(shots),
             "store_url": info.get("trackViewUrl", "").split("?")[0],
+            "source": source,
             "source_url": src,
         })
     print(f"    {rank:>2}. {name} — {saved}/{len(shots)} screenshots")
@@ -170,6 +171,8 @@ def main():
     p.add_argument("--width", type=int, default=600, help="download width in px")
     p.add_argument("--app-ids", nargs="+", help="collect these App Store IDs instead of the charts")
     p.add_argument("--label", default="curated", help="category folder name used with --app-ids")
+    p.add_argument("--source", default=None, help="record source tag (default: chart, or curated with --app-ids)")
+    p.add_argument("--start-rank", type=int, default=1, help="first rank number used with --app-ids (keeps ids unique)")
     p.add_argument("--out", default="raw", help="output folder (default ./raw)")
     a = p.parse_args()
 
@@ -186,8 +189,8 @@ def main():
     for country in a.countries:
         if a.app_ids:
             print(f"[{country}] {a.label}")
-            for rank, app_id in enumerate(a.app_ids, start=1):
-                collect_app(app_id, country, a.label, rank, out_root, a.max_shots, a.width, new)
+            for rank, app_id in enumerate(a.app_ids, start=a.start_rank):
+                collect_app(app_id, country, a.label, rank, out_root, a.max_shots, a.width, new, a.source or "curated")
             continue
         for cat in a.categories:
             print(f"[{country}] {CATEGORIES[cat]['label']} ({cat})")

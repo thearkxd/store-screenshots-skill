@@ -40,7 +40,8 @@ Rules of thumb:
 - Don't draw a branded device bezel (Apple's or anyone's hardware artwork). The renderer's `"device":
   {"style": "phone"}` is a neutral thin bezel with a pill cutout; `"style": "none"` is just the rounded screen
   with a shadow.
-- **Crop boxes** are fractions of the screen image `[x0, y0, x1, y1]`. Get them right: open the screen, or, if
+- **Crop boxes** are fractions of the screen image `[x0, y0, x1, y1]`. Get them right: `crop_helper.py grid`
+  draws a labelled grid to read them off, `crop_helper.py check set.json` previews every crop; or, if
   you built the screens from HTML, read element boxes with `getBoundingClientRect()` (the demo does this and
   writes `example-screens/regions.json`). End a crop between rows, never through one.
 - Alternate caption position top/bottom only to make room for a photo or a tall element (Chick-fil-A,

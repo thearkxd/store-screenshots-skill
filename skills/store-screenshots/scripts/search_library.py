@@ -43,6 +43,8 @@ def matches(r, a):
         return False
     if a.country and r["country"] not in a.country:
         return False
+    if a.source and r.get("source", "chart") not in a.source:
+        return False
     if a.quality and r["quality"] not in a.quality:
         return False
     if a.layout and r["layout"] not in a.layout:
@@ -117,6 +119,8 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--category", nargs="+")
     p.add_argument("--country", nargs="+", choices=["tr", "us"])
+    p.add_argument("--source", nargs="+", choices=["chart", "challenger", "curated"],
+                   help="chart = top-4 of the category chart; challenger = well-rated small/mid-size apps")
     p.add_argument("--quality", nargs="+", choices=["exemplary", "solid", "weak"])
     p.add_argument("--layout", nargs="+")
     p.add_argument("--first-shot", nargs="+")
@@ -142,8 +146,8 @@ def main():
 
     rows = load()
     if a.list_values:
-        for key in ("category", "country", "layout", "first_shot", "quality", "background"):
-            print(f"{key}: " + ", ".join(f"{k} ({v})" for k, v in sorted(Counter(r[key] for r in rows).items())))
+        for key in ("category", "country", "source", "layout", "first_shot", "quality", "background"):
+            print(f"{key}: " + ", ".join(f"{k} ({v})" for k, v in sorted(Counter(r.get(key) for r in rows).items(), key=lambda kv: str(kv[0]))))
         tech = Counter(t for r in {x["app_id"]: x for x in rows}.values() for t in (r["techniques"] or []))
         print("technique (apps): " + ", ".join(f"{k} ({v})" for k, v in sorted(tech.items())))
         print(f"images on disk: {sum(r['has_image'] for r in rows)} / {len(rows)} records")

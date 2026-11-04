@@ -97,10 +97,12 @@ Simulator: `xcrun simctl status_bar booted override --time 9:41 --batteryState c
 then `xcrun simctl io booted screenshot shot.png`. Android: `adb exec-out screencap -p > shot.png`.
 ```
 
-When screens arrive, open each one and check: resolution (a 738-px-wide share is usable but soft; ask for
+When screens arrive, run `python3 scripts/prepare_screens.py screens/ --out prepared/` - it reports resolution,
+aspect ratio, JPEG sources and mismatched status bars, and with `--status-bar 9:41` / `--cover FILE:x0,y0,x1,y1`
+fixes the last two. Then open each one and check: resolution (a 738-px-wide share is usable but soft; ask for
 the original if time allows), stray debug UI (cover it with the surrounding background colour - that's
 simplifying, not inventing), mismatched status bars, personal data. Measure crop boxes for callouts and zoom
-cards on the actual files and preview the crops before rendering. Callouts default to the element's own
+cards on the actual files (`crop_helper.py grid`) and preview them before rendering (`crop_helper.py check`). Callouts default to the element's own
 position (`dx`/`dy` nudge it); check that an enlarged callout fully covers the original and doesn't hide a
 section heading.
 

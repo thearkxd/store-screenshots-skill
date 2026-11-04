@@ -44,7 +44,9 @@ app runs on iPad.
   the app or imitate other products.
 
 `render_set.py` presets: `android` = 1080 × 1920 (default, promotion-eligible), `android-tall` = 1080 × 2160
-(2:1, the tallest allowed ratio).
+(2:1, the tallest allowed ratio). Android presets use a neutral punch-hole frame instead of the iPhone-style
+island. Add `"feature_graphic"` to the spec to render the 1024 × 500 graphic (`out/feature-graphic.png`);
+`check_set.py --store android` checks it.
 
 ## Practical consequences
 

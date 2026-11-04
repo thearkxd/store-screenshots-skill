@@ -2493,6 +2493,753 @@
    "quality": "weak",
    "ai_smell": false,
    "note": "Thin centred captions in vague superlatives ('Delivering You the Most Hyper-Local Forecast on the Planet') on loud gradient backgrounds."
+  },
+  {
+   "app_id": 466446054,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "outdated-ui",
+    "real-ui"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Raw 2016-era screens with a Carrier status bar and no captions; a library app that never told its own story."
+  },
+  {
+   "app_id": 594237344,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "caps-headline",
+    "content-showcase",
+    "two-tier-copy",
+    "verb-led"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Loud brand yellow, condensed caps headlines with a concrete sub-line ('the same day as Japan'); the manga covers carry it."
+  },
+  {
+   "app_id": 978931264,
+   "layout": "device-frame",
+   "techniques": [
+    "single-verb",
+    "dark-ui",
+    "social-proof",
+    "consistent-color",
+    "short-headline"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "One verb per shot in big caps (UPLOAD, PREVIEW, TRACK) on black; clear for a utility, the tilted opener with a trophy is the weakest shot."
+  },
+  {
+   "app_id": 1534367732,
+   "layout": "illustration-led",
+   "techniques": [
+    "line-illustration",
+    "emphasis-word",
+    "gradient-bg",
+    "real-ui",
+    "specific-use-case"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Line-drawn people above each phone and bold-keyword headlines naming real HR tasks (Review your time off balance); calm but small type."
+  },
+  {
+   "app_id": 896694807,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "feature-list",
+    "specific-use-case",
+    "real-ui",
+    "short-headline"
+   ],
+   "first_shot": "feature",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Indie dev tool done right: mint brand colour, plain 3-4 word headlines naming exact jobs (Fix merge conflicts, Commit graph with search) over real code UI; the opener is an honest feature list for a pro audience."
+  },
+  {
+   "app_id": 1522870046,
+   "layout": "device-frame",
+   "techniques": [
+    "caps-headline",
+    "gradient-bg",
+    "small-caption",
+    "dark-ui",
+    "feature-list"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Spec-label caps headlines (DEVICE and SENSOR Information) with small sub-paragraphs on a purple gradient; eight shots that look the same."
+  },
+  {
+   "app_id": 902823296,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "social-proof",
+    "verb-led",
+    "real-ui"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Consistent purple and verb-led headlines aimed at centre owners (Manage fast and secure check-in); 'The #1' and Shark Tank badge carry the opener."
+  },
+  {
+   "app_id": 1001688546,
+   "layout": "device-frame",
+   "techniques": [
+    "small-caption",
+    "serif-type",
+    "outdated-ui",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Tiny serif captions on a photo of a keyboard and old phones; unreadable at search size."
+  },
+  {
+   "app_id": 789844385,
+   "layout": "device-frame",
+   "techniques": [
+    "rhythm-copy",
+    "testimonials",
+    "social-proof",
+    "cards-break-out",
+    "specific-pain",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Copy with rhythm and a point ('Every event. No hidden fees. Ever.', 'Track. Freeze. Save.', 'See it. Pick it. Done.'), a review shot and price-chart cards pulled out of the UI."
+  },
+  {
+   "app_id": 1473663873,
+   "layout": "device-frame",
+   "techniques": [
+    "dark-ui",
+    "people-photo",
+    "verb-led",
+    "content-showcase",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Cinematic dark set with sentence headlines about the viewer's role (Watch and vote on new projects); the mission line on shot 1 is vague."
+  },
+  {
+   "app_id": 1525159784,
+   "layout": "device-frame",
+   "techniques": [
+    "stat-number",
+    "emphasis-word",
+    "social-proof",
+    "3d-objects",
+    "footnote-claim",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Concrete numbers with footnotes (+25pts in your 1st month*, $3500 tradeline), underlined key figures; parachutes and 3D props are noisy."
+  },
+  {
+   "app_id": 6472350114,
+   "layout": "device-frame",
+   "techniques": [
+    "stat-number",
+    "3d-objects",
+    "gradient-bg",
+    "exclamation",
+    "footnote-claim"
+   ],
+   "first_shot": "offer",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Floating 3D gold coins, piggy bank and pastel gradients around tilted phones; the '$25 to $500' offer is clear but the set looks generated."
+  },
+  {
+   "app_id": 457494327,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "caps-headline",
+    "overline-label",
+    "wordplay",
+    "brand-font",
+    "alternating-caption-position"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Brand red and the brand's condensed caps with a small overline ('GET IT AGAIN → YOUR \"USUAL\" FASTER'); 'Built from the buns up' is a good pun, the opener just announces the app."
+  },
+  {
+   "app_id": 726270499,
+   "layout": "photo-led",
+   "techniques": [
+    "sentence-across-shots",
+    "people-photo",
+    "product-photo",
+    "hand-drawn-annotation",
+    "caps-headline",
+    "alternating-caption-position"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Each headline is split above and below the phone ('ORDER AHEAD … AND AVOID THE LINE'), real food and people photography, hand-drawn arrows tying the shots together."
+  },
+  {
+   "app_id": 307569751,
+   "layout": "device-frame",
+   "techniques": [
+    "serif-type",
+    "brand-font",
+    "short-headline",
+    "real-ui",
+    "consistent-color",
+    "multi-device"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Quiet NYT editorial system: small serif sentence headlines on grey with real puzzles; very clear, a bit too quiet at search size."
+  },
+  {
+   "app_id": 6498883328,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "gameplay-sequence",
+    "small-caption",
+    "level-progression"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Eight near-identical boards labelled only 'Level 15…50'; shows progression but no reason to play this one."
+  },
+  {
+   "app_id": 883738213,
+   "layout": "device-frame",
+   "techniques": [
+    "content-showcase",
+    "feature-list",
+    "small-caption",
+    "real-ui",
+    "consistent-color"
+   ],
+   "first_shot": "content",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Real artwork does the selling; captions are small feature labels (Packed with Brushes, Layers, Blend Modes, and Masks)."
+  },
+  {
+   "app_id": 1534785237,
+   "layout": "device-frame",
+   "techniques": [
+    "verb-led",
+    "short-headline",
+    "real-content",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "White template with clear verb-led headlines (Remove backgrounds, Try on models) and real product results; clean but generic in look."
+  },
+  {
+   "app_id": 689501356,
+   "layout": "device-frame",
+   "techniques": [
+    "people-photo",
+    "tilted-device",
+    "small-caption",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Small captions and tilted collages on mint; 'Your go-to app for all things fitness & wellness' fails the swap test."
+  },
+  {
+   "app_id": 1043837948,
+   "layout": "device-frame",
+   "techniques": [
+    "dark-ui",
+    "consistent-color",
+    "small-caption",
+    "specific-use-case"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Black, calm and premium with real health data; the thin Title-Case captions are hard to read and 'Your Personal Health Companion' is generic."
+  },
+  {
+   "app_id": 310730297,
+   "layout": "device-frame",
+   "techniques": [
+    "small-caption",
+    "tilted-device",
+    "consistent-color",
+    "social-proof"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Four small-caption shots on blue, tilted opener with the app name; relies entirely on the membership brand."
+  },
+  {
+   "app_id": 751594890,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tone-headline",
+    "social-proof",
+    "stat-number",
+    "cards-break-out",
+    "consistent-color",
+    "verb-led"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Teal system with the key words in yellow (Make a Wishlist, Never Miss a Birthday); store logos and gift cards pop out of the frame; Title Case and laurels feel dated."
+  },
+  {
+   "app_id": 670443321,
+   "layout": "device-frame",
+   "techniques": [
+    "serif-type",
+    "content-showcase",
+    "small-caption",
+    "real-content"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Newspaper-style serif headlines on white with real articles; tidy but mostly section names (US News, Lifestyle)."
+  },
+  {
+   "app_id": 1239397626,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "serif-type",
+    "brand-font",
+    "specific-use-case",
+    "real-content",
+    "verb-led"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Economist red with its serif in sentence headlines that sound like the paper ('Go beyond breaking news in minutes', 'Make sense of the numbers'); every screen shows real journalism."
+  },
+  {
+   "app_id": 289560144,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tone-headline",
+    "color-per-shot",
+    "highlight-box",
+    "real-content",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Pastel colour per shot with a highlighted key phrase (Track Baby's Growth); the fruit-size comparison on shot 1 is a lovable proof; headlines are feature labels."
+  },
+  {
+   "app_id": 386022579,
+   "layout": "device-frame",
+   "techniques": [
+    "emphasis-word",
+    "social-proof",
+    "cards-break-out",
+    "consistent-color",
+    "verb-led"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Bold-keyword headlines (Track your baby's development) and a magnified 'Morning Sickness: what helps you?' callout; '#1 pregnancy app' opener is a claim, not a promise."
+  },
+  {
+   "app_id": 1046510029,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "outdated-ui",
+    "real-ui"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Bare setup screens with no captions; a hardware companion app that never says what it does."
+  },
+  {
+   "app_id": 1638906106,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tone-headline",
+    "stickers",
+    "dark-ui",
+    "playful-type",
+    "wordplay",
+    "cards-break-out"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Playful Gen-Z voice (SNOOP ON REPEATERS, FIND YOUR TUNE TWINS), stickers and emoji that belong to the product's own UI, two-tone caps on moody gradients from the album art."
+  },
+  {
+   "app_id": 668175318,
+   "layout": "device-frame",
+   "techniques": [
+    "story-sequence",
+    "consistent-color",
+    "small-caption",
+    "real-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "A clear pay-at-the-pump journey, but every caption is a small two-line sentence on the same blue; nothing reads at search size."
+  },
+  {
+   "app_id": 1104885987,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "verb-led",
+    "short-headline",
+    "real-ui",
+    "title-case-slogans"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Agency blue with short Title-Case jobs (Track Your Train in Real Time, Easy on Eyes at Night) over real timetables; clear, unremarkable."
+  },
+  {
+   "app_id": 1199070742,
+   "layout": "device-frame",
+   "techniques": [
+    "social-proof",
+    "brand-shapes",
+    "tilted-device",
+    "small-caption",
+    "color-per-shot"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Brand name and laurels on the first two shots, small captions and confetti shapes after; the AI-digest shot is the only differentiator and it's shot 4."
+  },
+  {
+   "app_id": 1218902777,
+   "layout": "device-frame",
+   "techniques": [
+    "icon-overline",
+    "small-caption",
+    "consistent-color",
+    "social-proof"
+   ],
+   "first_shot": "social-proof",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Small line icon + small two-line caption on white; calm but invisible at search size."
+  },
+  {
+   "app_id": 1325756279,
+   "layout": "device-frame",
+   "techniques": [
+    "before-after",
+    "dark-ui",
+    "content-showcase",
+    "social-proof",
+    "small-caption"
+   ],
+   "first_shot": "content",
+   "quality": "solid",
+   "ai_smell": true,
+   "note": "Strong results (before/after DIGI CAM, relight effects) on black; captions are small and the portraits lean on the AI-filter look."
+  },
+  {
+   "app_id": 1343581380,
+   "layout": "device-frame",
+   "techniques": [
+    "content-showcase",
+    "small-caption",
+    "feature-list",
+    "real-content"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "White template with feature names (Speech Cleanup, AutoCut, Speed Curve) over real edits; reads like a feature list."
+  },
+  {
+   "app_id": 1499198946,
+   "layout": "device-frame",
+   "techniques": [
+    "lowercase-copy",
+    "consistent-color",
+    "social-proof",
+    "testimonials",
+    "two-line-rhythm",
+    "alternating-caption-position"
+   ],
+   "first_shot": "social-proof",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Indie planner with a soft pink system and lowercase two-weight headlines (your simple day planner, establish routines & habits) placed around the UI; awards and quotes used sparingly."
+  },
+  {
+   "app_id": 1668787639,
+   "layout": "device-frame",
+   "techniques": [
+    "two-line-rhythm",
+    "specific-use-case",
+    "dark-ui",
+    "social-proof",
+    "ai-imagery",
+    "generic-claim"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "'One Chatbot, Endless Possibilities' and 'Generate Any Image' on dark glossy gradients with a cartoon AI portrait; the example prompts are concrete but the set is the AI-wrapper template."
+  },
+  {
+   "app_id": 1255711035,
+   "layout": "mixed",
+   "techniques": [
+    "serif-type",
+    "emphasis-word",
+    "photo-led",
+    "testimonials",
+    "lock-screen",
+    "content-showcase"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Serif headlines with one italic word over sunset photography, the widget shown on a real lock screen and a shot of short user reviews; sincere, if a little stock-scenic."
+  },
+  {
+   "app_id": 1405323394,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "testimonials",
+    "social-proof",
+    "small-caption",
+    "serif-type"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Purple system with a short user quote under every headline and a whole testimonial shot; headlines themselves are category labels (Sleep Meditations)."
+  },
+  {
+   "app_id": 479267592,
+   "layout": "device-frame",
+   "techniques": [
+    "rhythm-copy",
+    "mascot",
+    "consistent-color",
+    "cards-break-out",
+    "tilted-device",
+    "testimonials"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Strong two-beat copy ('Find the Right Car. Not Just Any Car.', 'See How Reliable a Car Will Be. Before You Buy.') with the fox mascot; tilted phones and Title Case age it."
+  },
+  {
+   "app_id": 723134859,
+   "layout": "device-frame",
+   "techniques": [
+    "stat-number",
+    "partner-logos",
+    "social-proof",
+    "consistent-color",
+    "small-caption"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Concrete numbers (Earn $100 a year on average, 3,500+ stores, 22,000+ restaurants) and a wall of real retailer logos; small serif captions on deep purple."
+  },
+  {
+   "app_id": 741292507,
+   "layout": "device-frame",
+   "techniques": [
+    "two-line-rhythm",
+    "lowercase-copy",
+    "real-content",
+    "people-photo",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Lowercase two-weight headlines (explore / the global village, without / language barrier) over real posts; airy but small at search size."
+  },
+  {
+   "app_id": 1641107226,
+   "layout": "illustration-led",
+   "techniques": [
+    "mascot",
+    "color-per-shot",
+    "stickers",
+    "social-proof",
+    "tilted-device"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Cute pets and widgets in a pastel colour per shot, matching the couples/besties audience; busy, but every shot shows the real widget."
+  },
+  {
+   "app_id": 892700751,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "caps-headline",
+    "multi-device",
+    "specific-use-case",
+    "real-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Blue topo-pattern ground, specific golfer jobs (Distances to the Pin on Every Hole, Leave Your Phone in the Cart) with watch and 3D green shots; Title Case throughout."
+  },
+  {
+   "app_id": 1572525917,
+   "layout": "device-frame",
+   "techniques": [
+    "condensed-type",
+    "dark-ui",
+    "offer",
+    "glow-effects",
+    "caps-headline"
+   ],
+   "first_shot": "offer",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Betting app: neon-purple brand system with condensed caps and an offer opener; on-brand for the category, loud everywhere."
+  },
+  {
+   "app_id": 434832826,
+   "layout": "mixed",
+   "techniques": [
+    "sentence-across-shots",
+    "people-photo",
+    "stickers",
+    "conversational",
+    "consistent-color",
+    "cards-break-out"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Conversational copy that runs across shots ('From outdoor adventures… to wine tastings', 'Travel hiccups? Cancel for free') with sticker circles and real people cut-outs on brand green."
+  },
+  {
+   "app_id": 705079381,
+   "layout": "mixed",
+   "techniques": [
+    "giant-type",
+    "people-photo",
+    "testimonials",
+    "consistent-color",
+    "specific-pain",
+    "two-tone-headline"
+   ],
+   "first_shot": "hook",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Giant 'Right place / Right time' poster pair, then orange shots with concrete promises (Got your phone? Then you've got your tickets) and a real-review shot."
+  },
+  {
+   "app_id": 1295303441,
+   "layout": "device-frame",
+   "techniques": [
+    "small-caption",
+    "caps-headline",
+    "mascot",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Small condensed caps sentences on mint across seven near-identical shots; the fox mascot is the only memorable thing."
+  },
+  {
+   "app_id": 1411869974,
+   "layout": "device-frame",
+   "techniques": [
+    "rhythm-copy",
+    "caps-headline",
+    "two-tone-headline",
+    "gradient-bg",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Punchy two-weight caps (FAST SECURE PRIVATE, AD BLOCK BY DEFAULT, SYNC BROWSE CONTINUE) on soft brand gradients; clear but generic for a browser."
+  },
+  {
+   "app_id": 545993260,
+   "layout": "device-frame",
+   "techniques": [
+    "hand-drawn-annotation",
+    "rhythm-copy",
+    "cards-break-out",
+    "highlight-box",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Short spoken headlines ('Your weekend. Full radar access.', 'Your weather. At a glance.') with hand-drawn arrows and labels pointing at the radar; every shot is one clear idea."
+  },
+  {
+   "app_id": 1559236118,
+   "layout": "device-frame",
+   "techniques": [
+    "caps-headline",
+    "photo-led",
+    "seasonal-campaign",
+    "cards-break-out",
+    "verb-led"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Spring photography behind the UI with event-based use cases (St. Patrick's Day parade, Easter picnic); caps headlines are small."
   }
  ],
  "shots": [
@@ -3710,6 +4457,566 @@
    "image_id": "d7ac03419db8",
    "headline": "",
    "language": null
+  },
+  {
+   "image_id": "1d0c7a2d541b",
+   "headline": "Build your library",
+   "language": "en"
+  },
+  {
+   "image_id": "49e46f151b70",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "ff60ae84543d",
+   "headline": "Send & receive fax from iPhone",
+   "language": "en"
+  },
+  {
+   "image_id": "15061d6f41a8",
+   "headline": "Get your benefits on the go",
+   "language": "en"
+  },
+  {
+   "image_id": "05eba3061f50",
+   "headline": "DEVICE and SENSOR Information",
+   "language": "en"
+  },
+  {
+   "image_id": "e9f1f6a02de7",
+   "headline": "system-wide Git support",
+   "language": "en"
+  },
+  {
+   "image_id": "06b44d766a9f",
+   "headline": "GitHub, GitLab or your own server",
+   "language": "en"
+  },
+  {
+   "image_id": "f0c9d2ca788a",
+   "headline": "Edit with favourite apps",
+   "language": "en"
+  },
+  {
+   "image_id": "a8f30924f56e",
+   "headline": "Fix merge conflicts",
+   "language": "en"
+  },
+  {
+   "image_id": "9d7504f65a55",
+   "headline": "Diff text and images",
+   "language": "en"
+  },
+  {
+   "image_id": "180c7d2379df",
+   "headline": "Commit graph with search",
+   "language": "en"
+  },
+  {
+   "image_id": "a93848db8999",
+   "headline": "Visualize upcoming activities, manage your time, and stay on top of coursework",
+   "language": "en"
+  },
+  {
+   "image_id": "05824390aad6",
+   "headline": "The #1 Early Education Platform",
+   "language": "en"
+  },
+  {
+   "image_id": "fdffb457e616",
+   "headline": "No Fee Tickets.",
+   "language": "en"
+  },
+  {
+   "image_id": "bdc337a4640f",
+   "headline": "Every event. No hidden fees. Ever.",
+   "language": "en"
+  },
+  {
+   "image_id": "ea4d87867393",
+   "headline": "Track. Freeze. Save.",
+   "language": "en"
+  },
+  {
+   "image_id": "a8d161180e52",
+   "headline": "Fans love saving money.",
+   "language": "en"
+  },
+  {
+   "image_id": "c6692192d21c",
+   "headline": "Sell. Manage. Create.",
+   "language": "en"
+  },
+  {
+   "image_id": "43614c93ffe3",
+   "headline": "360° Seat Views.",
+   "language": "en"
+  },
+  {
+   "image_id": "2eeda1ce143a",
+   "headline": "See it. Pick it. Done.",
+   "language": "en"
+  },
+  {
+   "image_id": "d05db76f1c73",
+   "headline": "Guaranteed entry. Every time.",
+   "language": "en"
+  },
+  {
+   "image_id": "2fce70a28d6f",
+   "headline": "Be a part of stories that amplify light.",
+   "language": "en"
+  },
+  {
+   "image_id": "785fdf1035e9",
+   "headline": "Grow +25pts in your 1st month*",
+   "language": "en"
+  },
+  {
+   "image_id": "8462cb9a1165",
+   "headline": "Cash advances from $25 to $500*",
+   "language": "en"
+  },
+  {
+   "image_id": "2257a66a3986",
+   "headline": "Fast Delivery",
+   "language": "en"
+  },
+  {
+   "image_id": "8e6d9ada57e6",
+   "headline": "The new Five Guys mobile app",
+   "language": "en"
+  },
+  {
+   "image_id": "4defa36d877f",
+   "headline": "Eat Mediterranean. Download delicious.",
+   "language": "en"
+  },
+  {
+   "image_id": "027d976bfa34",
+   "headline": "Order ahead and avoid the line",
+   "language": "en"
+  },
+  {
+   "image_id": "ccf6917b9af7",
+   "headline": "Customize your meal with unlimited possibilities",
+   "language": "en"
+  },
+  {
+   "image_id": "e5fc31a3b808",
+   "headline": "Reorder your favorites with ease",
+   "language": "en"
+  },
+  {
+   "image_id": "0cc362dde87e",
+   "headline": "Filter by dietary preferences",
+   "language": "en"
+  },
+  {
+   "image_id": "1f682164ad8e",
+   "headline": "Sign up and earn CAVA rewards",
+   "language": "en"
+  },
+  {
+   "image_id": "7ba1761f333d",
+   "headline": "Level 15",
+   "language": "en"
+  },
+  {
+   "image_id": "63e679479050",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "012c967bd49d",
+   "headline": "A Complete Artist's Toolkit",
+   "language": "en"
+  },
+  {
+   "image_id": "bcf2fbd53a10",
+   "headline": "Easily create professional images",
+   "language": "en"
+  },
+  {
+   "image_id": "f3897e4141a9",
+   "headline": "Your Personal Health Companion",
+   "language": "en"
+  },
+  {
+   "image_id": "53a6aeedd5eb",
+   "headline": "Your go-to app for all things fitness & wellness",
+   "language": "en"
+  },
+  {
+   "image_id": "eae1adc9226e",
+   "headline": "The #1 Secret Santa App",
+   "language": "en"
+  },
+  {
+   "image_id": "aa0bfdc3a7a0",
+   "headline": "AAA Mobile",
+   "language": "en"
+  },
+  {
+   "image_id": "66eaabaa0aed",
+   "headline": "Fearless Journalism.",
+   "language": "en"
+  },
+  {
+   "image_id": "464263c42a30",
+   "headline": "Go beyond breaking news in minutes.",
+   "language": "en"
+  },
+  {
+   "image_id": "a1c98a3ca501",
+   "headline": "See how finance, geopolitics and business connect.",
+   "language": "en"
+  },
+  {
+   "image_id": "c6404aa6347a",
+   "headline": "Watch debates on business and more.",
+   "language": "en"
+  },
+  {
+   "image_id": "048eef7fc5cf",
+   "headline": "Make sense of the numbers.",
+   "language": "en"
+  },
+  {
+   "image_id": "76c1f6ff06c7",
+   "headline": "Get smart suggestions in “For you”.",
+   "language": "en"
+  },
+  {
+   "image_id": "9e857018ee1b",
+   "headline": "Watch sharp takes on the news that matters.",
+   "language": "en"
+  },
+  {
+   "image_id": "fb2a0ad13933",
+   "headline": "Enjoy noise-cancelling podcasts.",
+   "language": "en"
+  },
+  {
+   "image_id": "36682963f044",
+   "headline": "Hear every story, wherever you are.",
+   "language": "en"
+  },
+  {
+   "image_id": "358daa08cb14",
+   "headline": "Track Baby's Growth",
+   "language": "en"
+  },
+  {
+   "image_id": "40943fec06c3",
+   "headline": "The #1 pregnancy & baby app",
+   "language": "en"
+  },
+  {
+   "image_id": "8de0954dbcae",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "af4883aec5e5",
+   "headline": "Friends' music on your homescreen",
+   "language": "en"
+  },
+  {
+   "image_id": "7f709bce987f",
+   "headline": "Want some quiet time? Enable ghost mode",
+   "language": "en"
+  },
+  {
+   "image_id": "7227dec9f63c",
+   "headline": "Snoop on repeaters",
+   "language": "en"
+  },
+  {
+   "image_id": "7eee2c082bf7",
+   "headline": "Find your tune twins",
+   "language": "en"
+  },
+  {
+   "image_id": "a69be8ad5704",
+   "headline": "Get reaction stickers",
+   "language": "en"
+  },
+  {
+   "image_id": "81fadb93618c",
+   "headline": "Check your weekly recap",
+   "language": "en"
+  },
+  {
+   "image_id": "51cd81855066",
+   "headline": "Share your favorites",
+   "language": "en"
+  },
+  {
+   "image_id": "1ec012dedd07",
+   "headline": "Ask music questions",
+   "language": "en"
+  },
+  {
+   "image_id": "40ede18a612d",
+   "headline": "Tickets for LIRR & Metro-North",
+   "language": "en"
+  },
+  {
+   "image_id": "6f1a3334dcb5",
+   "headline": "Earn savings you can use on fuel, car washes or in-store",
+   "language": "en"
+  },
+  {
+   "image_id": "c54dcca46ecc",
+   "headline": "Millions of people making neighborhoods safer, together.",
+   "language": "en"
+  },
+  {
+   "image_id": "69f50654f18e",
+   "headline": "Podcast App",
+   "language": "en"
+  },
+  {
+   "image_id": "1d36ac879874",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "a046883c06a1",
+   "headline": "The viral DIGI CAM effect",
+   "language": "en"
+  },
+  {
+   "image_id": "c211641c5839",
+   "headline": "A Slick Mobile Video Editor",
+   "language": "en"
+  },
+  {
+   "image_id": "b05cc519fdcd",
+   "headline": "One Chatbot, Endless Possibilities",
+   "language": "en"
+  },
+  {
+   "image_id": "f487409fbac3",
+   "headline": "Ask AI Anything",
+   "language": "en"
+  },
+  {
+   "image_id": "e3004cc7281d",
+   "headline": "your simple day planner",
+   "language": "en"
+  },
+  {
+   "image_id": "e5100bbfa679",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "fdebbe50163a",
+   "headline": "establish routines & habits",
+   "language": "en"
+  },
+  {
+   "image_id": "fafe5d4d9214",
+   "headline": "let AI plan your day",
+   "language": "en"
+  },
+  {
+   "image_id": "e25b1f107f78",
+   "headline": "stay focused with widgets & get notifications",
+   "language": "en"
+  },
+  {
+   "image_id": "acea6777d374",
+   "headline": "access everywhere",
+   "language": "en"
+  },
+  {
+   "image_id": "1501b0f52ba2",
+   "headline": "connect reminders & calendars",
+   "language": "en"
+  },
+  {
+   "image_id": "f5253c2b5467",
+   "headline": "join 15+ million people",
+   "language": "en"
+  },
+  {
+   "image_id": "b5ac4d069cb3",
+   "headline": "Bible Verse Widgets for Home Screen",
+   "language": "en"
+  },
+  {
+   "image_id": "8b9c4e83bab3",
+   "headline": "The #1 Prayer App in the World",
+   "language": "en"
+  },
+  {
+   "image_id": "c2569c277e3a",
+   "headline": "Your Perfect Car is Waiting. We'll Help You Find It.",
+   "language": "en"
+  },
+  {
+   "image_id": "330a586dd371",
+   "headline": "Earn Cash Back on shopping, travel, experiences and more",
+   "language": "en"
+  },
+  {
+   "image_id": "32950e80397e",
+   "headline": "Keep connected Stay closer",
+   "language": "en"
+  },
+  {
+   "image_id": "9cc6928bd258",
+   "headline": "explore the global village",
+   "language": "en"
+  },
+  {
+   "image_id": "2702261d5748",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "253a85de1b52",
+   "headline": "Golf GPS Range Finder",
+   "language": "en"
+  },
+  {
+   "image_id": "ba78685a1df3",
+   "headline": "Right place",
+   "language": "en"
+  },
+  {
+   "image_id": "568ae93b90f0",
+   "headline": "Right time",
+   "language": "en"
+  },
+  {
+   "image_id": "b628633b9adb",
+   "headline": "Find all the places you want to see",
+   "language": "en"
+  },
+  {
+   "image_id": "c28c3fde320d",
+   "headline": "And discover secrets most people miss",
+   "language": "en"
+  },
+  {
+   "image_id": "af74c0d7c5d8",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "00cc7e96b468",
+   "headline": "Book iconic tours or discover local experiences",
+   "language": "en"
+  },
+  {
+   "image_id": "342e4ccdee66",
+   "headline": "Got your phone? Then you've got your tickets",
+   "language": "en"
+  },
+  {
+   "image_id": "ed0e62f1a7b6",
+   "headline": "Always know exactly where to start your activity",
+   "language": "en"
+  },
+  {
+   "image_id": "d6cdae15ec49",
+   "headline": "Stress-free travel planning is our kind of thing",
+   "language": "en"
+  },
+  {
+   "image_id": "9bb27278ef64",
+   "headline": "From outdoor adventures to wine tastings",
+   "language": "en"
+  },
+  {
+   "image_id": "592e5907232f",
+   "headline": "...and save your favs for later with wishlists",
+   "language": "en"
+  },
+  {
+   "image_id": "10efc2cc8ca6",
+   "headline": "Travel hiccups? Cancel for free",
+   "language": "en"
+  },
+  {
+   "image_id": "65d3e2480c3c",
+   "headline": "Read real reviews that matter to you",
+   "language": "en"
+  },
+  {
+   "image_id": "5a69e5aaa510",
+   "headline": "Lavish or low-key... we have experiences for every budget.",
+   "language": "en"
+  },
+  {
+   "image_id": "9549558bf1d3",
+   "headline": "Search nearby activities, no matter where you are",
+   "language": "en"
+  },
+  {
+   "image_id": "eb709807c3e1",
+   "headline": "Around-the-clock customer service",
+   "language": "en"
+  },
+  {
+   "image_id": "58970bb99e74",
+   "headline": "Buy your Mint plan, right in the app",
+   "language": "en"
+  },
+  {
+   "image_id": "5f9ca4da9af1",
+   "headline": "Fast Secure Private",
+   "language": "en"
+  },
+  {
+   "image_id": "cafd05ff702f",
+   "headline": "Forecast with confidence",
+   "language": "en"
+  },
+  {
+   "image_id": "1a00eac8505b",
+   "headline": "All weather on one radar.",
+   "language": "en"
+  },
+  {
+   "image_id": "37d8c1751cb8",
+   "headline": "Your weekend. Full radar access.",
+   "language": "en"
+  },
+  {
+   "image_id": "34d33dea49b1",
+   "headline": "For you: Your weather. At a glance.",
+   "language": "en"
+  },
+  {
+   "image_id": "39dd02ea7b1b",
+   "headline": "Plan ahead smarter.",
+   "language": "en"
+  },
+  {
+   "image_id": "89df47b99285",
+   "headline": "Your forecast, wherever you go.",
+   "language": "en"
+  },
+  {
+   "image_id": "36465cf73c31",
+   "headline": "Track wind speeds.",
+   "language": "en"
+  },
+  {
+   "image_id": "628ce25fdab1",
+   "headline": "Enjoy the sun safely.",
+   "language": "en"
+  },
+  {
+   "image_id": "59767696eafa",
+   "headline": "Your weather in a video.",
+   "language": "en"
   }
  ],
  "lite": [
@@ -4261,6 +5568,118 @@
   "56b2a893f7e3",
   "4bae5efecfc8",
   "5ee9765d6728",
-  "835fdab0de37"
+  "835fdab0de37",
+  "1d0c7a2d541b",
+  "49e46f151b70",
+  "ff60ae84543d",
+  "15061d6f41a8",
+  "05eba3061f50",
+  "e9f1f6a02de7",
+  "06b44d766a9f",
+  "f0c9d2ca788a",
+  "a8f30924f56e",
+  "9d7504f65a55",
+  "180c7d2379df",
+  "a93848db8999",
+  "05824390aad6",
+  "fdffb457e616",
+  "bdc337a4640f",
+  "ea4d87867393",
+  "a8d161180e52",
+  "c6692192d21c",
+  "43614c93ffe3",
+  "2eeda1ce143a",
+  "d05db76f1c73",
+  "2fce70a28d6f",
+  "785fdf1035e9",
+  "8462cb9a1165",
+  "2257a66a3986",
+  "8e6d9ada57e6",
+  "4defa36d877f",
+  "027d976bfa34",
+  "ccf6917b9af7",
+  "e5fc31a3b808",
+  "0cc362dde87e",
+  "1f682164ad8e",
+  "7ba1761f333d",
+  "63e679479050",
+  "012c967bd49d",
+  "bcf2fbd53a10",
+  "f3897e4141a9",
+  "53a6aeedd5eb",
+  "eae1adc9226e",
+  "aa0bfdc3a7a0",
+  "66eaabaa0aed",
+  "464263c42a30",
+  "a1c98a3ca501",
+  "c6404aa6347a",
+  "048eef7fc5cf",
+  "76c1f6ff06c7",
+  "9e857018ee1b",
+  "fb2a0ad13933",
+  "36682963f044",
+  "358daa08cb14",
+  "40943fec06c3",
+  "8de0954dbcae",
+  "af4883aec5e5",
+  "7f709bce987f",
+  "7227dec9f63c",
+  "7eee2c082bf7",
+  "a69be8ad5704",
+  "81fadb93618c",
+  "51cd81855066",
+  "1ec012dedd07",
+  "40ede18a612d",
+  "6f1a3334dcb5",
+  "c54dcca46ecc",
+  "69f50654f18e",
+  "1d36ac879874",
+  "a046883c06a1",
+  "c211641c5839",
+  "b05cc519fdcd",
+  "f487409fbac3",
+  "e3004cc7281d",
+  "e5100bbfa679",
+  "fdebbe50163a",
+  "fafe5d4d9214",
+  "e25b1f107f78",
+  "acea6777d374",
+  "1501b0f52ba2",
+  "f5253c2b5467",
+  "b5ac4d069cb3",
+  "8b9c4e83bab3",
+  "c2569c277e3a",
+  "330a586dd371",
+  "32950e80397e",
+  "9cc6928bd258",
+  "2702261d5748",
+  "253a85de1b52",
+  "ba78685a1df3",
+  "568ae93b90f0",
+  "b628633b9adb",
+  "c28c3fde320d",
+  "af74c0d7c5d8",
+  "00cc7e96b468",
+  "342e4ccdee66",
+  "ed0e62f1a7b6",
+  "d6cdae15ec49",
+  "9bb27278ef64",
+  "592e5907232f",
+  "10efc2cc8ca6",
+  "65d3e2480c3c",
+  "5a69e5aaa510",
+  "9549558bf1d3",
+  "eb709807c3e1",
+  "58970bb99e74",
+  "5f9ca4da9af1",
+  "cafd05ff702f",
+  "1a00eac8505b",
+  "37d8c1751cb8",
+  "34d33dea49b1",
+  "39dd02ea7b1b",
+  "89df47b99285",
+  "36465cf73c31",
+  "628ce25fdab1",
+  "59767696eafa"
  ]
 }
