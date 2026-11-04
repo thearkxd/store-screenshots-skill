@@ -1,0 +1,63 @@
+name: Network test (store fetch)
+
+# Live check of fetch_listing.py against the real App Store and Google Play pages.
+# Runs on demand and weekly; never blocks releases (store pages change without notice).
+
+on:
+  workflow_dispatch:
+    inputs:
+      appstore_url:
+        description: "App Store URL"
+        default: "https://apps.apple.com/tr/app/seenfy-ne-izlesem-film-dizi/id6764370964"
+      play_url:
+        description: "Google Play URL"
+        default: "https://play.google.com/store/apps/details?id=com.spotify.music&hl=tr&gl=TR"
+  schedule:
+    - cron: "17 6 * * 1"
+  push:
+    paths: ["skills/store-screenshots/scripts/fetch_listing.py", ".github/workflows/network-test.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --quiet pillow
+      - name: Fetch listings
+        env:
+          AS_URL: ${{ github.event.inputs.appstore_url || 'https://apps.apple.com/tr/app/seenfy-ne-izlesem-film-dizi/id6764370964' }}
+          PLAY_URL: ${{ github.event.inputs.play_url || 'https://play.google.com/store/apps/details?id=com.spotify.music&hl=tr&gl=TR' }}
+        run: |
+          python skills/store-screenshots/scripts/fetch_listing.py "$AS_URL" "$PLAY_URL" --search "film dizi takip" --out listing
+      - name: Show and validate results
+        run: |
+          python - <<'EOF'
+          import glob, json, sys
+          ok = True
+          for f in sorted(glob.glob("listing/*/listing.json")):
+              d = json.load(open(f, encoding="utf-8"))
+              shots = glob.glob(f.replace("listing.json", "screenshots/*.png"))
+              print(f"== {d['store']}: {d['name']!r} seller={d.get('seller')!r} category={d.get('category')!r}")
+              print(f"   rating={d.get('rating')} count={d.get('rating_count')} version={d.get('version')}")
+              print(f"   description: {len(d.get('description') or '')} chars | release notes: {len(d.get('release_notes') or '')} chars")
+              print(f"   screenshots: {len(d.get('screenshots') or [])} urls, {len(shots)} saved | icon: {bool(d.get('icon_url'))}")
+              print("   first 300 chars:", (d.get("description") or "")[:300].replace("\n", " "))
+              for k in ("name", "description"):
+                  if not d.get(k):
+                      print(f"   !! missing {k}"); ok = False
+              if len(shots) < 2:
+                  print("   !! fewer than 2 screenshots saved"); ok = False
+          sys.exit(0 if ok else 1)
+          EOF
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: listing-${{ github.run_id }}
+          path: listing/
+          retention-days: 7
