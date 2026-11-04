@@ -40,7 +40,9 @@ Rules of thumb:
   If you want energy, use a callout or a crop, not a 15° rotation.
 - Don't draw a branded device bezel (Apple's or anyone's hardware artwork). The renderer's `"device":
   {"style": "phone"}` is a neutral thin bezel with a pill cutout; `"style": "none"` is just the rounded screen
-  with a shadow.
+  with a shadow. Google Play sets, iPad and iPhone Duo use `none` automatically (Play advises against device
+  imagery; a phone bezel around a tablet-shaped screen looks wrong) - `android_style`, `ipad_style`,
+  `duo_style` in `"device"` change that.
 - **Crop boxes** are fractions of the screen image `[x0, y0, x1, y1]`. Get them right: `crop_helper.py grid`
   draws a labelled grid to read them off, `crop_helper.py check set.json` previews every crop; or, if
   you built the screens from HTML, read element boxes with `getBoundingClientRect()` (the demo does this and

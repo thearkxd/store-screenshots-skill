@@ -54,19 +54,14 @@ def span_tests(tmp):
             assert "ERROR" not in out, out
     # the halves re-join to exactly the one canvas they were cut from, and the files on disk are those halves
     sys.path.insert(0, SCRIPTS)
-    import design
     import render_set as rs
     raw = json.load(open(fx, encoding="utf-8"))
     spec_dir = os.path.dirname(fx)
     fonts = rs.Fonts(spec_dir)
     for loc in ("tr", "en"):
         spec = rs.localize(raw, loc, raw["locales"])
-        d_style, shots, _ = design.apply_direction(spec)
-        for preset, (W, H) in sizes.items():
-            style = rs.merge(rs.DEFAULT_STYLE, d_style)
-            if preset == "android" and style["device"].get("android_style"):
-                style = rs.merge(style, {"device": {"style": style["device"]["android_style"]}})
-            style = rs.merge(style, {"_caption_floor": rs.caption_floor(shots, style, W, H, fonts, loc)})
+        for preset in sizes:
+            W, H, style, shots, _, _ = rs.prepare(spec, preset, spec_dir, fonts, loc)  # the pipeline render_set uses
             for shot in shots:
                 if shot.get("span") != 2:
                     continue
@@ -132,6 +127,79 @@ def span_tests(tmp):
     run(s("crop_helper.py"), "check", fx, "-o", os.path.join(tmp, "span-crops.jpg"))
 
 
+def size_tests(tmp):
+    """Every store size renders exactly, per-size screens and "stores" are honoured, and the store rules warn."""
+    import json
+    from PIL import Image
+    fx = os.path.join(ROOT, "tools", "fixtures", "duo-set.json")
+    out_dir = os.path.join(tmp, "sizes")
+    out = run(s("render_set.py"), fx, "--out", out_dir, both=True)
+    assert "not an iPhone Duo screen" not in out and "x " not in out.split("\n")[0], out
+    expect = {"ios": ((1206, 2622), 6, "ios"), "ios-large": ((1320, 2868), 6, "ios"), "duo-outer": ((1398, 2034), 6, "duo"),
+              "duo-inner": ((2007, 2853), 6, "duo"), "android": ((1080, 1920), 5, "android")}  # 5: the poster is iOS-only
+    for preset, (size, n, store) in expect.items():
+        folder = os.path.join(out_dir, preset)
+        files = sorted(f for f in os.listdir(folder) if f.endswith(".png"))
+        assert len(files) == n, (preset, files)
+        for f in files:
+            im = Image.open(os.path.join(folder, f))
+            assert im.size == size and im.mode == "RGB", (preset, f, im.size, im.mode)
+        res = run(s("check_set.py"), folder, "--store", store)
+        assert "ERROR" not in res and ("no 1206x2622" not in res) and ("no large iPhone" not in res), (preset, res)
+        rep = json.load(open(os.path.join(folder, "_render.json"), encoding="utf-8"))
+        assert not any("device frame" in w for e in rep["shots"] for w in e["warnings"]), (preset, rep)
+    # a Duo set checked as iPhone fails; an iPhone set alone warns about the missing large size
+    run(s("check_set.py"), os.path.join(out_dir, "duo-inner"), "--store", "ios", expect=1)
+    alone = os.path.join(tmp, "alone", "ios")
+    os.makedirs(alone)
+    for f in os.listdir(os.path.join(out_dir, "ios")):
+        if f.endswith(".png"):
+            Image.open(os.path.join(out_dir, "ios", f)).save(os.path.join(alone, f))
+    assert "no large iPhone set" in run(s("check_set.py"), alone, "--store", "ios")
+    # phone screens in a Duo set: rendered to fit, with a warning
+    out = run(s("render_set.py"), os.path.join(SKILL, "templates", "set.example.json"), "--out", os.path.join(tmp, "duo-phone"),
+              "--size", "duo-inner", both=True)
+    assert "not an iPhone Duo screen" in out, out
+    im = Image.open(os.path.join(tmp, "duo-phone", "duo-inner", "01.png"))
+    assert im.size == (2007, 2853)
+
+    def spec_with(extra, name):
+        d = json.load(open(os.path.join(SKILL, "templates", "set.example.json"), encoding="utf-8"))
+        d.update(extra)
+        d["shots"] = [dict(sh, screen=os.path.join(SKILL, "templates", sh["screen"])) if sh.get("screen") else sh for sh in d["shots"]]
+        path = os.path.join(tmp, f"sizes-{name}.json")
+        json.dump(d, open(path, "w", encoding="utf-8"), ensure_ascii=False)
+        return path
+    # iPhone size rules
+    assert "no large iPhone size" in run(s("render_set.py"), spec_with({"sizes": ["ios", "android"]}, "one-ios"),
+                                         "--out", os.path.join(tmp, "one-ios"), both=True)
+    assert "no iPhone Dynamic Island medium" in run(s("render_set.py"), spec_with({"sizes": ["ios-large"]}, "large-only"),
+                                                    "--out", os.path.join(tmp, "large-only"), both=True)
+    # Google Play: a framed device, a poster without "stores" and a long caption all warn
+    d = json.load(open(os.path.join(SKILL, "templates", "set.example.json"), encoding="utf-8"))
+    shots = [dict(sh, screen=os.path.join(SKILL, "templates", sh["screen"])) if sh.get("screen") else sh for sh in d["shots"]]
+    for sh in shots:
+        sh.pop("stores", None)
+    shots[0] = dict(shots[0], headline="Kaldığın bölüm\n*hep hazır*\nher akşam", max_lines=3, headline_size=0.12,
+                    sub="Kaldığın yerden devam et, yeni bölümleri kaçırma, listeni arkadaşlarınla paylaş.")
+    play = os.path.join(tmp, "play.json")
+    json.dump(dict(d, sizes=["android"], shots=shots, style=dict(d.get("style", {}), device=dict(d["style"]["device"], android_style="android"))),
+              open(play, "w", encoding="utf-8"), ensure_ascii=False)
+    out = run(s("render_set.py"), play, "--out", os.path.join(tmp, "play"), both=True)
+    for msg in ("device frame in a Google Play set", "type-only poster in a Google Play set", "Google Play recommends taglines"):
+        assert msg in out, (msg, out)
+    # Play copy rules
+    out = run(s("check_set.py"), os.path.join(out_dir, "android"), "--store", "android", "--lang", "tr", "--headlines",
+              "Hemen indir, şimdi dene", "“Harika bir uygulama” ★★★★★", "Yeni özellik: takvim", "1M+ downloads",
+              "Yeni bölüm çıkınca ilk sen bil")
+    assert out.count("call to action") == 1 and "user testimonial" in out, out
+    assert '"Yeni özellik: takvim": Google Play disallows' in out and '"1M+ downloads": Google Play disallows' in out, out
+    assert '05 "Yeni bölüm' not in out, out
+    # concept sheets at other sizes
+    run(s("concepts.py"), fx, "--size", "duo-inner", "--directions", "editorial", "cinematic", "-o", os.path.join(tmp, "duo-concepts.jpg"))
+    run(s("concepts.py"), fx, "--size", "android", "--directions", "poster", "-o", os.path.join(tmp, "android-concepts.jpg"))
+
+
 def main():
     for name in sorted(os.listdir(SCRIPTS)):
         if name.endswith(".py"):
@@ -151,9 +219,9 @@ def main():
         assert "Seenfy" in md and "## Description" in md, md[:500]
         run(s("fetch_listing.py"), "not-a-store-url", expect=1)
         run(s("render_set.py"), os.path.join(SKILL, "templates", "set.example.json"), "--out", tmp)
-        for preset, store in (("ios", "ios"), ("android", "android")):
+        for preset, store, n in (("ios", "ios", 6), ("ios-large", "ios", 6), ("android", "android", 5)):  # poster is iOS-only
             folder = os.path.join(tmp, preset)
-            assert len([f for f in os.listdir(folder) if f.endswith(".png")]) == 6, f"{preset}: expected 6 PNGs"
+            assert len([f for f in os.listdir(folder) if f.endswith(".png")]) == n, f"{preset}: expected {n} PNGs"
             run(s("check_set.py"), folder, "--store", store)
             assert os.path.exists(os.path.join(folder, "_search-preview.jpg"))
         run(s("peer_test.py"), os.path.join(tmp, "ios"), "--category", "navigation", "-o", os.path.join(tmp, "peer.jpg"))
@@ -162,7 +230,7 @@ def main():
         ex = os.path.join(tmp, "seenfy")
         run(s("render_set.py"), os.path.join(ROOT, "examples", "seenfy", "set.json"), "--out", ex, "--size", "android")
         for loc in ("tr", "en"):
-            assert len([f for f in os.listdir(os.path.join(ex, loc, "android")) if f.endswith(".png")]) == 6, loc
+            assert len([f for f in os.listdir(os.path.join(ex, loc, "android")) if f.endswith(".png")]) == 5, loc
             from PIL import Image
             assert Image.open(os.path.join(ex, loc, "feature-graphic.png")).size == (1024, 500)
             out = run(s("check_set.py"), os.path.join(ex, loc, "android"), "--store", "android")
@@ -187,6 +255,7 @@ def main():
         assert "cinematic" in out and "lacks glyphs" not in out, out
         assert os.path.getsize(os.path.join(tmp, "concepts.jpg")) > 20000
         span_tests(tmp)
+        size_tests(tmp)
         # every bundled font covers Turkish
         sys.path.insert(0, SCRIPTS)
         import render_set

@@ -26,7 +26,8 @@ as AI-generated.
   sits where search results cut it. Used once per set, twice only in sets of 8+.
 - **Scripts** (Python 3 + Pillow) - read a live store listing, check and clean raw screens (status bar, debug
   UI), place crops on a grid, render a whole set from one JSON spec at exact store sizes (every locale at once,
-  iPhone and Android frames, Google Play feature graphic, bundled OFL fonts, emphasis words, zoom cards,
+  every store size - iPhone medium + large, iPhone Duo outer + inner, iPad, Google Play - with the right frame
+  for each, Google Play feature graphic, bundled OFL fonts, emphasis words, zoom cards,
   callouts, posters, Turkish-safe capitals), check it against store and copy rules with a search-result
   preview, and peer-test it next to exemplary sets.
 
@@ -73,16 +74,17 @@ above was made end to end with the skill:
 *Not what's popular. What you'll love. · In the mood for a plot twist? · Your next episode, always ready ·
 Watch, like, check it off · Stop wondering what to watch · No spoilers. Promise.*
 
-**Google Play** - same spec, Android frame, plus the required 1024×500 feature graphic:
+**Google Play** - same spec: the bare rounded screen (Google advises against device imagery), the poster shot
+left out (`"stores": ["ios"]` - Play wants in-app screenshots), plus the required 1024×500 feature graphic:
 
 ![Seenfy Google Play feature graphic](docs/images/seenfy-feature-graphic.jpg)
 
-![Seenfy Google Play screenshots with the Android frame](docs/images/seenfy-android.jpg)
+![Seenfy Google Play screenshots, frameless](docs/images/seenfy-android.jpg)
 
 > The English set reuses the Turkish UI to show the copy side by side. For a real US listing, capture the
 > screens with the app in English - caption language should always match the UI (`references/localization.md`).
 
-Reproduce everything (TR + EN, iOS + Android + feature graphic) from one spec:
+Reproduce everything (TR + EN; iPhone 1206×2622 + 1320×2868, Google Play 1080×1920 + feature graphic) from one spec:
 `python3 skills/store-screenshots/scripts/render_set.py examples/seenfy/set.json --out out/` → `out/tr/…`,
 `out/en/…`. The spec and screens are in `examples/seenfy/`.
 
@@ -96,6 +98,24 @@ Reproduce everything (TR + EN, iOS + Android + feature graphic) from one spec:
 ![Example set rendered by render_set.py from the demo screens of a fictional app](docs/images/example-set.jpg)
 
 </details>
+
+## Store sizes
+
+One spec renders every store the app is on (`"sizes"`), checked against Apple's and Google's pages on
+2026-11-04 (`references/store-specs.md`):
+
+| Preset | Pixels | Notes |
+|---|---|---|
+| `ios` | 1206 × 2622 | iPhone, Dynamic Island medium - **required** |
+| `ios-large` | 1320 × 2868 | iPhone, Dynamic Island large - render with `ios` (otherwise Apple wants Face ID large) |
+| `duo-outer` · `duo-inner` | 1398 × 2034 · 2007 × 2853 | iPhone Duo - required from April 2027 for iOS 27.1 SDK apps; needs Duo screens |
+| `ipad` | 2064 × 2752 | iPad 13" - required if the app runs on iPad |
+| `android` | 1080 × 1920 | Google Play, 9:16, promotion-eligible; plus the 1024 × 500 feature graphic |
+
+Screens, crops and anything else can differ per size (`{"default": …, "duo-inner": …}`), a shot can be limited
+to one store (`"stores": ["ios"]`), and wider canvases (Duo, iPad) get type and spacing scaled to their shape.
+
+![iPhone Duo outer (left three) and inner (right three) displays, demo app](docs/images/duo-example.jpg)
 
 ## Full vs lite
 

@@ -42,9 +42,12 @@ Tick each expected behaviour. The prompts match `evals/evals.json`.
 - [ ] Before the full set, `concepts.py` runs and the reply shows the concept sheet (three directions) and
       asks which one - unless you said "just deliver".
 - [ ] `prepare_screens.py` runs and its report is summarised (resolution, status bars).
-- [ ] Renders at 1206×2622 and 1080×1920; `check_set.py` runs; the reply shows the overview and search preview
+- [ ] Renders at 1206×2622 **and** 1320×2868 (two iPhone sizes) and 1080×1920; `check_set.py` runs; the reply shows the overview and search preview
       images, not just file paths.
-- [ ] Android set uses the punch-hole frame; a feature graphic is offered or rendered for Google Play.
+- [ ] Android set shows the bare rounded screen (no device frame), no poster shot, no promo words or "download
+      now"; a feature graphic is offered or rendered for Google Play.
+- [ ] "Uygulamamız iPhone Duo'yu destekliyor" → asks for screens captured on iPhone Duo (outer + inner), renders
+      `duo-outer` / `duo-inner` with per-size screens, checks them with `--store duo`.
 - [ ] Turkish capitals are right (İ/ı) if caps are used.
 - [ ] "2. ve 3. görsel tek görsel gibi dursun" → one `"span": 2` entry (not two hand-aligned shots), the phone
       cut exactly in half by the seam, a headline per half, no text across the seam; at most one span in a set under 8.

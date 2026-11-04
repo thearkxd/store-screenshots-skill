@@ -1,0 +1,126 @@
+{
+ "_doc": "Smoke-test fixture for per-size presets: iPhone (medium + large), iPhone Duo outer and inner, Android. Duo screens come from tools/demo_screens/build.py --duo; screens and crops are given per size with {\"default\": …, \"duo-outer\": …, \"duo-inner\": …}.",
+ "app": "Duo fixture",
+ "lang": "tr",
+ "sizes": [
+  "ios",
+  "ios-large",
+  "duo-outer",
+  "duo-inner",
+  "android"
+ ],
+ "category": "entertainment",
+ "direction": "editorial",
+ "brand": {
+  "primary": "#E8462B",
+  "secondary": "#FFB547",
+  "ink": "#141414",
+  "paper": "#F3EEE6",
+  "dark": "#12100F"
+ },
+ "shots": [
+  {
+   "overline": "Takip",
+   "headline": "Kaldığın bölüm\n*hep hazır*",
+   "screen": {
+    "default": "../../skills/store-screenshots/templates/example-screens/01-home.jpg",
+    "duo-outer": "duo-screens/outer/01-home.jpg",
+    "duo-inner": "duo-screens/inner/01-home.jpg"
+   }
+  },
+  {
+   "overline": "Takvim",
+   "headline": "Yeni bölüm çıkınca\n*ilk sen* bil",
+   "screen": {
+    "default": "../../skills/store-screenshots/templates/example-screens/02-calendar.jpg",
+    "duo-outer": "duo-screens/outer/02-calendar.jpg",
+    "duo-inner": "duo-screens/inner/02-calendar.jpg"
+   },
+   "callouts": [
+    {
+     "crop": {
+      "default": [
+       0.036,
+       0.267,
+       0.964,
+       0.427
+      ],
+      "duo-outer": [
+       0.0386,
+       0.3525,
+       0.9614,
+       0.5413
+      ],
+      "duo-inner": [
+       0.0269,
+       0.2513,
+       0.9731,
+       0.3859
+      ]
+     },
+     "scale": 1.08
+    }
+   ]
+  },
+  {
+   "overline": "İstatistik",
+   "headline": "Bu yıl *312 saat*\ndizi izledin",
+   "layout": "zoom",
+   "screen": {
+    "default": "../../skills/store-screenshots/templates/example-screens/03-stats.jpg",
+    "duo-outer": "duo-screens/outer/03-stats.jpg",
+    "duo-inner": "duo-screens/inner/03-stats.jpg"
+   },
+   "crops": {
+    "default": [
+     [
+      0.03,
+      0.15,
+      0.97,
+      0.51
+     ]
+    ],
+    "duo-outer": [
+     [
+      0.0386,
+      0.2035,
+      0.9614,
+      0.6478
+     ]
+    ],
+    "duo-inner": [
+     [
+      0.0269,
+      0.1451,
+      0.9731,
+      0.4618
+     ]
+    ]
+   }
+  },
+  {
+   "span": 2,
+   "screen": {
+    "default": "../../skills/store-screenshots/templates/example-screens/04-friends.jpg",
+    "duo-outer": "duo-screens/outer/04-friends.jpg",
+    "duo-inner": "duo-screens/inner/04-friends.jpg"
+   },
+   "overline": "Arkadaşlar",
+   "headline": "Arkadaşların\n*ne izliyor?*",
+   "halves": [
+    {},
+    {
+     "overline": "Yorumlar",
+     "headline": "Spoiler'sız\n*konuş*"
+    }
+   ]
+  },
+  {
+   "headline": "*Spoiler* yok.\nSöz.",
+   "layout": "poster",
+   "stores": [
+    "ios"
+   ]
+  }
+ ]
+}

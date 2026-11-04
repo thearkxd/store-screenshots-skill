@@ -100,7 +100,7 @@ def strip_look(spec, direction):
         if isinstance(shot.get("device"), dict) and "x" in shot["device"] and shot.get("span") == 2:
             out["device"] = {"x": shot["device"]["x"]}  # where the phone crosses the seam is content, not look
         return out
-    sp["shots"] = [strip(s) for s in spec["shots"]]
+    sp["shots"] = [dict(strip(s), _entry=i) for i, s in enumerate(spec["shots"], start=1)]
     sp.pop("feature_graphic", None)
     return sp
 
@@ -133,21 +133,23 @@ def main():
         lang = loc.split("-")[0]
     else:
         lang = spec.get("lang", "en")
-    spec = design.ensure_brand(spec, spec_dir)
     picks = a.directions or suggest(a.category or spec.get("category"))
-    W, H = rs.PRESETS.get(a.size, (1206, 2622))
+    try:
+        W, H = rs.preset_size(a.size)
+    except ValueError as e:
+        p.error(str(e))
     fonts = rs.Fonts(spec_dir)
     rows = []
     for name in picks:
         sp = strip_look(spec, name)
-        style, shots, _ = design.apply_direction(sp)
-        style = rs.merge(rs.DEFAULT_STYLE, style)
-        style = rs.merge(style, {"_caption_floor": rs.caption_floor(shots, style, W, H, fonts, lang)})
+        # same pipeline as render_set: per-size screens, "stores", the device class's frame, canvas scaling
+        W, H, style, shots, _, _ = rs.prepare(sp, a.size, spec_dir, fonts, lang)
+        by_entry = {sh["_entry"]: sh for sh in shots}
         thumbs = []
         for i in a.shots:
-            if i - 1 >= len(shots):
+            if i not in by_entry:
                 continue
-            imgs, warns, _ = rs.render_any(shots[i - 1], style, W, H, fonts, spec_dir, lang)
+            imgs, warns, _ = rs.render_any(by_entry[i], style, W, H, fonts, spec_dir, lang)
             for w in warns:
                 print(f"! {name} shot {i}: {w}")
             # a span shows as its two halves, with the same gap the store puts between screenshots

@@ -4,8 +4,10 @@
  "lang": "tr",
  "sizes": [
   "ios",
+  "ios-large",
   "android"
  ],
+ "_doc_sizes": "ios (1206x2622, required) + ios-large (1320x2868) cover iPhone; android = Google Play 1080x1920; add duo-outer / duo-inner (iPhone Duo) or ipad with screens captured on those devices: \"screen\": {\"default\": \"…\", \"duo-inner\": \"…\"}. \"stores\": [\"ios\"] on a shot keeps it out of the Play set (the poster here: Play wants in-app screenshots). render_set.py --presets lists all.",
  "category": "entertainment",
  "_doc_direction": "Optional: \"direction\": \"editorial\" | \"poster\" | \"playful\" | \"cinematic\" | \"crafted\" | \"native\" | \"utility\" (concepts.py --list). The direction becomes the base look and \"style\" overrides it, so with a direction keep only the style keys you want to change. See references/directions.md.",
  "brand": {
@@ -134,6 +136,9 @@
    "_role": "poster - one per set at most",
    "headline": "*Spoiler* yok.\nSöz.",
    "layout": "poster",
+   "stores": [
+    "ios"
+   ],
    "poster_size": 0.22,
    "background": {
     "color": "#E8462B"

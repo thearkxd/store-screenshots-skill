@@ -4,10 +4,15 @@
 The screens belong to a fictional TV tracker ("Dizilog") and are drawn with HTML/CSS, then captured at
 iPhone resolution (402x874 pt @3x = 1206x2622 px) with Playwright. Maintainers only:
 
-  python3 tools/demo_screens/build.py
+  python3 tools/demo_screens/build.py            # templates/example-screens/ (shipped with the skill)
+  python3 tools/demo_screens/build.py --duo      # tools/fixtures/duo-screens/{outer,inner}/ (tests only, not shipped)
+
+The --duo screens are the same pages laid out on iPhone Duo-shaped displays (outer 1398x2034, inner
+2007x2853 px) - stand-ins for real Duo captures, so the renderer's Duo presets can be tested.
 """
 import json
 import os
+import sys
 
 from playwright.sync_api import sync_playwright
 
@@ -217,5 +222,35 @@ def main():
     print(json.dumps(regions))
 
 
+DUO = {"outer": (466, 678), "inner": (669, 951)}  # CSS px @3x -> 1398x2034, 2007x2853
+
+
+def duo():
+    pages = {"01-home": home(), "02-calendar": calendar(), "03-stats": stats(), "04-friends": friends(), "05-detail": detail()}
+    root = os.path.normpath(os.path.join(HERE, "..", "fixtures", "duo-screens"))
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        for kind, (w, h) in DUO.items():
+            out = os.path.join(root, kind)
+            os.makedirs(out, exist_ok=True)
+            pg = b.new_page(viewport={"width": w, "height": h}, device_scale_factor=3)
+            regions = {}
+            js = f"""() => [...document.querySelectorAll('[data-region]')].map(e => {{const r = e.getBoundingClientRect();
+                return [e.dataset.region, r.left / {w}, r.top / {h}, r.right / {w}, r.bottom / {h}]}})"""
+            for name, html in pages.items():
+                # same pages, wider body: the content keeps its phone widths, like an app not yet adapted
+                html = html.replace("</style>", f"body{{width:{w}px!important;height:{h}px!important}}</style>", 1)
+                pg.set_content(html)
+                pg.wait_for_timeout(150)
+                pg.screenshot(path=os.path.join(out, f"{name}.jpg"), type="jpeg", quality=82)
+                for key, *box in pg.evaluate(js):
+                    regions[f"{name}.jpg#{key}"] = [round(v, 4) for v in box]
+                print(kind, name)
+            with open(os.path.join(out, "regions.json"), "w") as f:
+                json.dump(regions, f, indent=1)
+            pg.close()
+        b.close()
+
+
 if __name__ == "__main__":
-    main()
+    duo() if "--duo" in sys.argv else main()

@@ -49,8 +49,8 @@ rendering. Run with `python3 <skill-dir>/scripts/<name>.py` (`python` on Windows
 | `prepare_screens.py` | Check incoming raw screens (resolution, ratio, JPEG, mismatched status bars), repaint a clean status bar (`--status-bar 9:41`), cover debug UI (`--cover`) |
 | `crop_helper.py` | `grid` draws a labelled coordinate grid on a screen; `check` previews every callout/zoom crop of a spec |
 | `concepts.py` | **Concept checkpoint:** shots 1–3 rendered in three design directions side by side (`--category` picks safe · bold · unexpected; `--list` shows all seven) - show it before rendering the set |
-| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; Android punch-hole frame for Android sizes; Google Play feature graphic (1024×500); every locale from one spec (`"locales"`); a `"direction"` preset with brand tokens; overlines, stickers, hand-drawn annotations, motif shapes; **span pairs** (`"span": 2`: one picture across two slots - a phone over the seam or a shared ground - cut into two PNGs that always line up, with seam/placement warnings); bundled fonts, tracking, Turkish-safe capitals |
-| `check_set.py` | Check finished PNGs: exact store sizes, no alpha, count limits, headline length, banned phrases; writes a **search-result preview** (first 3 shots at thumbnail size) and an overview sheet |
+| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; every store size (iPhone medium + large by default, iPhone Duo outer/inner, iPad, Android - bare rounded screen on Play, type scaled to wider canvases); per-size screens/crops and `"stores"` per shot; Google Play feature graphic (1024×500); every locale from one spec (`"locales"`); a `"direction"` preset with brand tokens; overlines, stickers, hand-drawn annotations, motif shapes; **span pairs** (`"span": 2`: one picture across two slots - a phone over the seam or a shared ground - cut into two PNGs that always line up, with seam/placement warnings); bundled fonts, tracking, Turkish-safe capitals |
+| `check_set.py` | Check finished PNGs (`--store ios / duo / ipad / android`): exact store sizes, the required iPhone sizes (looks at the neighbouring size folders), no alpha, count limits, headline length, banned phrases, Google Play's rules (no promo words, calls to action or testimonials); writes a **search-result preview** (first 3 shots at thumbnail size) and an overview sheet |
 | `peer_test.py` | Put your set next to 2–3 exemplary sets from the same category at the same size |
 | `make_sheet.py` | Contact sheets of any folders of screenshots |
 | `collect_examples.py` | Download any apps' store screenshots by id (competitors: `--app-ids … --label competitors`); maintainers use it for the library |
@@ -132,8 +132,14 @@ python3 scripts/crop_helper.py check set.json -o crops.jpg                      
 python3 scripts/render_set.py set.json --out out/
 ```
 - Several languages: `"locales": ["tr", "en"]` and `{"tr": "…", "en": "…"}` for any headline, sub or screen;
-  output goes to `out/<locale>/<preset>/`. Google Play: add `"feature_graphic"` (headline + screen) - it's
-  required on Play and rendered at 1024×500. Android presets get a punch-hole frame automatically.
+  output goes to `out/<locale>/<preset>/`.
+- **Sizes** (`references/store-specs.md`): iPhone needs two sets - `"sizes": ["ios", "ios-large", …]`
+  (1206×2622 is required; without a large set Apple wants Face ID large). Add `"duo-outer", "duo-inner"` if
+  the app supports iPhone Duo (required from April 2027 for the iOS 27.1 SDK) and `"ipad"` if it runs on
+  iPad - with screens captured on that device, given per size: `"screen": {"default": …, "duo-inner": …}`.
+- **Google Play:** add `"feature_graphic"` (headline + screen; required, 1024×500). Play sets show the bare
+  rounded screen (Google advises against device imagery), captions stay under 20% of the image, and a
+  type-only poster goes App Store-only with `"stores": ["ios"]`.
 Use the user's brand font if they provide a `.ttf/.otf`; otherwise the direction's bundled OFL fonts
 (`assets/fonts/FONTS.md`). Seed the screens with
 realistic data first: the renderer can't fix thin or empty UI. For layouts the renderer can't do, write
@@ -142,7 +148,9 @@ HTML/CSS and screenshot it at the exact pixel size with a headless browser if on
 ### Phase 6 - Check, compare, fix (loop at least once)
 ```bash
 python3 scripts/check_set.py out/ios --store ios --lang tr        # render_set writes out/<preset>/
+python3 scripts/check_set.py out/ios-large --store ios --lang tr
 python3 scripts/check_set.py out/android --store android --lang tr
+python3 scripts/check_set.py out/duo-inner --store duo --lang tr  # if the set has iPhone Duo sizes
 python3 scripts/peer_test.py out/ios --category <closest> -o peer.jpg
 ```
 Open `out/ios/_search-preview.jpg`, `out/ios/_overview.jpg` and `peer.jpg` and actually look. Fix what fails:
@@ -169,7 +177,8 @@ must verify (claims, numbers, legal lines).
   laughing at phones.
 - English captions in a Turkish listing (or vice versa); UI language ≠ caption language.
 - Unverifiable claims (#1, awards, "millions of users") the user hasn't confirmed; on **Google Play** no
-  ranking claims, award badges, prices or promos in the images at all.
+  ranking claims, award badges, prices, promos, calls to action ("download now") or testimonials at all.
+- A phone screenshot in an iPhone Duo or iPad set, or only one iPhone size.
 
 ## Honesty and limits
 

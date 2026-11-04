@@ -9,10 +9,12 @@ Writes out/<preset>/01.png … (RGB, no alpha, exact pixels) and out/<preset>/_r
 fonts, warnings) that check_set.py reads. See templates/set.example.json for every option.
 
 Layouts per shot: "device" (default) · "zoom" (cropped card) · "full" (full-bleed screen + band/pill caption)
-· "poster" (type only). Device styles: "phone" (thin bezel + island) · "android" (punch-hole camera, used
-automatically for android presets) · "none" (rounded screen, shadow). "feature_graphic" renders Google Play's
-1024x500 graphic. "locales": ["tr", "en"] + {"tr": …, "en": …} values render every language from one spec
-into out/<locale>/<preset>/.
+· "poster" (type only); "span": 2 puts one picture across two slots. Device styles: "phone" (thin bezel +
+island) · "android" (punch-hole camera) · "flat" · "none" (rounded screen, shadow - used for Google Play,
+iPad and iPhone Duo sets). Sizes (--presets): ios + ios-large by default; duo-outer, duo-inner, ipad, android.
+Any value can be given per size: {"default": …, "duo-inner": …}; "stores": ["ios"] keeps a shot out of other
+sets. "feature_graphic" renders Google Play's 1024x500 graphic. "locales": ["tr", "en"] + {"tr": …, "en": …}
+values render every language from one spec into out/<locale>/<preset>/.
 Headline emphasis: wrap words in *asterisks*; "\\n" forces a line break.
 """
 import argparse
@@ -33,14 +35,18 @@ import design  # noqa: E402
 FONT_DIR = os.path.normpath(os.path.join(HERE, "..", "assets", "fonts"))
 
 PRESETS = {  # checked 2026-11-04, see references/store-specs.md
-    "ios": (1206, 2622),
+    "ios": (1206, 2622),          # iPhone, Dynamic Island medium - the required iPhone size
     "ios-1179": (1179, 2556),
-    "ios-large": (1320, 2868),
-    "ios-faceid": (1284, 2778),
-    "ipad": (2064, 2752),
-    "android": (1080, 1920),
+    "ios-large": (1320, 2868),    # Dynamic Island large - render with "ios" (without a large set Apple wants Face ID large)
+    "ios-faceid": (1284, 2778),   # Face ID large
+    "duo-outer": (1398, 2034),    # iPhone Duo outer display (required from April 2027 for iOS 27.1 SDK apps)
+    "duo-inner": (2007, 2853),    # iPhone Duo inner display
+    "ipad": (2064, 2752),         # iPad 13"
+    "android": (1080, 1920),      # Google Play phone, 9:16 (promotion-eligible)
     "android-tall": (1080, 2160),
 }
+DEFAULT_SIZES = ["ios", "ios-large"]
+PHONE_RATIO = 2622 / 1206  # the canvas shape the styles and directions are tuned for
 
 FONT_ALIASES = {  # bundled, OFL - see assets/fonts/FONTS.md
     "sans": ("InterDisplay-SemiBold.otf", None),
@@ -94,7 +100,9 @@ DEFAULT_STYLE = {
     "sub_scale": 0.42,
     "sub_gap": 0.32,           # gap between headline and sub-line, in headline sizes
     "emphasis": {"style": "color", "color": "#E5482D"},
-    "device": {"style": "phone", "android_style": "android", "width": 0.82, "radius": 0.15, "border": 0.022, "border_color": "#0E0E10",
+    # Google Play advises against device imagery, so Android sets show the bare rounded screen; iPad and
+    # iPhone Duo screens aren't drawn in a phone bezel either. Set "android_style": "android" for a frame.
+    "device": {"style": "phone", "android_style": "none", "duo_style": "none", "ipad_style": "none", "width": 0.82, "radius": 0.15, "border": 0.022, "border_color": "#0E0E10",
                "island": True, "shadow": True, "gap": 0.075, "bleed": True},
     "card": {"radius": 0.045, "shadow": True, "width": 0.86},
     "band_color": None,
@@ -416,7 +424,7 @@ class Caption:
 
     def sub_size(self, head_size):
         # follows the headline, but never larger than a readable sub-line (posters have huge headlines)
-        return int(min(head_size, self.W * max(self.s["headline_size"], 0.13)) * self.s["sub_scale"])
+        return int(min(head_size, self.W * max(self.s["headline_size"], 0.13 * self.s.get("_k", 1.0))) * self.s["sub_scale"])
 
     def draw_sub(self, img, text, top, head_size, color=None):
         s = self.s
@@ -691,17 +699,46 @@ def caption_floor(shots, style, W, H, fonts, lang):
 
 
 def render_shot(shot, style, W, H, fonts, spec_dir, lang, base=None, info=None, caption_only=False):
+    info = info if info is not None else {}
+    img, warnings, size = _render_shot(shot, style, W, H, fonts, spec_dir, lang, base, info, caption_only)
+    return img, warnings + play_warnings(shot_style(style, shot), info, shot), size
+
+
+PLAY_TEXT_SHARE = 0.20  # Google Play: "Taglines should not take up more than 20% of the image"
+
+
+def play_warnings(s, info, shot):
+    """Google Play's screenshot guidance, for Android sets only."""
+    if s.get("_class") != "android":
+        return []
+    out = []
+    if info.get("poster"):
+        out.append("type-only poster in a Google Play set: Play wants screenshots that show the in-app experience "
+                   "and taglines under 20% of the image - add \"stores\": [\"ios\"] to keep it in the App Store set only")
+    elif info.get("text_ratio", 0) > PLAY_TEXT_SHARE:
+        out.append(f"caption covers {info['text_ratio']:.0%} of the height - Google Play recommends taglines take up "
+                   f"no more than 20% (shorter headline, no sub-line, or a smaller headline_size)")
+    if shot.get("screen") and s["device"].get("style") in ("phone", "android"):
+        out.append("device frame in a Google Play set - Play advises against device imagery; leave \"android_style\" "
+                   "at \"none\" (the bare rounded screen)")
+    return out
+
+
+def _render_shot(shot, style, W, H, fonts, spec_dir, lang, base=None, info=None, caption_only=False):
     """One slot. base: a ready-made ground (a span half) - no background or shapes are drawn then.
     caption_only: a shot without a screen draws just its caption (span halves around a shared phone)."""
     s = shot_style(style, shot)
     layout = shot.get("layout", "device")
     if layout not in ("device", "zoom", "full", "poster"):
         raise ValueError(f"unknown layout {layout!r} (device, zoom, full, poster)")
-    info = info if info is not None else {}
     warnings = []
     screen = load_screen(spec_dir, shot["screen"]) if shot.get("screen") else None
     if screen is None and layout != "poster" and not caption_only:
-        raise ValueError(f"layout {layout!r} needs a \"screen\" (or use \"layout\": \"poster\")")
+        raise ValueError(f"layout {layout!r} needs a \"screen\" (or use \"layout\": \"poster\"; per-size screens "
+                         f"need a \"default\" or a key for this size)")
+    U = W * s.get("_k", 1.0)  # one slot's width on a phone-shaped canvas: spacing that should follow the height
+    if screen is not None:
+        warnings += screen_fit_warnings(screen, s, W, H)
     if base is not None:
         canvas = base.copy()
     else:
@@ -731,7 +768,8 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang, base=None, info=None, 
             pcap.draw_overline(canvas, overline, int(pcap.last_top - tmp_h))
         warnings += w
         if sub:
-            pcap.draw_sub(canvas, sub, bottom + W * 0.04, size)
+            bottom = pcap.draw_sub(canvas, sub, bottom + U * 0.04, size)
+        info.update(text_ratio=(bottom - (pcap.last_top - tmp_h)) / H, poster=True)
         ref = bg_reference_color(s["background"], False)
         if ref and contrast(hexrgb(s["text_color"]), ref) < 3.0:
             warnings.append(f"low poster headline contrast {contrast(hexrgb(s['text_color']), ref):.1f}:1 (aim ≥ 3)")
@@ -746,12 +784,13 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang, base=None, info=None, 
         mode = shot.get("caption_style", "band")
         block, size = cap.block_height(headline, sub)
         block += cap.overline_height(overline)
-        pad = int(W * 0.055)
+        pad = int(U * 0.055)
         y0 = int(W * s["caption_top"]) if pos == "top" else H - block - int(W * s["caption_top"])
+        info.update(text_ratio=(block + 2 * pad) / H)
         d = ImageDraw.Draw(canvas)
         fill = hexrgb(s.get("band_color") or s["background"].get("color", "#111111"))
         if mode == "pill":
-            d.rounded_rectangle([W * 0.05, y0 - pad, W * 0.95, y0 + block + pad], radius=int(W * 0.05), fill=fill)
+            d.rounded_rectangle([W * 0.05, y0 - pad, W * 0.95, y0 + block + pad], radius=int(U * 0.05), fill=fill)
         elif pos == "top":
             d.rectangle([0, 0, W, y0 + block + pad], fill=fill)
         else:
@@ -772,9 +811,10 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang, base=None, info=None, 
     if sub:
         bottom = cap.draw_sub(canvas, sub, bottom + size * s["sub_gap"], size)
     warnings += cap.warnings
-    info.update(caption_top=top, caption_bottom=bottom if headline or sub or overline else None, caption_pos=pos)
+    info.update(caption_top=top, caption_bottom=bottom if headline or sub or overline else None, caption_pos=pos,
+                text_ratio=(bottom - top) / H if headline or sub or overline else 0.0)
     ref = bg_reference_color(s["background"], pos == "bottom")
-    need = 3.0 if size >= 0.075 * W else 4.5  # WCAG: large display type needs 3:1
+    need = 3.0 if size >= 0.075 * U else 4.5  # WCAG: large display type needs 3:1
     if ref and contrast(hexrgb(s["text_color"]), ref) < need:
         warnings.append(f"low headline contrast {contrast(hexrgb(s['text_color']), ref):.1f}:1 (aim ≥ {need})")
     if ref and sub and contrast(hexrgb(s.get("sub_color") or s["text_color"]), ref) < 4.5:
@@ -786,8 +826,8 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang, base=None, info=None, 
         # one or more crops of the screen, stacked as cards ("crops": [[x0,y0,x1,y1], ...])
         boxes = shot.get("crops") or [shot.get("crop", [0, 0, 1, 0.5])]
         pieces = [crop_frac(screen, b) for b in boxes]
-        area_top = bottom + W * 0.08 if pos == "top" else W * 0.07
-        area_bot = H - W * 0.07 if pos == "top" else top - W * 0.08
+        area_top = bottom + U * 0.08 if pos == "top" else U * 0.07
+        area_bot = H - U * 0.07 if pos == "top" else top - U * 0.08
         gap = W * shot.get("card_gap", 0.04)
         width_px = W * s["card"]["width"]
         # same scale for every card so the UI stays consistent; shrink to fit the free area
@@ -813,11 +853,45 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang, base=None, info=None, 
         dh = device_geometry(screen, dv, W)[4]
         dev_top = int(top - W * dv["gap"] - dh)
         if not dv.get("bleed", True):
-            dev_top = max(dev_top, int(W * 0.06))
+            dev_top = max(dev_top, int(U * 0.06))
         limit = top - W * dv["gap"]
+    s = fit_device(s, screen, W, H, dev_top, pos)
     canvas, xf = draw_device(canvas, screen, s, W, H, dev_top, limit)
     canvas, _ = draw_callouts(canvas, screen, shot, s, W, H, xf)
     return finish(canvas, xf), warnings, size
+
+
+SCREEN_SHAPES = {"iphone": (1.9, 2.4), "android": (1.6, 2.4), "duo": (1.3, 1.6), "ipad": (1.25, 1.6)}
+CLASS_NAMES = {"iphone": "an iPhone", "android": "an Android phone", "duo": "an iPhone Duo", "ipad": "an iPad"}
+
+
+def screen_fit_warnings(screen, s, W, H):
+    """A screen captured on another kind of device (a phone screenshot in an iPhone Duo or iPad set) looks
+    wrong - and Apple shows a Duo set as "optimized for iPhone Duo"."""
+    cls = s.get("_class")
+    if cls not in SCREEN_SHAPES:
+        return []
+    r = screen.height / screen.width
+    lo, hi = SCREEN_SHAPES[cls]
+    if r < 1:
+        return [f"screen is landscape ({screen.width}x{screen.height}) in a portrait set"]
+    if not lo <= r <= hi:
+        return [f"screen is {screen.width}x{screen.height} - that's not {CLASS_NAMES[cls]} screen; capture it on "
+                f"{CLASS_NAMES[cls]} (per-size screens: \"screen\": {{\"default\": …, \"{s.get('_preset')}\": …}})"]
+    return []
+
+
+def fit_device(s, screen, W, H, dev_top, pos):
+    """On a wider canvas a tall screen would run far off the bottom: shrink the device until at most a sliver
+    bleeds (phone-shaped sets keep the normal bleed)."""
+    if s.get("_k", 1.0) >= 0.999 or pos != "top":
+        return s
+    dv = s["device"]
+    dh = device_geometry(screen, dv, W)[4]
+    allowed = H + 0.06 * dh - dev_top
+    if dh <= allowed:
+        return s
+    return dict(s, device=dict(dv, width=dv["width"] * allowed / dh))
 
 
 def draw_callouts(canvas, screen, shot, s, W, H, xf):
@@ -882,6 +956,8 @@ def render_span(shot, style, W, H, fonts, spec_dir, lang, keep=None):
     halves = span_halves(shot)
     screen = load_screen(spec_dir, shot["screen"]) if shot.get("screen") else None
     bridge = screen is not None
+    if bridge:
+        warnings += screen_fit_warnings(screen, s, W, H)
     if not bridge:
         for k in ("callouts", "crop", "crops"):
             if shot.get(k):
@@ -924,7 +1000,9 @@ def render_span(shot, style, W, H, fonts, spec_dir, lang, keep=None):
     pad = W * SEAM_PAD
     if bridge:
         dv = s["device"]
-        dev_top = int((max(bottoms) if bottoms else W * 0.12) + W * dv["gap"] + H * dv.get("dy", 0))
+        dev_top = int((max(bottoms) if bottoms else W * s.get("_k", 1.0) * 0.12) + W * dv["gap"] + H * dv.get("dy", 0))
+        if s.get("_class") == "android" and dv.get("style") in ("phone", "android"):
+            warnings.append("device frame in a Google Play set - Play advises against device imagery")
         x = (shot.get("device") or {}).get("x", 1.0)  # default: centred on the seam, half the phone in each slot
         canvas, xf = draw_device(canvas, screen, s, W, H, dev_top, cx=W * x, even=(x == 1.0))
         if keep is not None:
@@ -974,6 +1052,29 @@ def render_any(shot, style, W, H, fonts, spec_dir, lang):
     return render_span(shot, style, W, H, fonts, spec_dir, lang)
 
 
+IPHONE_MEDIUM = {(1206, 2622), (1179, 2556)}
+IPHONE_LARGE = {(1260, 2736), (1290, 2796), (1320, 2868), (1284, 2778), (1242, 2688)}
+
+
+def iphone_size_warnings(sizes):
+    """App Store Connect: at least one Dynamic Island medium screenshot; and a large set (Dynamic Island large,
+    or else Face ID large is required). One spec renders both - list them in "sizes"."""
+    got = set()
+    for n in sizes:
+        try:
+            w, h = preset_size(n)
+        except ValueError:
+            continue
+        got.add((min(w, h), max(w, h)))
+    out = []
+    if got and not got & IPHONE_MEDIUM:
+        out.append("no iPhone Dynamic Island medium size (1206x2622 / 1179x2556) - App Store Connect requires it; add \"ios\" to \"sizes\"")
+    if got & IPHONE_MEDIUM and not got & IPHONE_LARGE:
+        out.append("no large iPhone size - without a Dynamic Island large set Apple requires Face ID large (1284x2778); "
+                   "add \"ios-large\" to \"sizes\"")
+    return out
+
+
 def set_warnings(shots, store):
     """Rules for the whole set: how many spans, where they sit, how many slots."""
     out, slot, spans = [], 0, []
@@ -996,6 +1097,142 @@ def set_warnings(shots, store):
             out.append("a span on shots 3-4 is cut in half in search results (only shots 1-3 show) - "
                        "move it to 1-2 or 2-3, or after shot 4")
     return out
+
+
+# ------------------------------------------------------------------ presets: stores, devices, canvas shape
+
+def preset_size(name):
+    if name in PRESETS:
+        return PRESETS[name]
+    if re.fullmatch(r"\d+x\d+", name or ""):
+        return tuple(map(int, name.split("x")))
+    raise ValueError(f"unknown size {name!r}; use --presets")
+
+
+DUO_SIZES = {(1398, 2034), (2007, 2853)}
+IPAD_SIZES = {(2064, 2752), (2048, 2732), (1488, 2266), (1668, 2420), (1668, 2388), (1640, 2360), (1668, 2224)}
+
+
+def device_class(name, W, H):
+    """iphone · duo · ipad · android - what kind of screens and frame a preset wants."""
+    n = name or ""
+    if n.startswith("android"):
+        return "android"
+    if n.startswith("duo") or (min(W, H), max(W, H)) in DUO_SIZES:
+        return "duo"
+    if n.startswith("ipad") or (min(W, H), max(W, H)) in IPAD_SIZES:
+        return "ipad"
+    if n.startswith("ios"):
+        return "iphone"
+    return "iphone" if max(W, H) / min(W, H) > 2.05 else "android"
+
+
+def store_of(name, W, H):
+    return "android" if device_class(name, W, H) == "android" else "ios"
+
+
+VARIANT_KEYS = set(PRESETS) | {"iphone", "duo", "ipad", "android", "ios", "default"}
+
+
+def resolve_variants(obj, name, W, H):
+    """Per-preset values: {"default": "screens/01.png", "duo-inner": "screens/duo/01.png"} picks the exact preset,
+    then its device class (iphone/duo/ipad/android), then its store (ios/android), then "default"."""
+    if isinstance(obj, dict):
+        keys = set(obj)
+        if keys and keys <= VARIANT_KEYS:
+            for k in (name, device_class(name, W, H), store_of(name, W, H), "default"):
+                if k in obj:
+                    return resolve_variants(obj[k], name, W, H)
+            return None
+        return {k: resolve_variants(v, name, W, H) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [resolve_variants(v, name, W, H) for v in obj]
+    return obj
+
+
+def keep_shot(shot, name, W, H):
+    """"stores": ["ios"] (or "android", "iphone", "duo", "ipad") limits a shot to those sets."""
+    st = shot.get("stores")
+    if not st:
+        return True
+    st = [st] if isinstance(st, str) else st
+    return store_of(name, W, H) in st or device_class(name, W, H) in st
+
+
+def canvas_k(W, H):
+    """1.0 for phone-shaped canvases; < 1 for wider ones (iPad, iPhone Duo), where every size that the styles
+    give as a fraction of the width is scaled down so type and spacing keep their proportion to the height."""
+    return min(1.0, (H / W) / PHONE_RATIO)
+
+
+SCALED_KEYS = ("headline_size", "min_headline_size", "caption_top", "poster_size")
+
+
+def scale_look(d, k):
+    """Scale the width-relative sizes in a style or a shot by k (see canvas_k)."""
+    if k >= 0.999 or not isinstance(d, dict):
+        return d
+    out = dict(d)
+    for key in SCALED_KEYS:
+        if isinstance(out.get(key), (int, float)):
+            out[key] = out[key] * k
+    for key, subkeys in (("overline_style", ("size", "gap")), ("stickers_style", ("size",)),
+                         ("annotation_style", ("size", "width")), ("card", ("radius",)), ("device", ("gap",))):
+        if isinstance(out.get(key), dict):
+            out[key] = dict(out[key], **{sk: out[key][sk] * k for sk in subkeys if isinstance(out[key].get(sk), (int, float))})
+    for key in ("stickers", "annotations"):
+        if isinstance(out.get(key), list):
+            out[key] = [dict(o, **{sk: o[sk] * k for sk in ("size", "width") if isinstance(o.get(sk), (int, float))}) for o in out[key]]
+    if isinstance(out.get("shapes"), list):
+        out["shapes"] = [dict(sh, **{sk: sh[sk] * k for sk in ("width", "r", "step", "stroke") if isinstance(sh.get(sk), (int, float))})
+                         for sh in out["shapes"]]
+    bg = out.get("background")
+    if isinstance(bg, dict) and isinstance(bg.get("light"), dict) and isinstance(bg["light"].get("r"), (int, float)):
+        out["background"] = dict(bg, light=dict(bg["light"], r=bg["light"]["r"] * k))
+    if isinstance(out.get("halves"), list):
+        out["halves"] = [scale_look(h, k) for h in out["halves"]]
+    if isinstance(out.get("style"), dict):
+        out["style"] = scale_look(out["style"], k)
+    return out
+
+
+def device_for(dv, cls, ref=None):
+    """The frame a device class gets when the spec says "phone" (the iPhone-style bezel). ref: the set's
+    device style, for its android_style / duo_style / ipad_style choices."""
+    if not isinstance(dv, dict) or dv.get("style", "phone") != "phone":
+        return dv
+    ref = ref or dv
+    alt = {"android": dv.get("android_style", ref.get("android_style", "none")),
+           "duo": dv.get("duo_style", ref.get("duo_style", "none")),
+           "ipad": dv.get("ipad_style", ref.get("ipad_style", "none"))}.get(cls)
+    return dict(dv, style=alt) if alt else dv
+
+
+def prepare(spec, name, spec_dir, fonts, lang):
+    """Everything one preset needs: (W, H, style, shots, tokens) with variants, "stores", the direction, the
+    device class's frame and the canvas-shape scaling applied."""
+    W, H = preset_size(name)
+    spec = resolve_variants(spec, name, W, H)
+    spec = dict(spec, shots=[sh for sh in spec.get("shots", []) if keep_shot(sh, name, W, H)])
+    spec = design.ensure_brand(spec, spec_dir)
+    d_style, shots, tokens = design.apply_direction(spec)
+    cls = device_class(name, W, H)
+    k = canvas_k(W, H)
+    style = scale_look(merge(DEFAULT_STYLE, d_style), k)
+    ref = style["device"]
+    style = merge(style, {"device": device_for(ref, cls), "_k": k, "_preset": name, "_class": cls})
+    out = []
+    for sh in shots:
+        sh = scale_look(sh, k)
+        if isinstance(sh.get("device"), dict) and sh["device"].get("style") == "phone":
+            sh = dict(sh, device=device_for(sh["device"], cls, ref))  # only the style changes; a span keeps its own x
+        if isinstance(sh.get("halves"), list):
+            sh = dict(sh, halves=[dict(h, device=device_for(h["device"], cls, ref))
+                                  if isinstance(h.get("device"), dict) and h["device"].get("style") == "phone" else h
+                                  for h in sh["halves"]])
+        out.append(sh)
+    style = merge(style, {"_caption_floor": caption_floor(out, style, W, H, fonts, lang)})
+    return W, H, style, out, tokens, spec
 
 
 LOCALE_KEY = re.compile(r"^[a-z]{2}(-[A-Za-z]{2,4})?$")
@@ -1028,6 +1265,8 @@ def render_feature_graphic(fg, style, fonts, spec_dir, lang, out_path):
         if fg.get("crop"):
             screen = crop_frac(screen, fg["crop"])
         dv = merge(s["device"], {"width": fg.get("device_width", 0.3), "style": s["device"].get("android_style") or s["device"]["style"]})
+        if dv["style"] in ("phone", "android"):
+            warnings.append("device frame in the feature graphic - Google Play advises against device imagery")
         canvas, _ = draw_device(canvas, screen, dict(s, device=dv), W, H, int(H * fg.get("device_top", 0.12)),
                                 cx=W * fg.get("device_x", 0.76))
     cap = Caption(fonts, s, W, lang)
@@ -1070,41 +1309,33 @@ def main():
     fonts = Fonts(spec_dir)
     exit_code = 0
     for loc, out_root in runs:
-        spec = localize(raw_spec, loc, locales) if loc else raw_spec
-        lang = (loc.split("-")[0] if loc else spec.get("lang", "en"))
-        spec = design.ensure_brand(spec, spec_dir)
-        d_style, d_shots, tokens = design.apply_direction(spec)
-        spec = dict(spec, shots=d_shots)
-        if spec.get("feature_graphic"):
-            spec["feature_graphic"] = design.resolve_tokens(spec["feature_graphic"], tokens)
-        base_style = merge(DEFAULT_STYLE, d_style)
-        sizes = [a.size] if a.size else spec.get("sizes", ["ios"])
+        spec_l = localize(raw_spec, loc, locales) if loc else raw_spec
+        lang = (loc.split("-")[0] if loc else spec_l.get("lang", "en"))
+        sizes = [a.size] if a.size else spec_l.get("sizes", DEFAULT_SIZES)
         for name in sizes:
-            if name in PRESETS:
-                W, H = PRESETS[name]
-            elif re.fullmatch(r"\d+x\d+", name):
-                W, H = map(int, name.split("x"))
-            else:
-                sys.exit(f"unknown size {name!r}; use --presets")
-            style = base_style
-            if name.startswith("android") and base_style["device"].get("style") == "phone" and base_style["device"].get("android_style"):
-                style = merge(base_style, {"device": {"style": base_style["device"]["android_style"]}})
-            style = merge(style, {"_caption_floor": caption_floor(spec["shots"], style, W, H, fonts, lang)})
+            try:
+                W, H, style, shots, tokens, spec = prepare(spec_l, name, spec_dir, fonts, lang)
+            except ValueError as e:
+                sys.exit(str(e))
             out_dir = os.path.join(out_root, name)
             os.makedirs(out_dir, exist_ok=True)
-            report = {"preset": name, "size": [W, H], "lang": lang, "locale": loc, "shots": [], "set_warnings": []}
-            for w in set_warnings(spec["shots"], "android" if name.startswith("android") else "ios"):
+            cls = style["_class"]
+            report = {"preset": name, "size": [W, H], "lang": lang, "locale": loc, "device": cls,
+                      "store": store_of(name, W, H), "shots": [], "set_warnings": []}
+            for w in set_warnings(shots, report["store"]):
                 report["set_warnings"].append(w)
                 print(f"! {loc or ''} {name} set: {w}")
+            if cls == "iphone" and not a.size:
+                for w in iphone_size_warnings(sizes):
+                    report["set_warnings"].append(w)
+                    print(f"! {loc or ''} {name} set: {w}")
             slot = 0
-            for i, shot in enumerate(spec["shots"], start=1):
-                if name.startswith("android") and isinstance(shot.get("device"), dict) and shot["device"].get("style") == "phone":
-                    shot = merge(shot, {"device": {"style": style["device"]["style"]}})
+            for i, shot in enumerate(shots, start=1):
                 n_slots = 2 if (shot.get("span", 1) == 2 or shot.get("halves")) else 1
                 try:
                     imgs, warnings, size = render_any(shot, style, W, H, fonts, spec_dir, lang)
                 except (FileNotFoundError, ValueError) as e:
-                    print(f"x shot {i}: {e}", file=sys.stderr)
+                    print(f"x {name} shot {i}: {e}", file=sys.stderr)
                     exit_code = 1
                     slot += n_slots
                     continue
@@ -1128,10 +1359,17 @@ def main():
             with open(os.path.join(out_dir, "_render.json"), "w", encoding="utf-8") as f:
                 json.dump(report, f, ensure_ascii=False, indent=1)
             print(f"{(loc + ' ') if loc else ''}{name}: {len(report['shots'])} shots → {out_dir}   fonts: {', '.join(report['fonts'])}")
-        if spec.get("feature_graphic") and (any(n.startswith("android") for n in sizes) or a.size is None):
+        android_sizes = [n for n in sizes if store_of(n, *preset_size(n)) == "android"]
+        if spec_l.get("feature_graphic") and (android_sizes or a.size is None):
+            _, _, fg_style, _, tokens, fg_spec = prepare(spec_l, android_sizes[0] if android_sizes else "android",
+                                                         spec_dir, fonts, lang)
+            fg = design.resolve_tokens(fg_spec["feature_graphic"], tokens)
             fg_path = os.path.join(out_root, "feature-graphic.png")
-            for w in render_feature_graphic(spec["feature_graphic"], base_style, fonts, spec_dir, lang, fg_path):
+            for w in render_feature_graphic(fg, fg_style, fonts, spec_dir, lang, fg_path):
                 print(f"! {loc or ''} feature graphic: {w}")
+            with open(os.path.join(out_root, "_feature-graphic.json"), "w", encoding="utf-8") as f:
+                json.dump({"headline": (fg.get("headline") or "").replace("*", "").replace("\n", " "),
+                           "sub": fg.get("sub") or "", "lang": lang}, f, ensure_ascii=False, indent=1)
             print(f"{(loc + ' ') if loc else ''}feature graphic → {fg_path}")
     sys.exit(exit_code)
 

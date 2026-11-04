@@ -17,6 +17,7 @@
  ],
  "sizes": [
   "ios",
+  "ios-large",
   "android"
  ],
  "shots": [
@@ -139,6 +140,9 @@
     "en": "Comments with spoilers stay hidden until you open them."
    },
    "layout": "poster",
+   "stores": [
+    "ios"
+   ],
    "poster_size": 0.22
   }
  ],

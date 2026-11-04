@@ -67,7 +67,8 @@ Ask at most these, in one message (skip what you already know):
 2. **What it does, in one sentence**, and **for whom**.
 3. **The 2–3 things it does better** than what people use today (name the alternatives if you can).
 4. **Brand:** colours, font, logo/icon. Point to a website, landing page or Figma if there is one.
-5. **Stores and languages** (App Store, Google Play; Turkish, English…).
+5. **Stores, devices and languages** (App Store, Google Play; iPad? iPhone Duo? Turkish, English…). iPad and
+   iPhone Duo sets need screens captured on those devices.
 
 Screenshots of the app can come now or after the storyboard (§5). If the user has a website, landing page or
 pitch deck, read it: it's usually a better source for the promise than a form.
@@ -92,7 +93,9 @@ For the new set I need these raw screenshots (PNG, straight from the device or s
 2. …
 Capture tips: dark/light mode as in the design · app language = store language · realistic, filled data
 (no empty states, no real personal data) · same clean status bar on every screen · no debug UI (test
-buttons, dev banners) · full-resolution PNG, not a shared/compressed copy · iPhone 1179×2556 or 1206×2622.
+buttons, dev banners) · full-resolution PNG, not a shared/compressed copy · iPhone 1179×2556 or 1206×2622 ·
+if the app supports iPhone Duo or iPad: the same screens captured there too (Duo outer 1398×2034, inner
+2007×2853; iPad 2064×2752) - their layouts differ, so crops are read separately.
 Simulator: `xcrun simctl status_bar booted override --time 9:41 --batteryState charged --batteryLevel 100`,
 then `xcrun simctl io booted screenshot shot.png`. Android: `adb exec-out screencap -p > shot.png`.
 ```

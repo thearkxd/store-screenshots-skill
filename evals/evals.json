@@ -66,6 +66,18 @@
    "prompt": "2. ve 3. görsel tek bir görsel gibi dursun, telefon ikisinin ortasında olsun.",
    "expected_output": "Turns shots 2-3 into one span entry (\"span\": 2, bridge: a shared screen, phone centred on the seam so each screenshot holds exactly half) instead of designing two separate shots; picks a screen whose proof isn't dead centre (or lifts it out as a callout on one side), gives each half its own headline at the top, keeps text and callouts off the seam, renders, and reports any seam warnings from render_set/check_set.",
    "files": []
+  },
+  {
+   "id": 12,
+   "prompt": "Uygulamamız iPhone Duo'yu da destekliyor, Duo için de görselleri hazırla.",
+   "expected_output": "Asks for raw screens captured on iPhone Duo (outer 1398x2034 and inner 2007x2853) rather than reusing phone screens; adds duo-outer and duo-inner to \"sizes\" with per-size screens and crops ({\"default\": …, \"duo-inner\": …}); renders and checks them with check_set.py --store duo; mentions that Duo screenshots become required from April 2027 for apps built with the iOS 27.1 SDK.",
+   "files": []
+  },
+  {
+   "id": 13,
+   "prompt": "Bu seti Google Play için de çıkar.",
+   "expected_output": "Renders the android size (1080x1920) with the bare rounded screen (no device frame), keeps a type-only poster out of the Play set with \"stores\": [\"ios\"], removes promo words, prices, calls to action and testimonials, keeps captions under 20% of the image, adds a 1024x500 feature graphic without a device frame, and runs check_set.py --store android.",
+   "files": []
   }
  ]
 }
