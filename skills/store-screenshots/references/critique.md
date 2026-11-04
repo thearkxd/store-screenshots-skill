@@ -5,6 +5,8 @@ headlines; point to the shot number.
 
 ## Process
 
+0. If the user gave a store link, run `python3 scripts/fetch_listing.py <url> --search "<keywords>"` first:
+   it saves the current screenshots, `current.jpg` and the listing text, and lists competitors to compare with.
 1. Look at the set at full size, then build a contact sheet and a search-size view:
    `python3 scripts/make_sheet.py --rows <folder> -o sheet.jpg` and
    `python3 scripts/check_set.py <folder> --store ios` (writes `_search-preview.jpg`; size errors are expected

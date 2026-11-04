@@ -30,6 +30,24 @@
       "prompt": "Localise my English App Store screenshot headlines into Turkish: 'Never miss an episode', 'Track everything you watch', 'See what friends are watching'.",
       "expected_output": "Rewritten (not literal) Turkish headlines with a consistent sen/siz choice, notes on Turkish capitals if caps are used, a reminder that the UI in the screenshots must also be Turkish, and no banned phrases.",
       "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Uygulamam için mağaza görselleri hazırlar mısın?",
+      "expected_output": "Before anything else, asks whether the app is live on the App Store / Google Play and for the store link(s), offering the short form if it isn't. Does not ask the full questionnaire when a link would answer it, and does not start designing.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "https://apps.apple.com/tr/app/seenfy-ne-izlesem-film-dizi/id6764370964 için yeni mağaza görselleri yap.",
+      "expected_output": "Runs fetch_listing.py (or falls back to a web fetch / asks to paste the listing if blocked), drafts the brief from the description, scores the current set with the critique scorecard and keeps its good lines, asks whether the set is for the current version or an update, proposes a storyboard, then asks for the specific raw screens per shot. Does not crop UI out of the current marketing screenshots and does not render before raw screens arrive.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Henüz yayında olmayan bir bütçe uygulaması yapıyorum, adı Kumbara. Görselleri hazırla.",
+      "expected_output": "Asks the short form in one message (what it does in one sentence and for whom, 2-3 differentiators, brand colours/font or a website/Figma, stores and languages) without re-asking the name, then brief, storyboard and a raw-screen request.",
+      "files": []
     }
   ]
 }

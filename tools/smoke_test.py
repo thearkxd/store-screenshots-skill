@@ -40,6 +40,12 @@ def main():
     out = run(s("search_library.py"), "--quality", "exemplary", "--verified", "--position", "1", "--format", "headlines")
     assert out.strip(), "no verified exemplary headlines"
     with tempfile.TemporaryDirectory() as tmp:
+        # listing intake, offline: parse a saved iTunes lookup response
+        run(s("fetch_listing.py"), "--lookup-json", os.path.join(ROOT, "tools", "fixtures", "appstore-lookup-seenfy.json"),
+            "--country", "tr", "--out", os.path.join(tmp, "listing"))
+        md = open(os.path.join(tmp, "listing", "appstore-tr-seenfy-ne-izlesem-film-dizi", "listing.md"), encoding="utf-8").read()
+        assert "Seenfy" in md and "## Description" in md, md[:500]
+        run(s("fetch_listing.py"), "not-a-store-url", expect=1)
         run(s("render_set.py"), os.path.join(SKILL, "templates", "set.example.json"), "--out", tmp)
         for preset, store in (("ios", "ios"), ("android", "android")):
             folder = os.path.join(tmp, preset)

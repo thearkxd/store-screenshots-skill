@@ -56,8 +56,14 @@ Skills don't sync between products - install in each one you use.
 
 ## Use
 
+The skill starts by asking whether the app is already live. **Live:** send the App Store / Google Play
+link(s) - it reads the listing (description, what's new, category, rating, current screenshots, competitors),
+drafts the brief, scores the current set, and then asks for exactly the raw screens the new storyboard needs.
+**Not live:** it asks a short form instead (what it does, for whom, what it does better, brand).
+
 Just ask, in any language:
-- "Seenfy için App Store mağaza görselleri hazırla, ekran görüntüleri ekte."
+- "Şu uygulama için yeni mağaza görselleri yap: https://apps.apple.com/tr/app/…/id6764370964"
+- "Henüz yayında olmayan bir bütçe uygulaması için mağaza görselleri hazırla."
 - "Critique our Play Store screenshots and tell me the three biggest fixes."
 - "What do the best finance apps put in their first screenshot?"
 - "Bu İngilizce başlıkları Türkçe'ye uyarla."
@@ -77,10 +83,10 @@ python3 $S/peer_test.py out/ios --category entertainment -o peer.jpg
 ```
 skills/store-screenshots/
   SKILL.md                    workflow, non-negotiables, red flags, tool map
-  references/                 copy-rules · storytelling · layouts · anti-ai · localization · store-specs ·
-                              critique · library-guide
-  scripts/                    search_library · render_set · check_set · peer_test · make_sheet ·
-                              collect_examples · build_catalog
+  references/                 intake · copy-rules · storytelling · layouts · anti-ai · localization ·
+                              store-specs · critique · library-guide
+  scripts/                    fetch_listing · search_library · render_set · check_set · peer_test ·
+                              make_sheet · collect_examples · build_catalog
   templates/                  set.example.json + demo screens of a fictional app
   assets/fonts/               Inter, Inter Display, Lora (OFL, subset to Latin + Turkish)
   assets/library/             catalog.json · classifications.json · stats.json · img/

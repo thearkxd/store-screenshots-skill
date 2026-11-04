@@ -19,21 +19,22 @@ Reply in the user's language. Keep the process light: short explanations, real f
 3. **Pass the swap test.** Replace the app name with a competitor's: if the headline is still true, rewrite it
    (`references/copy-rules.md`).
 4. **First shot = the promise**, never a logo, splash, login or "we renewed our app".
-5. **Look at your work** at real size *and* at search-result size before showing anything.
+5. **Raw screens only.** Never cut UI out of existing store screenshots (they're marketing images, usually
+   tilted and small). Ask for the exact raw screens the storyboard needs.
+6. **Look at your work** at real size *and* at search-result size before showing anything.
 
 ## Pick the mode
 
 | The user wants… | Mode | Start with |
 |---|---|---|
-| A new screenshot set | **Create** (phases below) | Phase 1 |
-| Feedback on existing screenshots | **Critique** | `references/critique.md` |
+| A new screenshot set | **Create** (phases below) | Phase 0 |
+| Feedback on existing screenshots (or a store link) | **Critique** | `scripts/fetch_listing.py`, then `references/critique.md` |
 | Headlines/captions only | **Copy** | Phases 1–2, then `references/copy-rules.md` |
 | Another language / store | **Localise** | `references/localization.md` |
 | Examples, "what do others in my category do?" | **Research** | `scripts/search_library.py` |
 
-**Fast track:** if the user wants results now or gives little info, ask at most four questions in one message
-(what it does in one sentence, who for, the 1–2 things it does better than alternatives, screenshots + brand
-colours) - or state assumptions and go. Iterate after they react.
+**Fast track:** if the user wants results now, still ask the one intake question (live? link?) - a store link
+replaces most other questions. Otherwise state assumptions and go; iterate after they react.
 
 ## Tools in this skill
 
@@ -43,22 +44,34 @@ rendering. Run with `python3 <skill-dir>/scripts/<name>.py` (`python` on Windows
 
 | Script | Use it to |
 |---|---|
+| `fetch_listing.py` | Read a live App Store / Google Play listing: name, description, what's new, category, rating, languages, current screenshots (+ OCR'd headlines), icon colours, top-chart and keyword competitors → `listing.md` |
 | `search_library.py` | Query the library: `--category`, `--country tr/us`, `--quality exemplary/weak`, `--technique`, `--layout`, `--position 1`, `--ai-smell`, `--query`; `--summary` shows a category's conventions; `--format headlines` lists real headlines; `--format paths` gives images to look at |
 | `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; bundled fonts, tracking, Turkish-safe capitals |
 | `check_set.py` | Check finished PNGs: exact store sizes, no alpha, count limits, headline length, banned phrases; writes a **search-result preview** (first 3 shots at thumbnail size) and an overview sheet |
 | `peer_test.py` | Put your set next to 2–3 exemplary sets from the same category at the same size |
 | `make_sheet.py` | Contact sheets of any folders of screenshots |
-| `collect_examples.py`, `build_catalog.py` | Maintainers: refresh the library from the App Store charts |
+| `collect_examples.py` | Download any apps' store screenshots by id (competitors: `--app-ids … --label competitors`); maintainers use it for the library |
+| `build_catalog.py` | Maintainers: rebuild the library catalog |
 
 If the library images are missing (lite package), every script still works on the text catalog; only the
 images that ship are viewable (`search_library.py` marks them `img`).
 
 ## Workflow
 
-### Phase 1 - Understand the app (before any pixels)
-Get: the app in one sentence, the audience, the moment of use, the 1–2 things it does better, the store(s) and
-languages, brand colours/font, and the real screenshots. Open every screenshot and list what each one *proves*.
-Write a 5-line brief: **promise · audience · proof points (3–6) · tone · constraints**. State assumptions.
+### Phase 0 - Intake: is it live? (`references/intake.md`)
+Unless the user already said, ask first: **is the app on the App Store / Google Play? If yes, send the
+link(s).** Skip anything they've already given you.
+- **Live:** `python3 scripts/fetch_listing.py <url…> --search "<category keywords>" --out listing/`, read
+  `listing.md`, open `current.jpg`. Also ask whether the set is for the current version or an update with
+  new features. If the store can't be reached (exit code 2), use a web-fetch tool or ask the user to paste
+  the listing text (intake §3).
+- **Not live:** ask the short form in one message: name, what it does in one sentence and for whom, the 2–3
+  things it does better, brand (colours, font, website/Figma), stores and languages.
+
+### Phase 1 - Brief (and critique, if live)
+Write a 5-line brief - **promise · audience · proof points (3–6) · tone · constraints** - from the listing or
+the answers, and confirm it with the user. If the app is live, critique the current set
+(`references/critique.md`): score, top three fixes, and which lines are worth keeping.
 
 ### Phase 2 - Research the category (5 minutes, not an hour)
 ```bash
@@ -77,6 +90,9 @@ to App Store categories; see `references/library-guide.md` for the list and the 
   `references/copy-rules.md`.
 - Pick the strongest option per shot and show the user the **storyboard as a table** (shot · headline · sub-line ·
   which screen · layout) before rendering, unless they asked you to just deliver.
+- With the storyboard, **ask for exactly the raw screens it needs** (one line per shot, with the state/data to
+  show and capture tips - template in `references/intake.md` §5). Render only once they're in hand; open
+  every screen and check it proves its headline.
 
 ### Phase 4 - Design and render
 - Choose one visual system for the whole set: background colour from the brand (not a default gradient), one
@@ -90,8 +106,8 @@ python3 scripts/render_set.py set.json --out out/
 ```
 Use the user's brand font if they provide a `.ttf/.otf`; otherwise the bundled OFL fonts (`sans` headline,
 `text` sub-line, `serif-italic` for one emphasis word - `assets/fonts/FONTS.md`). Seed the screens with
-realistic data first: the renderer can't fix thin or empty UI. For layouts the renderer can't do, write HTML/CSS and screenshot it at
-the exact pixel size with a headless browser if one is available (`references/layouts.md` §6).
+realistic data first: the renderer can't fix thin or empty UI. For layouts the renderer can't do, write
+HTML/CSS and screenshot it at the exact pixel size with a headless browser if one is available (`references/layouts.md` §6).
 
 ### Phase 5 - Check, compare, fix (loop at least once)
 ```bash
@@ -136,6 +152,7 @@ must verify (claims, numbers, legal lines).
 
 | Read | When |
 |---|---|
+| `references/intake.md` | Start of every job: live-app vs new-app flow, listing fetch and fallbacks, brief, screen request |
 | `references/copy-rules.md` | Writing or judging any headline (patterns, banned words EN/TR, swap test) |
 | `references/storytelling.md` | Ordering the set, first three shots, set structures |
 | `references/layouts.md` | Layout recipes, type, colour, emphasis devices, HTML route |
