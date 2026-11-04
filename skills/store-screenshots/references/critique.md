@@ -27,7 +27,7 @@ headlines; point to the shot number.
 | 4 | **Voice** (say-it test) | Slogans/Title Case | Plain | Sounds like a person |
 | 5 | **Glance legibility** at search size | Unreadable | Some | All readable |
 | 6 | **One idea per shot** | Paragraphs/lists | Some crowding | Clean |
-| 7 | **Proof** (screen proves headline) | Unrelated screens | Loose | Each screen proves it |
+| 7 | **Proof** (screen proves headline; believable data; no proof shown twice) | Unrelated screens | Loose, thin or repeated | Each screen proves it, data holds up |
 | 8 | **Visual system** (colour/type/emphasis) | Inconsistent | Mostly | One system |
 | 9 | **No AI/template smell** (`anti-ai.md`) | Several signals | One or two | None |
 | 10 | **Localisation & compliance** | Wrong language / store violations | Minor issues | Correct |

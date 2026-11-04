@@ -200,6 +200,48 @@ def size_tests(tmp):
     run(s("concepts.py"), fx, "--size", "android", "--directions", "poster", "-o", os.path.join(tmp, "android-concepts.jpg"))
 
 
+def quality_tests(tmp):
+    """The checks that catch a set that looks fine but doesn't sell: no promise in shots 1-3, the same proof
+    twice, thin demo data."""
+    import json
+    import shutil
+    from PIL import Image, ImageDraw
+    tpl = os.path.join(SKILL, "templates", "set.example.json")
+    d = json.load(open(tpl, encoding="utf-8"))
+    d["shots"] = [dict(sh, screen=os.path.join(SKILL, "templates", sh["screen"])) if sh.get("screen") else sh for sh in d["shots"]]
+
+    def render(extra, name, shots=None):
+        path = os.path.join(tmp, f"q-{name}.json")
+        json.dump(dict(d, sizes=["ios"], shots=shots or d["shots"], **extra), open(path, "w", encoding="utf-8"), ensure_ascii=False)
+        return run(s("render_set.py"), path, "--out", os.path.join(tmp, "q", name), both=True)
+    good = render({}, "good")
+    assert "first three headlines" not in good and "the same way" not in good, good
+    assert "none of the first three headlines names what the app does" in render({"promise_words": ["carousel", "TikTok"]}, "promise")
+    twice = [dict(sh) for sh in d["shots"]]
+    twice[4] = dict(twice[4], screen=twice[0]["screen"])
+    assert "shots 01 and 05 show 01-home.jpg the same way" in render({}, "twice", twice)
+    # thin demo data: one figure three times on a screen
+    raw = os.path.join(tmp, "thin")
+    os.makedirs(raw)
+    im = Image.new("RGB", (1206, 2622), (246, 244, 240))
+    dr = ImageDraw.Draw(im)
+    sys.path.insert(0, SCRIPTS)
+    import render_set as rs
+    f = rs.Fonts(SKILL).get("text", 56)
+    for i, (label, fig) in enumerate([("Hikaye", "48,2 B"), ("Liste", "11,8 B"), ("Grotesk", "48,2 B"),
+                                      ("Teknik", "27,5 B"), ("Sekiller", "48,2 B")]):
+        dr.text((90, 300 + i * 260), label, font=f, fill=(20, 20, 20))
+        dr.text((860, 300 + i * 260), fig, font=f, fill=(20, 20, 20))
+    im.save(os.path.join(raw, "01-analytics.png"))
+    out = run(s("prepare_screens.py"), raw, "--out", os.path.join(tmp, "thin-out"), both=True)
+    if shutil.which("tesseract"):
+        assert "demo data looks thin" in out and "appears 3 times" in out, out
+    else:
+        assert "demo-data check skipped" in out, out
+    out = run(s("prepare_screens.py"), os.path.join(ROOT, "examples", "seenfy", "screens"), "--out", os.path.join(tmp, "seenfy-prep"), both=True)
+    assert "demo data looks thin" not in out, out  # real, varied data stays quiet
+
+
 def main():
     for name in sorted(os.listdir(SCRIPTS)):
         if name.endswith(".py"):
@@ -256,6 +298,7 @@ def main():
         assert os.path.getsize(os.path.join(tmp, "concepts.jpg")) > 20000
         span_tests(tmp)
         size_tests(tmp)
+        quality_tests(tmp)
         # every bundled font covers Turkish
         sys.path.insert(0, SCRIPTS)
         import render_set

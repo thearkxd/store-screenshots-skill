@@ -2,6 +2,21 @@
  "_doc": "One spec, two locales: {\"tr\": …, \"en\": …} values are picked per locale; output goes to out/<locale>/<preset>/. The English captions reuse the Turkish UI (README demo); for a real US listing capture the screens in English and give \"screen\": {\"tr\": …, \"en\": …}. The look comes from the \"cinematic\" direction (assets/directions/); try others with concepts.py.",
  "app": "Seenfy: Ne İzlesem? Film Dizi",
  "category": "entertainment",
+ "promise_words": {
+  "tr": [
+   "izle",
+   "film",
+   "dizi",
+   "bölüm"
+  ],
+  "en": [
+   "watch",
+   "film",
+   "movie",
+   "show",
+   "episode"
+  ]
+ },
  "direction": "cinematic",
  "brand": {
   "primary": "#5B5BF5",

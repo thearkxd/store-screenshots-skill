@@ -68,6 +68,14 @@ as one row covering two shot numbers (e.g. "02-03 · span · bridge").
 - Hide anything that dates or confuses: debug banners, empty states, lorem ipsum, 2019 dates, an old status
   bar, someone's real personal data.
 - Prefer the state *after* the user did something (a result, a filled list) over the empty start screen.
+- **The output is the hero** when the app makes something (content, designs, photos, documents, songs,
+  plans): show what it made, big, early - Suno's song, Pixelcut's image, a carousel's slides - not only the
+  dashboard around it. A span pair fits a wide output.
+- **Numbers must hold up.** Vary them (no figure repeated down a list), give every "best" or "winner" more
+  than one sample, keep totals consistent between screens. People in the domain notice thin demo data.
+- **One proof per shot.** The same screen (or the same element - one failed post, one card) in two shots is
+  one proof shown twice; use the slot for something new.
+- Check enlarged pieces at full size before using them: a callout magnifies UI bugs as much as UI.
 - Use **zoom/crop** when the proof is one card on a busy screen (Flo's "Period in 3 days", Capital One's 720
   credit score, ParkMobile's timer).
 

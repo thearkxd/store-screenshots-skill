@@ -92,7 +92,8 @@ For the new set I need these raw screenshots (PNG, straight from the device or s
 1. <screen> - showing <state/data>, e.g. "Discover, with the 'Picked for you' row filled"
 2. …
 Capture tips: dark/light mode as in the design · app language = store language · realistic, filled data
-(no empty states, no real personal data) · same clean status bar on every screen · no debug UI (test
+(no empty states, no real personal data; varied numbers - no figure repeated down a list, more than one
+sample behind any "best" or "winner"; check long titles wrap cleanly) · same clean status bar on every screen · no debug UI (test
 buttons, dev banners) · full-resolution PNG, not a shared/compressed copy · iPhone 1179×2556 or 1206×2622 ·
 if the app supports iPhone Duo or iPad: the same screens captured there too (Duo outer 1398×2034, inner
 2007×2853; iPad 2064×2752) - their layouts differ, so crops are read separately.

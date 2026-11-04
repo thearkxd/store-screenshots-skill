@@ -20,6 +20,9 @@ as AI-generated.
   editorial, poster, playful, cinematic, crafted, native, utility - each a full visual system driven by the
   app's brand colours. A concept sheet shows the first three shots in three directions before anything is
   rendered, so the look is a choice, not a template.
+- **Checks that catch a set that looks fine but doesn't sell** - none of the first three headlines saying
+  what the app does (`"promise_words"`), the same screen used as proof twice, and thin demo data (the same
+  figure repeated on a screen, read with tesseract).
 - **Span pairs** - one picture across two screenshots (a phone cut exactly in half by the seam, or one ground
   behind two shots), drawn on a single double-width canvas and split down the middle so the halves always
   line up; the renderer warns when text or a callout crosses the seam, a half has no headline or the pair

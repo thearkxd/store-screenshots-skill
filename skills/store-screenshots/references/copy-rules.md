@@ -84,6 +84,8 @@ Each pattern names real headlines (verified) from the library. Search more with
 | Company news | "We renewed the Ziraat Bank Mobile App for you!", "Halkbank Mobil Yenilendi!" | Users don't care that you redesigned |
 | Paragraph captions | Otobüsüm Nerede, Pegasus, e-Devlet | Unreadable at store size |
 | Repeating the app name | "TikTok Pro - Events" on every shot | Wastes the headline slot |
+| Repeating the screen's own title | Headline "Three hooks tested, the winner moved up" over a screen that says "3 hooks tested; the most watched moved up" | The caption should add the benefit the screen can't say |
+| A clever line about a side feature first | Shot 1 "Which font worked? Let the data say." for an app whose job is making carousels | Search shows shots 1–3; none says what the app does |
 | Broken / translated English | "Share Amazing Sound With Friend", "AI intelligent service" | Signals low care (or machine output) |
 
 ## 4. Banned and tired phrases

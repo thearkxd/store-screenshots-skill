@@ -10,6 +10,11 @@
   "android"
  ],
  "category": "entertainment",
+ "promise_words": [
+  "dizi",
+  "bölüm",
+  "izle"
+ ],
  "direction": "editorial",
  "brand": {
   "primary": "#E8462B",

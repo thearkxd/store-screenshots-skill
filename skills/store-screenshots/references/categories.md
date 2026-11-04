@@ -15,6 +15,10 @@ Graphics & Design · Health & Fitness · Lifestyle · Magazines & Newspapers · 
 News · Photo & Video · Productivity · Reference · Shopping · Social Networking · Sports · Travel · Utilities ·
 Weather · Kids and others
 
+Across categories: **if the app makes something** (posts, designs, photos, documents, songs, plans), its
+output is the hero - show what it made, big, in shots 1–3 (Suno's song, Pixelcut's image). Scheduling and
+analytics around that output come second.
+
 How to use: read your category and one neighbour (a news app reads Magazines too; a habit tracker reads
 Productivity and Health). Take the **norm** as what the search results will look like around you, steal from
 the **best**, ban the **clichés**, and pick the angle (`angle.md`) from **stand out**.

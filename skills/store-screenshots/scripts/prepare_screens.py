@@ -10,6 +10,8 @@ Checks every screen and prints a report:
   - aspect ratio vs. iPhone (2.17) and common Android ratios; mixed ratios in one set
   - JPEG source (prefer the original PNG)
   - status-bar consistency (time/battery differ between screens - detected roughly by comparing the bars)
+  - thin demo data: the same figure ("48,2 B", "27,5%") three or more times on one screen - read with
+    tesseract if it is installed (skipped otherwise; --no-ocr to skip)
 
 --status-bar TIME   repaints the status bar band (top 6.2 % of the height) with the colour sampled under it
                     and draws TIME, signal, Wi-Fi and a full battery in a matching light/dark colour. Screens
@@ -22,11 +24,15 @@ Checks every screen and prints a report:
 Writes PNGs to --out (same names, .png) and prepared/report.json. Point the spec's "screen" paths there.
 """
 import argparse
+import collections
 import glob
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -103,13 +109,49 @@ def draw_status_bar(im, time_text):
     return im
 
 
+# a figure a screen would show: 48,2 B · 12.5K · 1,2 Mn · 87% · 3,4 bin · 4.8 - not clock times or dates
+FIGURE = re.compile(r"(?<![\d:./,])(\d{1,3}(?:[.,]\d{1,2})?\s?(?:B|K|M|Mn|bin|milyon|%)(?![A-Za-zçğıöşüÇĞİÖŞÜ])|%\s?\d{1,3}(?:[.,]\d)?"
+                    r"|\d{1,3}[.,]\d{1,2}(?![\d:./]))")
+
+
+def ocr_langs():
+    exe = shutil.which("tesseract")
+    if not exe:
+        return None, None
+    try:
+        out = subprocess.run([exe, "--list-langs"], capture_output=True, text=True, timeout=20).stdout.split()
+    except (OSError, subprocess.SubprocessError):
+        return None, None
+    langs = "+".join(l for l in ("eng", "tur") if l in out) or None
+    return exe, langs
+
+
+def repeated_figures(im, exe, langs, times=3):
+    """Figures that appear `times`+ times on one screen - a sign the demo data was copy-pasted."""
+    g = im.convert("L")
+    if g.width < 1400:
+        g = g.resize((g.width * 2, g.height * 2))
+    with tempfile.TemporaryDirectory() as tmp:
+        path = os.path.join(tmp, "s.png")
+        g.save(path)
+        try:
+            text = subprocess.run([exe, path, "-", "-l", langs, "--psm", "11"], capture_output=True, text=True,
+                                  timeout=120).stdout
+        except (OSError, subprocess.SubprocessError):
+            return []
+    norm = [re.sub(r"\s+", " ", m.group(0).strip()).replace(" %", "%") for m in FIGURE.finditer(text)]
+    return [(f, n) for f, n in collections.Counter(norm).most_common() if n >= times]
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("inputs", nargs="+", help="screen files or folders")
     p.add_argument("--out", default="prepared")
     p.add_argument("--status-bar", metavar="TIME", help="repaint a clean status bar with this time, e.g. 9:41")
     p.add_argument("--cover", action="append", default=[], metavar="FILE:x0,y0,x1,y1")
+    p.add_argument("--no-ocr", action="store_true", help="skip the demo-data check (tesseract)")
     a = p.parse_args()
+    exe, langs = (None, None) if a.no_ocr else ocr_langs()
 
     files = []
     for i in a.inputs:
@@ -135,6 +177,10 @@ def main():
             notes.append("JPEG - fine, but the original PNG is sharper (shared screenshots are usually recompressed)")
         if abs(r - IPHONE) / IPHONE > 0.02 and not any(abs(r - x) / x < 0.02 for x in ANDROID):
             notes.append(f"unusual aspect ratio {r:.3f} (iPhone is {IPHONE:.3f}) - cropped or a screen recording?")
+        if exe and langs:
+            for fig, n in repeated_figures(im, exe, langs)[:3]:
+                notes.append(f"demo data looks thin: \"{fig}\" appears {n} times on this screen - seed varied, plausible "
+                             "numbers (and more than one sample behind any 'best' or 'winner')")
         sd, mean = band_uniformity(im)
         bars.append(im.crop(band_box(im)).resize((80, 6)).convert("L"))
         for box in covers.get(os.path.basename(f), []):
@@ -156,7 +202,8 @@ def main():
     for i in range(1, len(bars)):
         a_px, b_px = pixels(bars[0]), pixels(bars[i])
         diffs.append(sum(abs(x - y) for x, y in zip(a_px, b_px)) / len(a_px))
-    print(f"{len(files)} screens → {a.out}")
+    print(f"{len(files)} screens → {a.out}" + ("" if exe and langs or a.no_ocr else
+                                                 "   (no tesseract: demo-data check skipped)"))
     for r_ in report:
         print(f"- {r_['file']}: {r_['size'][0]}x{r_['size'][1]} (ratio {r_['ratio']})")
         for n in r_["notes"]:

@@ -41,7 +41,9 @@ Tick each expected behaviour. The prompts match `evals/evals.json`.
 - [ ] The brief has an `Angle:` line chosen from three candidates; the category playbook is used.
 - [ ] Before the full set, `concepts.py` runs and the reply shows the concept sheet (three directions) and
       asks which one - unless you said "just deliver".
-- [ ] `prepare_screens.py` runs and its report is summarised (resolution, status bars).
+- [ ] `prepare_screens.py` runs and its report is summarised (resolution, status bars, thin demo data).
+- [ ] The first three headlines say what the app does (`"promise_words"` set from the brief); an app that
+      makes something shows its output big; no screen or element is used as proof twice.
 - [ ] Renders at 1206×2622 **and** 1320×2868 (two iPhone sizes) and 1080×1920; `check_set.py` runs; the reply shows the overview and search preview
       images, not just file paths.
 - [ ] Android set shows the bare rounded screen (no device frame), no poster shot, no promo words or "download

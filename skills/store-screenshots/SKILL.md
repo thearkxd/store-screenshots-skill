@@ -75,8 +75,10 @@ link(s).** Skip anything they've already given you.
 Write a short brief - **promise · audience · proof points (3–6) · tone · constraints** - from the listing or
 the answers. Then find the **angle** (`references/angle.md`): write three one-line angles of different types
 (the exact person, the enemy, the ritual, the insider word, the proof only you have), pick the one the
-screens can prove and competitors can't say, and add it as `Angle:` to the brief. Confirm brief + angle with
-the user. If the app is live, critique the current set (`references/critique.md`): score, top three fixes,
+screens can prove and competitors can't say, and add it as `Angle:` to the brief. Note the 2–4 words that say what the app does or makes, in the user's
+language (Deckfy: "carousel", "TikTok"; a tracker: "dizi", "takip") - they go in the spec as
+`"promise_words"`, and the renderer warns if none of the first three headlines uses one. Confirm brief +
+angle with the user. If the app is live, critique the current set (`references/critique.md`): score, top three fixes,
 and which lines are worth keeping.
 
 ### Phase 2 - Research the category (5 minutes, not an hour)
@@ -92,9 +94,18 @@ to App Store categories; see `references/library-guide.md` for the list and the 
 
 ### Phase 3 - Story and copy
 - Order the proof points by what the *user* cares about, not by the app's menu (`references/storytelling.md`).
+- **Shots 1–3 say what the app does** - search shows only those. A stranger must be able to answer "what
+  does it make or do?" from their headlines alone; a clever line about a secondary feature (analytics, a
+  setting) waits until later.
+- **If the app makes something** (content, designs, photos, documents, music, plans), at least one early
+  shot shows that output big - not as a thumbnail in a list. A span pair suits a wide output (a carousel's
+  slides, a photo series).
+- **One proof per shot, never twice:** two shots on the same screen, or the same element (a failed post, a
+  card) in two shots, waste a slot. The renderer flags the same screen shown the same way.
 - Draft **2–3 headline options per shot** in the user's language, 3–6 words each, verb-led or spoken,
   with one concrete detail (a number, a real moment, a named pain). Shot 1 states the angle; use the
-  audience's insider words in at least two. Rules and banned words: `references/copy-rules.md`.
+  audience's insider words in at least two. The headline adds what the screen can't say - it doesn't repeat
+  the screen's own title. Rules and banned words: `references/copy-rules.md`.
 - Pick the strongest option per shot and show the user the **storyboard as a table** (shot · headline · sub-line ·
   which screen · layout) before rendering, unless they asked you to just deliver.
 - With the storyboard, **ask for exactly the raw screens it needs** (one line per shot, with the state/data to
@@ -155,6 +166,15 @@ python3 scripts/peer_test.py out/ios --category <closest> -o peer.jpg
 ```
 Open `out/ios/_search-preview.jpg`, `out/ios/_overview.jpg` and `peer.jpg` and actually look. Fix what fails:
 - Can you read every headline at search size? Can you tell what the app does from shots 1–3 alone?
+- **Look at every callout and zoom at 100 %** - enlarging also enlarges bugs: words broken mid-line
+  ("kaybetmemeni / n"), truncated text, misaligned UI. A bug in the screen is fixed in the app and
+  re-captured, never painted over.
+- **Is the data believable?** The same figure repeated across a screen, or a "winner" resting on one sample,
+  reads as fake to the people who know the domain (`prepare_screens.py` flags repeated figures when
+  tesseract is installed). Re-seed and re-capture.
+- Does the headline name a part of the screen ("which font worked?")? Then that part is pulled out or
+  marked - not left in the middle of a long list.
+- Does a headline just repeat the screen's own title? Rewrite it to add the benefit.
 - Does any shot look like a template, an AI render, or a competitor (`references/anti-ai.md`)?
 - Does it look equally resolved next to the peers? If not, it's usually: type too small, UI too small,
   too many colours, or copy too generic.

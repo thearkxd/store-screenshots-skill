@@ -11,6 +11,18 @@
   "android"
  ],
  "category": "entertainment",
+ "promise_words": {
+  "tr": [
+   "dizi",
+   "bölüm",
+   "izle"
+  ],
+  "en": [
+   "episode",
+   "show",
+   "watch"
+  ]
+ },
  "direction": "crafted",
  "brand": {
   "primary": "#E8462B",
@@ -136,9 +148,9 @@
      "crops": [
       [
        0.03,
-       0.15,
+       0.51,
        0.97,
-       0.51
+       0.652
       ]
      ]
     }
@@ -149,7 +161,18 @@
     "tr": "Ne izlesem diye\n*düşünme*",
     "en": "Stop wondering\n*what to watch*"
    },
-   "screen": "../../skills/store-screenshots/templates/example-screens/01-home.jpg"
+   "screen": "../../skills/store-screenshots/templates/example-screens/01-home.jpg",
+   "callouts": [
+    {
+     "crop": [
+      0.0448,
+      0.1579,
+      0.9552,
+      0.5686
+     ],
+     "scale": 1.06
+    }
+   ]
   }
  ]
 }

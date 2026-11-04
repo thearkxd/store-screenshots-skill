@@ -1075,6 +1075,67 @@ def iphone_size_warnings(sizes):
     return out
 
 
+def tr_lower(text):
+    return text.replace("I", "ı").replace("İ", "i").lower()
+
+
+def slot_units(shots):
+    """(slot label, unit) for every screenshot slot: a shot, or each half of a span."""
+    out, slot = [], 0
+    for sh in shots:
+        if sh.get("span") == 2 or sh.get("halves"):
+            for h in span_halves(sh):
+                slot += 1
+                out.append((f"{slot:02d}", h))
+        else:
+            slot += 1
+            out.append((f"{slot:02d}", sh))
+    return out
+
+
+def promise_warnings(shots, words, lang):
+    """The first three shots are what search shows: one of their headlines must name what the app does or
+    makes (spec "promise_words", from the brief - e.g. ["carousel", "TikTok"])."""
+    if not words:
+        return []
+    words = [words] if isinstance(words, str) else [w for w in words if w]
+    low = (lambda t: tr_lower(t)) if lang == "tr" else (lambda t: t.lower())
+    heads = [low((u.get("headline") or "").replace("*", "").replace("\n", " ")) for _, u in slot_units(shots)[:3]]
+    if any(low(w) in h for w in words for h in heads):
+        return []
+    return [f"none of the first three headlines names what the app does ({', '.join(words)}) - search shows only "
+            "these three, so shot 1 (or 2-3) should say it in the user's words"]
+
+
+def repeat_warnings(shots):
+    """The same screen shown the same way twice is the same proof twice."""
+    seen, out = {}, []
+    units = []
+    slot = 0
+    for sh in shots:
+        if sh.get("span") == 2 or sh.get("halves"):
+            if sh.get("screen"):  # bridge: one phone across both slots
+                units.append((f"{slot + 1:02d}-{slot + 2:02d}", sh))
+            else:
+                units += [(f"{slot + 1 + j:02d}", h) for j, h in enumerate(span_halves(sh))]
+            slot += 2
+        else:
+            slot += 1
+            units.append((f"{slot:02d}", sh))
+    for label, u in units:
+        if not u.get("screen") or not isinstance(u["screen"], str):
+            continue
+        layout = u.get("layout", "device")
+        crops = u.get("crops") or ([u["crop"]] if u.get("crop") else []) if layout == "zoom" else []
+        key = (os.path.normpath(u["screen"]), layout, json.dumps(crops), json.dumps([c.get("crop") for c in u.get("callouts") or []]))
+        if key in seen:
+            out.append(f"shots {seen[key]} and {label} show {os.path.basename(u['screen'])} the same way - each shot "
+                       "should prove something new (another screen, or a crop of a different element)")
+        else:
+            seen[key] = label
+    return out
+
+
 def set_warnings(shots, store):
     """Rules for the whole set: how many spans, where they sit, how many slots."""
     out, slot, spans = [], 0, []
@@ -1322,7 +1383,9 @@ def main():
             cls = style["_class"]
             report = {"preset": name, "size": [W, H], "lang": lang, "locale": loc, "device": cls,
                       "store": store_of(name, W, H), "shots": [], "set_warnings": []}
-            for w in set_warnings(shots, report["store"]):
+            set_rules = (set_warnings(shots, report["store"]) + repeat_warnings(shots)
+                         + promise_warnings(shots, spec.get("promise_words"), lang))
+            for w in set_rules:
                 report["set_warnings"].append(w)
                 print(f"! {loc or ''} {name} set: {w}")
             if cls == "iphone" and not a.size:
