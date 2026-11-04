@@ -5,9 +5,7 @@ designer for **App Store and Google Play screenshots**: from the app's promise t
 pixel-exact PNGs - built from the app's real screens, with copy that passes the "swap test" and doesn't read
 as AI-generated.
 
-![Example set rendered by render_set.py from the demo screens of a fictional app](docs/images/example-set.jpg)
-
-*The example set: `render_set.py` + `templates/set.example.json`, from the demo screens of a fictional TV tracker.*
+![Seenfy App Store screenshots made with this skill, Turkish](docs/images/seenfy-tr.jpg)
 
 - **Process & craft** - brief, category research, story order, the first three shots, headline patterns,
   banned/tired phrases (EN + TR), layouts, type, colour, emphasis devices, localisation, critique scorecard,
@@ -20,6 +18,53 @@ as AI-generated.
   sizes (bundled OFL fonts, tracking, emphasis words in a second font, phone frame, stacked zoom cards,
   pulled-out callouts, posters, Turkish-safe capitals), check a set against store and copy rules with a
   search-result preview, and peer-test it next to exemplary sets.
+
+## Real example: Seenfy
+
+[Seenfy](https://apps.apple.com/tr/app/id6764370964) is a Turkish film & TV discovery and tracking app. The set
+above was made end to end with the skill:
+
+1. **Intake** - `fetch_listing.py` read the live App Store listing (description, release notes, category,
+   current screenshots) and found closer competitors with `--search "film dizi takip"` (Raf, Kare,
+   Letterboxd, Bingers, Muvy).
+2. **Critique** - the existing set scored **13/20**: strong Turkish voice ("Filmi izledin. Şimdi konuş."), but
+   AI-rendered cinema rooms, tilted phones, UI too small to read, two shots on the same screen.
+3. **Storyboard** - one promise per shot, taken from the listing's own proof points (personal picks, mood
+   collections, continue watching, one-tap tracking, spoiler-free comments), then a request for exactly the
+   raw screens each shot needs.
+4. **Render & check** - 6 raw iPhone screens → `render_set.py` (callouts for the match score, the
+   continue-watching card and the action buttons; a debug button covered), `check_set.py` for App Store and
+   Google Play sizes and copy rules, `peer_test.py` next to exemplary sets.
+
+**Turkish (App Store TR)**
+
+| # | Headline | Proof on screen |
+|---|---|---|
+| 1 | Popüler olanı değil, *seveceğini* izle | "%88 Sana Uygun" match score, pulled out |
+| 2 | Bu akşam *plot twist* mi istiyorsun? | Mood collections |
+| 3 | Kaldığın bölüm *hep hazır* | Continue watching, S2E5 |
+| 4 | İzle, beğen, *işaretle* | Watchlist / like / watched buttons |
+| 5 | Ne izlesem diye *düşünme* | Discover |
+| 6 | *Spoiler* yok. Söz. | Poster: spoiler comments stay hidden |
+
+**English** - rewritten, not translated:
+
+![Seenfy screenshots, English captions](docs/images/seenfy-en.jpg)
+
+*Not what's popular. What you'll love. · In the mood for a plot twist? · Your next episode, always ready ·
+Watch, like, check it off · Stop wondering what to watch · No spoilers. Promise.*
+
+> The English set reuses the Turkish UI to show the copy side by side. For a real US listing, capture the
+> screens with the app in English - caption language should always match the UI (`references/localization.md`).
+
+Reproduce both: `python3 skills/store-screenshots/scripts/render_set.py examples/seenfy/set.tr.json --out out/tr`
+(and `set.en.json`). Specs and screens are in `examples/seenfy/`.
+
+<details><summary>The skill's own demo set (fictional app, from <code>templates/set.example.json</code>)</summary>
+
+![Example set rendered by render_set.py from the demo screens of a fictional app](docs/images/example-set.jpg)
+
+</details>
 
 ## Full vs lite
 
@@ -90,6 +135,7 @@ skills/store-screenshots/
   templates/                  set.example.json + demo screens of a fictional app
   assets/fonts/               Inter, Inter Display, Lora (OFL, subset to Latin + Turkish)
   assets/library/             catalog.json · classifications.json · stats.json · img/
+examples/seenfy/              a real set: specs (TR + EN) and the raw screens
 evals/evals.json              test prompts with expected behaviour
 tools/package_skill.py        builds the full and lite zips
 tools/smoke_test.py           what CI runs on every push
@@ -133,3 +179,7 @@ App Store ve Google Play mağaza görselleri için bir skill: uygulamanın vaadi
 PNG olarak üretir ve kontrol eder. İçinde Türkiye ve ABD App Store'larında 25 kategoriden en popüler
 uygulamaların 1.366 mağaza görseli var; her uygulama iyi/kötü ve nedeniyle etiketli. claude.ai ve ChatGPT
 için 20 MB altındaki **lite** paketi, Claude Code ve diğer ajanlar için **tam** paketi kullanın.
+
+Gerçek örnek: yukarıdaki Seenfy seti skill ile baştan sona üretildi (mağaza sayfası okundu, eski set 13/20
+aldı, storyboard çıkarıldı, 6 ham ekranla render edildi). Türkçe ve İngilizce spec'ler `examples/seenfy/`
+klasöründe.

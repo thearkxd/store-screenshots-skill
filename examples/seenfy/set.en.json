@@ -1,0 +1,143 @@
+{
+ "app": "Seenfy: Ne İzlesem? Film Dizi",
+ "lang": "en",
+ "sizes": [
+  "ios",
+  "android"
+ ],
+ "style": {
+  "background": {
+   "color": "#F2EFE9"
+  },
+  "text_color": "#121212",
+  "sub_color": "#5C5852",
+  "font": "sans",
+  "sub_font": "text",
+  "tracking": -0.02,
+  "headline_size": 0.1,
+  "min_headline_size": 0.062,
+  "max_lines": 2,
+  "line_height": 1.04,
+  "text_width": 0.86,
+  "caption_top": 0.11,
+  "emphasis": {
+   "style": "font",
+   "font": "serif-italic",
+   "weight": 500,
+   "scale": 1.1,
+   "color": "#5B5BF5"
+  },
+  "device": {
+   "style": "phone",
+   "width": 0.8,
+   "radius": 0.15,
+   "border": 0.022,
+   "border_color": "#0E0E10",
+   "island": true,
+   "shadow": true,
+   "gap": 0.08,
+   "bleed": true
+  },
+  "card": {
+   "radius": 0.05,
+   "shadow": true,
+   "width": 0.88
+  }
+ },
+ "shots": [
+  {
+   "_role": "promise: personal, not popular - proof is the match score",
+   "headline": "Not what's popular.\n*What you'll love.*",
+   "screen": "screens/02-sana-uygun.jpg",
+   "callouts": [
+    {
+     "crop": [
+      0.088,
+      0.218,
+      0.46,
+      0.258
+     ],
+     "scale": 1.9,
+     "dx": 0.06
+    }
+   ]
+  },
+  {
+   "_role": "differentiator: mood collections",
+   "headline": "In the mood for\na *plot twist*?",
+   "screen": "screens/06-koleksiyonlar.jpg",
+   "layout": "zoom",
+   "crops": [
+    [
+     0.035,
+     0.236,
+     0.965,
+     0.886
+    ]
+   ],
+   "background": {
+    "color": "#121212"
+   },
+   "text_color": "#F2EFE9",
+   "emphasis": {
+    "color": "#9A9BFF"
+   }
+  },
+  {
+   "_role": "tracker: continue where you left off",
+   "headline": "Your next episode,\n*always ready*",
+   "screen": "screens/05-anasayfa.png",
+   "callouts": [
+    {
+     "crop": [
+      0.048,
+      0.205,
+      0.78,
+      0.437
+     ],
+     "scale": 1.08,
+     "dy": 0.008
+    }
+   ]
+  },
+  {
+   "_role": "control: watched / liked / list in one tap",
+   "headline": "Watch, like,\n*check it off*",
+   "screen": "screens/04-detay.jpg",
+   "callouts": [
+    {
+     "crop": [
+      0.545,
+      0.088,
+      0.945,
+      0.147
+     ],
+     "scale": 1.5,
+     "dx": -0.05,
+     "dy": 0.012
+    }
+   ]
+  },
+  {
+   "_role": "closer: the app's own question, answered",
+   "headline": "Stop wondering\n*what to watch*",
+   "screen": "screens/01-kesfet.jpg"
+  },
+  {
+   "_role": "poster: spoiler-free comments (a real feature)",
+   "headline": "*No* spoilers.\nPromise.",
+   "sub": "Comments with spoilers stay hidden until you open them.",
+   "layout": "poster",
+   "poster_size": 0.22,
+   "background": {
+    "color": "#5B5BF5"
+   },
+   "text_color": "#F2EFE9",
+   "sub_color": "#E3E2FF",
+   "emphasis": {
+    "color": "#121212"
+   }
+  }
+ ],
+ "_note": "English captions over the Turkish UI: README demo only. For the US store, capture the screens with the app in English."
+}
