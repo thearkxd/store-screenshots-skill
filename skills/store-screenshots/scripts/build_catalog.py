@@ -121,7 +121,7 @@ def colour_features(im):
     counts = sorted(q.getcolors(), reverse=True)
     palette = ["#%02x%02x%02x" % tuple(pal[i * 3:i * 3 + 3]) for _, i in counts[:3]]
     lum = small.convert("L")
-    px = list(lum.getdata())
+    px = list(lum.get_flattened_data() if hasattr(lum, 'get_flattened_data') else lum.getdata())
     brightness = sum(px) / len(px) / 255
     # background: the four corners are almost always background (outside the device and the caption)
     def stats(box):

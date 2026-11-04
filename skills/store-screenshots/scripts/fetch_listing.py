@@ -107,9 +107,14 @@ def fetch_appstore(ref):
     info = appstore_from_lookup(data["results"][0], ref["country"])
     try:  # subtitle lives only in the page HTML
         page = get(f"https://apps.apple.com/{ref['country']}/app/id{ref['id']}", timeout=15).decode("utf-8", "ignore")
-        m = re.search(r'<h2[^>]*class="[^"]*subtitle[^"]*"[^>]*>\s*(.*?)\s*</h2>', page, re.S)
+        m = (re.search(r'<h2[^>]*class="[^"]*subtitle[^"]*"[^>]*>\s*(.*?)\s*</h2>', page, re.S)
+             or re.search(r'<p[^>]*class="[^"]*subtitle[^"]*"[^>]*>\s*(.*?)\s*</p>', page, re.S)
+             or re.search(r'"subtitle"\s*:\s*"((?:[^"\\]|\\.){2,120})"', page))
         if m:
-            info["subtitle"] = html.unescape(re.sub(r"<[^>]+>", "", m.group(1))).strip()
+            sub = m.group(1)
+            if sub.startswith("\\u") or "\\" in sub:
+                sub = json.loads(f'"{sub}"')
+            info["subtitle"] = html.unescape(re.sub(r"<[^>]+>", "", sub)).strip() or None
     except Exception:
         pass
     return info
@@ -187,9 +192,14 @@ def fetch_play(ref):
     if not info["name"]:
         m = re.search(r'<meta property="og:title" content="([^"]+)"', page)
         info["name"] = html.unescape(m.group(1)).split(" - ")[0] if m else ref["id"]
-    m = re.search(r'itemprop="description"[^>]*>(.*?)</div>', page, re.S)  # "What's new"
-    if m and not info["release_notes"]:
-        info["release_notes"] = html.unescape(re.sub(r"<[^>]+>", "", m.group(1))).strip()[:1500]
+    # "What's new" is another itemprop="description" block; skip the one that is the main description
+    head = re.sub(r"\s+", " ", info["description"])[:60]
+    for blob in re.findall(r'itemprop="description"[^>]*>(.*?)</div>', page, re.S):
+        text = html.unescape(re.sub(r"<br\s*/?>", "\n", blob))
+        text = re.sub(r"<[^>]+>", "", text).strip()
+        if text and re.sub(r"\s+", " ", text)[:60] != head:
+            info["release_notes"] = text[:1500]
+            break
     shots = []
     for tag in re.findall(r"<img[^>]+>", page):
         src = re.search(r'src="(https://play-lh\.googleusercontent\.com/[^"]+)"', tag)
