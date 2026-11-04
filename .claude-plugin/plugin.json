@@ -1,0 +1,10 @@
+{
+  "name": "store-screenshots",
+  "description": "Plan, write and render App Store / Google Play screenshots that explain the app and don't look AI-made - with a classified library of 1,300+ real top-chart screenshots (TR + US) and scripts for search, rendering, store checks and peer tests.",
+  "version": "1.0.0",
+  "author": {"name": "Alpiworks"},
+  "homepage": "https://github.com/thearkxd/store-screenshots-skill",
+  "repository": "https://github.com/thearkxd/store-screenshots-skill",
+  "license": "MIT",
+  "keywords": ["app store", "google play", "screenshots", "aso", "marketing", "design"]
+}

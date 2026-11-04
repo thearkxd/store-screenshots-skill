@@ -1,0 +1,924 @@
+{
+ "all": {
+  "shots": 1366,
+  "apps": 197,
+  "headline_words": {
+   "p25": 3.0,
+   "median": 5.0,
+   "p75": 7.0
+  },
+  "no_headline_share": 0.05,
+  "headline_top_share": 0.86,
+  "dark_share": 0.2,
+  "background": {
+   "flat": 493,
+   "gradient": 405,
+   "flat-top": 283,
+   "image": 185
+  },
+  "layout": {
+   "device-frame": 986,
+   "full-bleed-ui": 150,
+   "mixed": 146,
+   "photo-led": 36,
+   "illustration-led": 34,
+   "panorama": 9,
+   "type-led": 5
+  },
+  "quality": {
+   "solid": 606,
+   "exemplary": 382,
+   "weak": 378
+  }
+ },
+ "by_country": {
+  "tr": {
+   "shots": 684,
+   "apps": 98,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 4.0,
+    "p75": 7.0
+   },
+   "no_headline_share": 0.04,
+   "headline_top_share": 0.86,
+   "dark_share": 0.18,
+   "background": {
+    "flat": 217,
+    "gradient": 209,
+    "flat-top": 170,
+    "image": 88
+   },
+   "layout": {
+    "device-frame": 518,
+    "full-bleed-ui": 78,
+    "mixed": 36,
+    "photo-led": 23,
+    "illustration-led": 15,
+    "panorama": 9,
+    "type-led": 5
+   },
+   "quality": {
+    "solid": 284,
+    "weak": 267,
+    "exemplary": 133
+   },
+   "headline_language": {
+    "en": 511,
+    "tr": 130
+   }
+  },
+  "us": {
+   "shots": 682,
+   "apps": 99,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 5.0,
+    "p75": 7.0
+   },
+   "no_headline_share": 0.05,
+   "headline_top_share": 0.87,
+   "dark_share": 0.21,
+   "background": {
+    "flat": 276,
+    "gradient": 196,
+    "flat-top": 113,
+    "image": 97
+   },
+   "layout": {
+    "device-frame": 468,
+    "mixed": 110,
+    "full-bleed-ui": 72,
+    "illustration-led": 19,
+    "photo-led": 13
+   },
+   "quality": {
+    "solid": 322,
+    "exemplary": 249,
+    "weak": 111
+   },
+   "headline_language": {
+    "en": 634,
+    "tr": 5
+   }
+  }
+ },
+ "by_category": {
+  "books": {
+   "shots": 57,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 5.0,
+    "p75": 6.0
+   },
+   "no_headline_share": 0.11,
+   "headline_top_share": 0.84,
+   "dark_share": 0.18,
+   "background": {
+    "flat-top": 17,
+    "gradient": 15,
+    "flat": 13,
+    "image": 12
+   },
+   "layout": {
+    "device-frame": 37,
+    "mixed": 8,
+    "illustration-led": 7,
+    "type-led": 5
+   },
+   "quality": {
+    "exemplary": 32,
+    "weak": 15,
+    "solid": 10
+   }
+  },
+  "business": {
+   "shots": 52,
+   "apps": 8,
+   "headline_words": {
+    "p25": 5.0,
+    "median": 7.0,
+    "p75": 8.0
+   },
+   "no_headline_share": 0.08,
+   "headline_top_share": 0.83,
+   "dark_share": 0.13,
+   "background": {
+    "gradient": 32,
+    "flat-top": 14,
+    "flat": 5,
+    "image": 1
+   },
+   "layout": {
+    "device-frame": 44,
+    "illustration-led": 8
+   },
+   "quality": {
+    "weak": 36,
+    "solid": 8,
+    "exemplary": 8
+   }
+  },
+  "developer-tools": {
+   "shots": 40,
+   "apps": 8,
+   "headline_words": {
+    "p25": 2.0,
+    "median": 8.0,
+    "p75": 11.0
+   },
+   "no_headline_share": 0.17,
+   "headline_top_share": 0.93,
+   "dark_share": 0.05,
+   "background": {
+    "flat": 34,
+    "flat-top": 3,
+    "gradient": 3
+   },
+   "layout": {
+    "device-frame": 22,
+    "full-bleed-ui": 18
+   },
+   "quality": {
+    "weak": 23,
+    "solid": 17
+   }
+  },
+  "education": {
+   "shots": 61,
+   "apps": 8,
+   "headline_words": {
+    "p25": 2.0,
+    "median": 4.0,
+    "p75": 5.0
+   },
+   "no_headline_share": 0.0,
+   "headline_top_share": 0.75,
+   "dark_share": 0.02,
+   "background": {
+    "gradient": 21,
+    "image": 20,
+    "flat": 16,
+    "flat-top": 4
+   },
+   "layout": {
+    "full-bleed-ui": 32,
+    "device-frame": 15,
+    "mixed": 14
+   },
+   "quality": {
+    "weak": 30,
+    "exemplary": 16,
+    "solid": 15
+   }
+  },
+  "entertainment": {
+   "shots": 48,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 3.0,
+    "p75": 5.0
+   },
+   "no_headline_share": 0.12,
+   "headline_top_share": 0.79,
+   "dark_share": 0.71,
+   "background": {
+    "flat": 26,
+    "gradient": 15,
+    "flat-top": 4,
+    "image": 3
+   },
+   "layout": {
+    "device-frame": 45,
+    "panorama": 3
+   },
+   "quality": {
+    "weak": 38,
+    "solid": 10
+   }
+  },
+  "finance": {
+   "shots": 56,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 5.0,
+    "p75": 8.5
+   },
+   "no_headline_share": 0.02,
+   "headline_top_share": 0.86,
+   "dark_share": 0.14,
+   "background": {
+    "flat": 27,
+    "gradient": 14,
+    "image": 9,
+    "flat-top": 6
+   },
+   "layout": {
+    "device-frame": 28,
+    "mixed": 16,
+    "panorama": 6,
+    "full-bleed-ui": 6
+   },
+   "quality": {
+    "exemplary": 22,
+    "weak": 20,
+    "solid": 14
+   }
+  },
+  "food-drink": {
+   "shots": 49,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 4.0,
+    "p75": 6.0
+   },
+   "no_headline_share": 0.0,
+   "headline_top_share": 0.84,
+   "dark_share": 0.02,
+   "background": {
+    "flat": 27,
+    "flat-top": 8,
+    "gradient": 7,
+    "image": 7
+   },
+   "layout": {
+    "device-frame": 31,
+    "mixed": 12,
+    "illustration-led": 6
+   },
+   "quality": {
+    "solid": 32,
+    "exemplary": 17
+   }
+  },
+  "games": {
+   "shots": 50,
+   "apps": 8,
+   "headline_words": {
+    "p25": 1.0,
+    "median": 2.0,
+    "p75": 2.0
+   },
+   "no_headline_share": 0.14,
+   "headline_top_share": 0.62,
+   "dark_share": 0.18,
+   "background": {
+    "gradient": 22,
+    "image": 16,
+    "flat-top": 7,
+    "flat": 5
+   },
+   "layout": {
+    "full-bleed-ui": 42,
+    "illustration-led": 8
+   },
+   "quality": {
+    "solid": 29,
+    "weak": 13,
+    "exemplary": 8
+   }
+  },
+  "graphics-design": {
+   "shots": 53,
+   "apps": 8,
+   "headline_words": {
+    "p25": 2.2,
+    "median": 4.0,
+    "p75": 8.0
+   },
+   "no_headline_share": 0.06,
+   "headline_top_share": 0.91,
+   "dark_share": 0.38,
+   "background": {
+    "image": 17,
+    "gradient": 16,
+    "flat": 14,
+    "flat-top": 6
+   },
+   "layout": {
+    "device-frame": 39,
+    "photo-led": 8,
+    "full-bleed-ui": 6
+   },
+   "quality": {
+    "solid": 29,
+    "weak": 24
+   }
+  },
+  "health-fitness": {
+   "shots": 62,
+   "apps": 8,
+   "headline_words": {
+    "p25": 2.0,
+    "median": 4.0,
+    "p75": 6.0
+   },
+   "no_headline_share": 0.03,
+   "headline_top_share": 0.79,
+   "dark_share": 0.15,
+   "background": {
+    "gradient": 27,
+    "flat": 19,
+    "image": 9,
+    "flat-top": 7
+   },
+   "layout": {
+    "device-frame": 46,
+    "mixed": 16
+   },
+   "quality": {
+    "solid": 24,
+    "exemplary": 22,
+    "weak": 16
+   }
+  },
+  "lifestyle": {
+   "shots": 55,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 5.0,
+    "p75": 6.0
+   },
+   "no_headline_share": 0.02,
+   "headline_top_share": 0.89,
+   "dark_share": 0.22,
+   "background": {
+    "gradient": 38,
+    "flat": 7,
+    "flat-top": 7,
+    "image": 3
+   },
+   "layout": {
+    "device-frame": 33,
+    "photo-led": 22
+   },
+   "quality": {
+    "solid": 28,
+    "exemplary": 22,
+    "weak": 5
+   }
+  },
+  "magazines-newspapers": {
+   "shots": 53,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 5.0,
+    "p75": 7.0
+   },
+   "no_headline_share": 0.02,
+   "headline_top_share": 0.92,
+   "dark_share": 0.32,
+   "background": {
+    "flat": 24,
+    "gradient": 19,
+    "flat-top": 7,
+    "image": 3
+   },
+   "layout": {
+    "device-frame": 49,
+    "full-bleed-ui": 4
+   },
+   "quality": {
+    "solid": 27,
+    "exemplary": 22,
+    "weak": 4
+   }
+  },
+  "medical": {
+   "shots": 55,
+   "apps": 8,
+   "headline_words": {
+    "p25": 5.0,
+    "median": 8.0,
+    "p75": 13.0
+   },
+   "no_headline_share": 0.07,
+   "headline_top_share": 0.87,
+   "dark_share": 0.05,
+   "background": {
+    "flat": 24,
+    "gradient": 15,
+    "image": 11,
+    "flat-top": 5
+   },
+   "layout": {
+    "device-frame": 34,
+    "full-bleed-ui": 8,
+    "mixed": 8,
+    "illustration-led": 5
+   },
+   "quality": {
+    "solid": 34,
+    "weak": 21
+   }
+  },
+  "music": {
+   "shots": 48,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 5.0,
+    "p75": 6.0
+   },
+   "no_headline_share": 0.1,
+   "headline_top_share": 0.81,
+   "dark_share": 0.46,
+   "background": {
+    "gradient": 16,
+    "image": 16,
+    "flat": 9,
+    "flat-top": 7
+   },
+   "layout": {
+    "device-frame": 44,
+    "full-bleed-ui": 4
+   },
+   "quality": {
+    "exemplary": 22,
+    "weak": 16,
+    "solid": 10
+   }
+  },
+  "navigation": {
+   "shots": 53,
+   "apps": 8,
+   "headline_words": {
+    "p25": 4.0,
+    "median": 6.0,
+    "p75": 8.0
+   },
+   "no_headline_share": 0.06,
+   "headline_top_share": 0.91,
+   "dark_share": 0.04,
+   "background": {
+    "flat": 18,
+    "flat-top": 16,
+    "gradient": 15,
+    "image": 4
+   },
+   "layout": {
+    "device-frame": 47,
+    "mixed": 6
+   },
+   "quality": {
+    "solid": 24,
+    "exemplary": 16,
+    "weak": 13
+   }
+  },
+  "news": {
+   "shots": 55,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 4.0,
+    "p75": 5.0
+   },
+   "no_headline_share": 0.02,
+   "headline_top_share": 0.89,
+   "dark_share": 0.45,
+   "background": {
+    "flat": 21,
+    "flat-top": 21,
+    "gradient": 7,
+    "image": 6
+   },
+   "layout": {
+    "device-frame": 49,
+    "mixed": 6
+   },
+   "quality": {
+    "solid": 41,
+    "exemplary": 14
+   }
+  },
+  "photo-video": {
+   "shots": 58,
+   "apps": 8,
+   "headline_words": {
+    "p25": 2.0,
+    "median": 3.0,
+    "p75": 4.8
+   },
+   "no_headline_share": 0.0,
+   "headline_top_share": 0.93,
+   "dark_share": 0.34,
+   "background": {
+    "flat": 30,
+    "flat-top": 28
+   },
+   "layout": {
+    "device-frame": 58
+   },
+   "quality": {
+    "solid": 40,
+    "weak": 10,
+    "exemplary": 8
+   }
+  },
+  "productivity": {
+   "shots": 64,
+   "apps": 8,
+   "headline_words": {
+    "p25": 4.0,
+    "median": 5.0,
+    "p75": 6.2
+   },
+   "no_headline_share": 0.0,
+   "headline_top_share": 0.95,
+   "dark_share": 0.03,
+   "background": {
+    "gradient": 30,
+    "flat": 16,
+    "flat-top": 12,
+    "image": 6
+   },
+   "layout": {
+    "device-frame": 48,
+    "mixed": 16
+   },
+   "quality": {
+    "exemplary": 48,
+    "solid": 16
+   }
+  },
+  "reference": {
+   "shots": 59,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 6.0,
+    "p75": 7.0
+   },
+   "no_headline_share": 0.02,
+   "headline_top_share": 0.92,
+   "dark_share": 0.19,
+   "background": {
+    "flat-top": 25,
+    "flat": 15,
+    "gradient": 13,
+    "image": 6
+   },
+   "layout": {
+    "device-frame": 47,
+    "full-bleed-ui": 12
+   },
+   "quality": {
+    "weak": 27,
+    "solid": 24,
+    "exemplary": 8
+   }
+  },
+  "shopping": {
+   "shots": 54,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.0,
+    "median": 5.0,
+    "p75": 7.0
+   },
+   "no_headline_share": 0.04,
+   "headline_top_share": 0.89,
+   "dark_share": 0.04,
+   "background": {
+    "flat-top": 20,
+    "flat": 19,
+    "gradient": 8,
+    "image": 7
+   },
+   "layout": {
+    "device-frame": 39,
+    "mixed": 15
+   },
+   "quality": {
+    "solid": 25,
+    "exemplary": 22,
+    "weak": 7
+   }
+  },
+  "social-networking": {
+   "shots": 49,
+   "apps": 8,
+   "headline_words": {
+    "p25": 2.5,
+    "median": 4.0,
+    "p75": 7.0
+   },
+   "no_headline_share": 0.04,
+   "headline_top_share": 0.73,
+   "dark_share": 0.08,
+   "background": {
+    "flat": 36,
+    "gradient": 12,
+    "image": 1
+   },
+   "layout": {
+    "device-frame": 43,
+    "mixed": 6
+   },
+   "quality": {
+    "solid": 28,
+    "exemplary": 21
+   }
+  },
+  "sports": {
+   "shots": 59,
+   "apps": 8,
+   "headline_words": {
+    "p25": 2.0,
+    "median": 3.0,
+    "p75": 4.0
+   },
+   "no_headline_share": 0.0,
+   "headline_top_share": 0.86,
+   "dark_share": 0.44,
+   "background": {
+    "gradient": 23,
+    "image": 15,
+    "flat": 13,
+    "flat-top": 8
+   },
+   "layout": {
+    "device-frame": 36,
+    "mixed": 23
+   },
+   "quality": {
+    "solid": 47,
+    "weak": 12
+   }
+  },
+  "travel": {
+   "shots": 59,
+   "apps": 8,
+   "headline_words": {
+    "p25": 3.2,
+    "median": 5.0,
+    "p75": 7.0
+   },
+   "no_headline_share": 0.02,
+   "headline_top_share": 0.93,
+   "dark_share": 0.02,
+   "background": {
+    "flat": 27,
+    "flat-top": 18,
+    "gradient": 13,
+    "image": 1
+   },
+   "layout": {
+    "device-frame": 53,
+    "photo-led": 6
+   },
+   "quality": {
+    "solid": 29,
+    "weak": 16,
+    "exemplary": 14
+   }
+  },
+  "utilities": {
+   "shots": 56,
+   "apps": 8,
+   "headline_words": {
+    "p25": 2.0,
+    "median": 4.0,
+    "p75": 5.0
+   },
+   "no_headline_share": 0.07,
+   "headline_top_share": 0.89,
+   "dark_share": 0.09,
+   "background": {
+    "flat-top": 27,
+    "flat": 25,
+    "gradient": 4
+   },
+   "layout": {
+    "device-frame": 46,
+    "full-bleed-ui": 10
+   },
+   "quality": {
+    "solid": 22,
+    "weak": 18,
+    "exemplary": 16
+   }
+  },
+  "weather": {
+   "shots": 61,
+   "apps": 8,
+   "headline_words": {
+    "p25": 4.0,
+    "median": 6.0,
+    "p75": 8.2
+   },
+   "no_headline_share": 0.02,
+   "headline_top_share": 0.97,
+   "dark_share": 0.3,
+   "background": {
+    "flat": 23,
+    "gradient": 20,
+    "image": 12,
+    "flat-top": 6
+   },
+   "layout": {
+    "device-frame": 53,
+    "full-bleed-ui": 8
+   },
+   "quality": {
+    "exemplary": 24,
+    "solid": 23,
+    "weak": 14
+   }
+  }
+ },
+ "first_shots": {
+  "shots": 200,
+  "apps": 197,
+  "headline_words": {
+   "p25": 2.0,
+   "median": 5.0,
+   "p75": 7.0
+  },
+  "no_headline_share": 0.07,
+  "headline_top_share": 0.81,
+  "dark_share": 0.24,
+  "background": {
+   "flat": 69,
+   "gradient": 54,
+   "image": 39,
+   "flat-top": 38
+  },
+  "layout": {
+   "device-frame": 142,
+   "full-bleed-ui": 25,
+   "mixed": 20,
+   "illustration-led": 5,
+   "photo-led": 5,
+   "panorama": 2,
+   "type-led": 1
+  },
+  "quality": {
+   "solid": 90,
+   "weak": 58,
+   "exemplary": 52
+  }
+ },
+ "techniques_per_app": {
+  "consistent-color": 90,
+  "real-ui": 72,
+  "verb-led": 33,
+  "generic-claim": 27,
+  "localized": 27,
+  "social-proof": 27,
+  "two-tier-copy": 26,
+  "gradient-bg": 25,
+  "content-showcase": 23,
+  "emphasis-word": 23,
+  "people-photo": 21,
+  "dark-ui": 21,
+  "tilted-device": 20,
+  "small-caption": 19,
+  "color-per-shot": 18,
+  "stat-number": 18,
+  "no-caption": 17,
+  "short-headline": 17,
+  "locale-mismatch": 15,
+  "serif-type": 14,
+  "title-case-slogans": 11,
+  "offer": 11,
+  "cards-break-out": 11,
+  "real-content": 11,
+  "exclamation": 9,
+  "two-tone-headline": 9,
+  "paragraph-copy": 9,
+  "outdated-ui": 8,
+  "caps-headline": 8,
+  "specific-use-case": 8,
+  "condensed-type": 8,
+  "3d-objects": 7,
+  "wordplay": 6,
+  "caption-band": 6,
+  "gameplay-sequence": 6,
+  "heavy-type": 6,
+  "icon-overline": 6,
+  "feature-list": 5,
+  "ai-imagery": 5,
+  "mascot": 5,
+  "rhythm-copy": 5,
+  "testimonials": 5,
+  "brand-first": 4,
+  "brand-font": 4,
+  "panorama": 4,
+  "sentence-across-shots": 4,
+  "before-after": 4,
+  "zoom-crop": 4,
+  "alternating-caption-position": 4,
+  "seasonal-campaign": 4,
+  "specific-pain": 4,
+  "highlight-box": 4,
+  "question-hook": 3,
+  "lowercase-copy": 3,
+  "typo": 3,
+  "hand-holding-phone": 3,
+  "company-centric": 3,
+  "highlight-pill": 3,
+  "brand-shapes": 3,
+  "single-adjective": 3,
+  "conversational": 3,
+  "sub-brand-logos": 3,
+  "humour": 3,
+  "two-line-rhythm": 3,
+  "footnote-claim": 3,
+  "glow-effects": 3,
+  "giant-type": 3,
+  "caption-pill": 2,
+  "brand-pattern": 2,
+  "playful-type": 2,
+  "partner-logos": 2,
+  "stock-photo": 2,
+  "sticker-captions": 2,
+  "localized-content": 2,
+  "warm-dark": 2,
+  "overline-label": 2,
+  "alternating-bg": 2,
+  "brand-colors-in-type": 2,
+  "icon-in-text": 2,
+  "product-photo": 2,
+  "disclaimer": 2,
+  "hand-drawn-annotation": 2,
+  "persona-story": 1,
+  "machine-translation": 1,
+  "single-benefit": 1,
+  "many-type-sizes": 1,
+  "emoji-stickers": 1,
+  "brand-waves": 1,
+  "transit-lines": 1,
+  "duplicate-shots": 1,
+  "painted-backdrop": 1,
+  "brand-motif": 1,
+  "colon-headline": 1,
+  "bookends": 1,
+  "low-contrast-copy": 1,
+  "3d-type": 1,
+  "faded-ui": 1,
+  "repeated-app-name": 1,
+  "simplified-ui": 1,
+  "left-aligned-type": 1,
+  "product-collage": 1,
+  "landscape": 1,
+  "key-art": 1,
+  "outlined-type": 1,
+  "lock-screen": 1,
+  "wide-caps": 1,
+  "stickers": 1,
+  "comparison": 1,
+  "flat-illustration": 1,
+  "arch-frame": 1,
+  "story-sequence": 1,
+  "live-activity": 1,
+  "onboarding-screens": 1
+ }
+}

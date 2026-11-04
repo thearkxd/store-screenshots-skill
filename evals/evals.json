@@ -1,0 +1,35 @@
+{
+  "skill_name": "store-screenshots",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Seenfy diye bir dizi/film takip uygulamam var (iPhone + Android). Ekteki 6 ekran görüntüsünden App Store için Türkçe mağaza görselleri hazırla. Marka rengi #6C2BD9.",
+      "expected_output": "A short brief with assumptions, category research from the library (entertainment + related), a storyboard table with Turkish headlines that pass the swap test (no banned phrases, 3-6 words, sen form), a render spec using only the provided screens, PNGs at 1206x2622 checked with check_set.py, a search-preview and peer-test image that were actually viewed, and notes on what to verify.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Critique these App Store screenshots for my budgeting app and tell me what to change first.",
+      "expected_output": "A scorecard from references/critique.md with a total, the three highest-impact fixes quoting current headlines with rewritten alternatives, a shot-by-shot table, comparison to exemplary finance sets in the library (e.g. Cash App, PayPal, Kalshi), and no invented facts about the app.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Write headlines for 6 Google Play screenshots for a parking app. We're the #1 parking app in Istanbul and the first hour is free.",
+      "expected_output": "Six concrete headlines plus sub-lines, with a clear note that Google Play disallows ranking claims (#1) and price/promo text (first hour free) in screenshots, offering compliant alternatives; uses library navigation examples (Waze, ParkMobile) for patterns, not copy.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "What do the best weather apps do in their first screenshot? Show me examples.",
+      "expected_output": "Uses search_library.py on weather/position 1, quotes only verified headlines (HIRKA, WeatherX, The Weather Channel), shows or lists the images, and summarises the patterns with the honesty caveat that quality labels are reviewer judgement.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Localise my English App Store screenshot headlines into Turkish: 'Never miss an episode', 'Track everything you watch', 'See what friends are watching'.",
+      "expected_output": "Rewritten (not literal) Turkish headlines with a consistent sen/siz choice, notes on Turkish capitals if caps are used, a reminder that the UI in the screenshots must also be Turkish, and no banned phrases.",
+      "files": []
+    }
+  ]
+}

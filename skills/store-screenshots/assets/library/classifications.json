@@ -1,0 +1,4266 @@
+{
+ "_doc": "Source of truth for the visual labels. apps: one object per App Store app id (layout, techniques, first_shot, quality, ai_smell, note). shots: per-image overrides (verified headline, language, note, exemplary). lite: image ids shipped in the lite package. See references/library-guide.md §5.",
+ "apps": [
+  {
+   "app_id": 348177651,
+   "layout": "device-frame",
+   "techniques": [
+    "color-per-shot",
+    "real-ui",
+    "stat-number",
+    "feature-list",
+    "content-showcase",
+    "verb-led"
+   ],
+   "first_shot": "content",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Each shot takes one colour from the brand palette; 2-5 word headlines; one shot turns the feature list into tappable-looking chips instead of a paragraph."
+  },
+  {
+   "app_id": 1503128132,
+   "layout": "illustration-led",
+   "techniques": [
+    "content-showcase",
+    "two-tier-copy",
+    "generic-claim",
+    "ai-imagery"
+   ],
+   "first_shot": "content",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Glossy AI-looking fantasy art and pink gradients; 'A Universe of Romance & Fantasy' could belong to any reading app."
+  },
+  {
+   "app_id": 1421091911,
+   "layout": "device-frame",
+   "techniques": [
+    "content-showcase",
+    "two-tier-copy",
+    "generic-claim",
+    "tilted-device"
+   ],
+   "first_shot": "content",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Caps one-word hooks (1M+ NOVELS, BINGE) over the same purple and cover collages; interchangeable with every web-novel app."
+  },
+  {
+   "app_id": 6739541048,
+   "layout": "type-led",
+   "techniques": [
+    "localized",
+    "verb-led",
+    "tilted-device",
+    "color-per-shot"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Large left-aligned Turkish headlines with a cropped, tilted phone; conversational copy ('Okuduğun satırlar sohbete dönüşsün') though the first line is generic."
+  },
+  {
+   "app_id": 379693831,
+   "layout": "mixed",
+   "techniques": [
+    "consistent-color",
+    "people-photo",
+    "real-ui",
+    "content-showcase",
+    "two-line-rhythm"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Strict orange/black brand system, alternates photo shots and UI shots; parallel headline rhythm 'Audiobooks you'll love. Podcasts you'll binge.'"
+  },
+  {
+   "app_id": 1076402606,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "emphasis-word",
+    "social-proof",
+    "content-showcase",
+    "real-ui",
+    "bookends"
+   ],
+   "first_shot": "brand",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "One maroon background, one bolded key word per headline, award laurels on shot 1 and a matching cover collage closing the set."
+  },
+  {
+   "app_id": 6756558351,
+   "layout": "device-frame",
+   "techniques": [
+    "question-hook",
+    "consistent-color",
+    "real-ui",
+    "emphasis-word"
+   ],
+   "first_shot": "hook",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Copy does the work: crossed-out 'DOOMSCROLL' and a screen time statistic as a hook; the flat grey background is forgettable."
+  },
+  {
+   "app_id": 302584613,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tier-copy",
+    "emphasis-word",
+    "color-per-shot",
+    "real-ui",
+    "serif-type"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Editorial feel: small coloured overline naming the feature + serif headline with one italic word; restrained navy/grey/cream palette."
+  },
+  {
+   "app_id": 1633045734,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "real-ui",
+    "tilted-device",
+    "exclamation",
+    "gradient-bg"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Government-portal look: long Turkish headlines ending in '!', small type on a generic blue gradient, UI shown whole and unreadable."
+  },
+  {
+   "app_id": 574794931,
+   "layout": "device-frame",
+   "techniques": [
+    "social-proof",
+    "stat-number",
+    "people-photo",
+    "consistent-color",
+    "emphasis-word"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Opens with a concrete number (1.6 million people a year) and a people cut-out; later headlines are small and wordy."
+  },
+  {
+   "app_id": 546505307,
+   "layout": "device-frame",
+   "techniques": [
+    "brand-first",
+    "generic-claim",
+    "consistent-color",
+    "real-ui",
+    "feature-list"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "First shot spends itself on 'Your AI-Powered Collaboration Platform' with a sparkle icon; the rest list features one by one in long sentences."
+  },
+  {
+   "app_id": 1386412985,
+   "layout": "device-frame",
+   "techniques": [
+    "persona-story",
+    "real-ui",
+    "consistent-color"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Plain and small, but every shot follows the same believable business (a cake shop), so the UI content tells a story."
+  },
+  {
+   "app_id": 1113153706,
+   "layout": "illustration-led",
+   "techniques": [
+    "3d-objects",
+    "tilted-device",
+    "generic-claim",
+    "low-contrast-copy"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Pastel 3D blobs, floating tilted phones and 'all in one app' in low-contrast lilac text: the default AI-render look."
+  },
+  {
+   "app_id": 309735670,
+   "layout": "device-frame",
+   "techniques": [
+    "stat-number",
+    "cards-break-out",
+    "verb-led",
+    "consistent-color",
+    "real-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Quantified promise first ('Get hired 30% faster', with footnote); UI cards break out of the frame so the key element reads at thumbnail size."
+  },
+  {
+   "app_id": 444553167,
+   "layout": "device-frame",
+   "techniques": [
+    "no-caption",
+    "outdated-ui",
+    "brand-first"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Logo instead of captions, old device frames and 2016 dates: the store page says nothing about why to install."
+  },
+  {
+   "app_id": 899247664,
+   "layout": "device-frame",
+   "techniques": [
+    "real-ui",
+    "consistent-color",
+    "verb-led"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Apple's house template: small black headline, light grey ground, whole-screen device. Clear but anonymous - fine for a utility, too quiet for a newcomer."
+  },
+  {
+   "app_id": 640199958,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "real-ui"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Bare screenshots with no captions; only works because the audience already knows the brand."
+  },
+  {
+   "app_id": 1477376905,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "real-ui",
+    "locale-mismatch"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Bare screenshots, and the Turkish store shows a Spanish UI: an un-localised listing is visible to every visitor."
+  },
+  {
+   "app_id": 1602054864,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tier-copy",
+    "generic-claim",
+    "machine-translation",
+    "gradient-bg",
+    "tilted-device"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "'AI intelligent service', 'Intelligent device configuration' and stiff translated sub-lines on a pastel gradient: reads as generated copy."
+  },
+  {
+   "app_id": 6504506653,
+   "layout": "device-frame",
+   "techniques": [
+    "verb-led",
+    "social-proof",
+    "3d-type",
+    "gradient-bg",
+    "consistent-color"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Consistent two-word imperative headlines (Create Instantly, Remix Anything, Play Together); the glossy 3D '#1 Platform' opener is the weakest shot."
+  },
+  {
+   "app_id": 6822465999,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "question-hook",
+    "two-tone-headline",
+    "paragraph-copy",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Turkish headlines phrased as the user's own questions ('HANGİ KURUM KAÇ PUANLA KAPATTI?'), two-tone condensed caps; the paragraph under each headline is too long."
+  },
+  {
+   "app_id": 6736946513,
+   "layout": "mixed",
+   "techniques": [
+    "localized",
+    "feature-list",
+    "paragraph-copy",
+    "mascot",
+    "social-proof",
+    "generic-claim"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Every shot carries a headline, a sub-paragraph and a list of features; nothing reads at thumbnail size and the message is 'everything for everyone'."
+  },
+  {
+   "app_id": 839482639,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "outdated-ui",
+    "localized"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Raw grade-book screens with no captions and old UI chrome."
+  },
+  {
+   "app_id": 570060128,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "caption-pill",
+    "color-per-shot",
+    "real-ui",
+    "verb-led",
+    "lowercase-copy",
+    "brand-font"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Real lesson UI full-bleed, the caption sits at the bottom in a chunky coloured pill in the brand font; lowercase verb-led copy, one colour per shot."
+  },
+  {
+   "app_id": 924620788,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "real-ui"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Clean UI but no captions at all: the visitor has to work out the benefits alone."
+  },
+  {
+   "app_id": 6478287397,
+   "layout": "mixed",
+   "techniques": [
+    "social-proof",
+    "stat-number",
+    "two-tone-headline",
+    "3d-objects",
+    "people-photo",
+    "lowercase-copy"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": true,
+   "note": "Strong numbers (98% cheaper, 37 hours of speaking) but the chrome robot, flags and laurels on the opener are stock AI imagery."
+  },
+  {
+   "app_id": 1542571008,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tone-headline",
+    "generic-claim",
+    "faded-ui",
+    "social-proof"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Noun-phrase slogans (All-In-One Study Buddy, Pro-Level Explanation, Visual Study Agent) over UI that fades into white: generic and hard to read."
+  },
+  {
+   "app_id": 6504849169,
+   "layout": "device-frame",
+   "techniques": [
+    "content-showcase",
+    "generic-claim",
+    "title-case-slogans",
+    "consistent-color"
+   ],
+   "first_shot": "content",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Dark-red glossy drama posters with slogans like 'Premium Immersive Drama Series' and 'Immersive HD Experience' - the category template, nothing ownable."
+  },
+  {
+   "app_id": 6445905219,
+   "layout": "device-frame",
+   "techniques": [
+    "content-showcase",
+    "generic-claim",
+    "tilted-device",
+    "typo"
+   ],
+   "first_shot": "content",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Same short-drama template (Watch Exclusive Stories, Diverse Content Selection) and a typo ('Onginals') left in a top-chart listing."
+  },
+  {
+   "app_id": 1463201795,
+   "layout": "panorama",
+   "techniques": [
+    "localized",
+    "panorama",
+    "brand-pattern",
+    "hand-holding-phone",
+    "single-benefit"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Distinct green brand pattern, one short Turkish promise ('Eğlenceyi yerinde yaşa.') and a phone that continues across shots 1-2; later shots have no captions."
+  },
+  {
+   "app_id": 6670430706,
+   "layout": "device-frame",
+   "techniques": [
+    "content-showcase",
+    "generic-claim",
+    "social-proof",
+    "title-case-slogans"
+   ],
+   "first_shot": "content",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Italic Title-Case slogans (Smooth Streaming, VIP Exclusive, Massive Variety of Short Dramas) and laurel numbers: generic category copy."
+  },
+  {
+   "app_id": 6741796873,
+   "layout": "device-frame",
+   "techniques": [
+    "repeated-app-name",
+    "people-photo",
+    "consistent-color"
+   ],
+   "first_shot": "content",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "The app name is repeated as the headline on every shot; the real message is a tiny sub-line nobody reads at thumbnail size."
+  },
+  {
+   "app_id": 6754134922,
+   "layout": "device-frame",
+   "techniques": [
+    "content-showcase",
+    "generic-claim",
+    "two-tier-copy",
+    "consistent-color"
+   ],
+   "first_shot": "content",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Strong brand colours wasted on filler pairs like 'Any Genre / Everything You Want' and 'Expect the Unexpected / Ultimate Emotional Journey'."
+  },
+  {
+   "app_id": 835599320,
+   "layout": "device-frame",
+   "techniques": [
+    "brand-first",
+    "real-ui",
+    "content-showcase",
+    "verb-led"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "After a slogan opener, short concrete headlines on white with full-screen content (Find recipes for every season) let the content sell."
+  },
+  {
+   "app_id": 521117624,
+   "layout": "panorama",
+   "techniques": [
+    "sentence-across-shots",
+    "people-photo",
+    "panorama",
+    "company-centric"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "One sentence runs across all six shots with a spokesperson walking through them - clever, but it opens with 'is renewed', which is news for the bank, not the user."
+  },
+  {
+   "app_id": 885993234,
+   "layout": "device-frame",
+   "techniques": [
+    "company-centric",
+    "paragraph-copy",
+    "tilted-device",
+    "consistent-color"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Opens with 'We renewed the app for you!'; the remaining captions are small two-line instructions ('By adding your favorite menus to my shortcuts...')."
+  },
+  {
+   "app_id": 6711348553,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "real-ui",
+    "localized"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Raw banking screens, no captions; balances and menus are unreadable at store size."
+  },
+  {
+   "app_id": 1068841746,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "company-centric",
+    "exclamation",
+    "two-tier-copy",
+    "gradient-bg"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "'Halkbank Mobil Yenilendi!' opener, then bottom captions with exclamation marks; like most Turkish banks it leads with its own redesign."
+  },
+  {
+   "app_id": 1632713844,
+   "layout": "device-frame",
+   "techniques": [
+    "people-photo",
+    "verb-led",
+    "consistent-color",
+    "real-ui",
+    "condensed-type",
+    "offer"
+   ],
+   "first_shot": "social-proof",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Warm brown ground matched to the dark UI, condensed headlines that are all verbs (Take a position on any outcome), a real athlete and a concrete offer on shot 1."
+  },
+  {
+   "app_id": 407558537,
+   "layout": "mixed",
+   "techniques": [
+    "emphasis-word",
+    "zoom-crop",
+    "brand-shapes",
+    "hand-holding-phone",
+    "stat-number"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Brand circles in red/blue frame each shot; the credit-score shot (a giant 720 GOOD) shows how one zoomed number beats a whole screen."
+  },
+  {
+   "app_id": 711923939,
+   "layout": "device-frame",
+   "techniques": [
+    "color-per-shot",
+    "simplified-ui",
+    "verb-led",
+    "stat-number",
+    "left-aligned-type"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Green/black/beige rotation, big left-aligned headlines with concrete numbers (Invest with as little as $1) and UI simplified to one card per shot."
+  },
+  {
+   "app_id": 283646709,
+   "layout": "mixed",
+   "techniques": [
+    "consistent-color",
+    "condensed-type",
+    "cards-break-out",
+    "people-photo",
+    "verb-led",
+    "footnote-claim"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Deep-blue system with bold white condensed headlines placed top or bottom as the UI needs; specific promises with footnotes (Earn 5% back, No late fees*)."
+  },
+  {
+   "app_id": 6463031298,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "playful-type",
+    "consistent-color",
+    "partner-logos",
+    "short-headline"
+   ],
+   "first_shot": "hook",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Playful opener ('İndirim mmmmm' with a burger), then one-word Turkish category headlines (Yemek, Market, Su) on one green; partner logos pop out of the frame."
+  },
+  {
+   "app_id": 373034841,
+   "layout": "mixed",
+   "techniques": [
+    "offer",
+    "people-photo",
+    "exclamation",
+    "locale-mismatch",
+    "consistent-color"
+   ],
+   "first_shot": "offer",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Concrete offer first (800 TL off your first 5 orders) and real courier/family photos - but the Turkish store gets English captions."
+  },
+  {
+   "app_id": 1534477610,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "wordplay",
+    "highlight-pill",
+    "cards-break-out",
+    "two-tone-headline"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Turkish copy plays on the brand name ('Gelsin mi? Gelsin!') with highlighted words in pills; busy, but every shot states one concrete perk."
+  },
+  {
+   "app_id": 1100698915,
+   "layout": "device-frame",
+   "techniques": [
+    "brand-shapes",
+    "tilted-device",
+    "two-tier-copy",
+    "locale-mismatch",
+    "consistent-color"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Starbucks green with star shapes and tilted phones; tidy, though English copy in the Turkish store."
+  },
+  {
+   "app_id": 922103212,
+   "layout": "device-frame",
+   "techniques": [
+    "emphasis-word",
+    "consistent-color",
+    "real-ui",
+    "humour"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Three shots, each one specific benefit with the payoff in bold ('Order ahead to save time (& avoid the line)'); the aside in brackets sounds human."
+  },
+  {
+   "app_id": 719972451,
+   "layout": "illustration-led",
+   "techniques": [
+    "sentence-across-shots",
+    "product-collage",
+    "condensed-type",
+    "consistent-color",
+    "footnote-claim"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Condensed all-caps headlines on brand red with real products bursting out of the frame; the last shot completes the sentence ('OR WHATEVER THE DAY CALLS FOR')."
+  },
+  {
+   "app_id": 488818252,
+   "layout": "device-frame",
+   "techniques": [
+    "wordplay",
+    "product-photo",
+    "alternating-caption-position",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Clean white with brand-red copy and a pun ('App-etite'); captions alternate top and bottom to leave room for the product photo."
+  },
+  {
+   "app_id": 6762023973,
+   "layout": "mixed",
+   "techniques": [
+    "condensed-type",
+    "product-photo",
+    "tilted-device",
+    "hand-holding-phone"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Condensed blue caps and drink photography; the drive-thru photo on shot 1 shows the real moment of use."
+  },
+  {
+   "app_id": 6761760135,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "caption-band",
+    "gameplay-sequence",
+    "generic-claim"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Shots 1-4 solve one level step by step, so the rules teach themselves; the captions (Test Your IQ, Cute and Fun) are filler."
+  },
+  {
+   "app_id": 6769314786,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "gameplay-sequence"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Eight near-identical gameplay frames with no captions; nothing changes from shot to shot."
+  },
+  {
+   "app_id": 1105855019,
+   "layout": "illustration-led",
+   "techniques": [
+    "verb-led",
+    "before-after",
+    "consistent-color",
+    "exclamation",
+    "gameplay-sequence"
+   ],
+   "first_shot": "feature",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "One-verb headlines on a constant red banner (Collect! Fill orders! Renovate!) and a before/after shot that shows progress in one glance."
+  },
+  {
+   "app_id": 1617391485,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "generic-claim",
+    "caption-band",
+    "single-adjective"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Single words as captions (RELAXING, SIMPLE FUN) over score screens - interchangeable with any block puzzle."
+  },
+  {
+   "app_id": 6752672568,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "caption-band",
+    "verb-led",
+    "gameplay-sequence",
+    "exclamation"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Verb-led caps captions in a bottom band (CLEAR THE BOARD!, BEAT THE CLOCK!) over real levels; key art saved for the last shot."
+  },
+  {
+   "app_id": 6499209744,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "caption-band",
+    "verb-led",
+    "gameplay-sequence",
+    "exclamation"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Same bottom-band formula; mixes plain puzzle frames with reward art so the set doesn't look repetitive."
+  },
+  {
+   "app_id": 6483539426,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "landscape",
+    "key-art",
+    "small-caption"
+   ],
+   "first_shot": "content",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Landscape key art with tiny corner captions: relies on the brand; in portrait search results these become thin strips."
+  },
+  {
+   "app_id": 6738049229,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tier-copy",
+    "generic-claim",
+    "title-case-slogans",
+    "gradient-bg",
+    "ai-imagery",
+    "typo"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Spec-sheet headlines (Multi-Reference Fusion, HDR Format Native 4K) on a teal gradient, with a typo ('Mutilingual'); reads like a feature list pasted into a template."
+  },
+  {
+   "app_id": 6751294549,
+   "layout": "device-frame",
+   "techniques": [
+    "real-ui",
+    "consistent-color"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Google's plain template: small sentence-case headline over the whole dark UI; honest but undersells a visual product."
+  },
+  {
+   "app_id": 6757994164,
+   "layout": "device-frame",
+   "techniques": [
+    "before-after",
+    "serif-type",
+    "social-proof",
+    "title-case-slogans",
+    "generic-claim"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": true,
+   "note": "The before/after slider shows the value instantly; the Title-Case serif slogans (Trendy Themes, Designer-Grade Garden Decor) are interchangeable."
+  },
+  {
+   "app_id": 1472157401,
+   "layout": "photo-led",
+   "techniques": [
+    "stock-photo",
+    "stat-number",
+    "no-caption"
+   ],
+   "first_shot": "content",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Stock-photo couples in collages and mostly no captions; '500+ Layouts' is the only real message."
+  },
+  {
+   "app_id": 6803819743,
+   "layout": "device-frame",
+   "techniques": [
+    "verb-led",
+    "mascot",
+    "consistent-color",
+    "outlined-type"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Kawaii pastel world that matches the audience; consistent two-line imperative headlines (Make Your Battery Yours, Match Every Mood)."
+  },
+  {
+   "app_id": 6761900294,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "content-showcase",
+    "dark-ui",
+    "lock-screen"
+   ],
+   "first_shot": "content",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "For a wallpaper app the product is the picture: most shots are just the lock screen with the wallpaper applied."
+  },
+  {
+   "app_id": 1573778936,
+   "layout": "mixed",
+   "techniques": [
+    "social-proof",
+    "tilted-device",
+    "exclamation",
+    "many-type-sizes",
+    "locale-mismatch",
+    "panorama"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Five type sizes per shot, ellipses and exclamations ('WHEREVER YOU ARE, YOUR WORKOUT IS THERE!'); the eye has nowhere to land."
+  },
+  {
+   "app_id": 347184248,
+   "layout": "device-frame",
+   "techniques": [
+    "emphasis-word",
+    "consistent-color",
+    "real-ui",
+    "locale-mismatch"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Decent bold-keyword headlines, but the Turkish store shows 'localised Australian foods' and 'Australians losing weight' - the wrong market's listing."
+  },
+  {
+   "app_id": 896501514,
+   "layout": "device-frame",
+   "techniques": [
+    "social-proof",
+    "stat-number",
+    "zoom-crop",
+    "consistent-color",
+    "short-headline"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "'Trusted by 300M women' opener, two-word headlines and zoomed UI cards with the one number that matters ('Period in 3 days')."
+  },
+  {
+   "app_id": 6802658063,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "two-tone-headline",
+    "alternating-caption-position",
+    "real-ui",
+    "question-hook",
+    "conversational"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Best Turkish copy in the set: short, spoken lines with a coloured second half ('Ne yediğini artık bil.', 'Ürün neyi saklıyor?'), placed top or bottom around a real scan."
+  },
+  {
+   "app_id": 426826309,
+   "layout": "device-frame",
+   "techniques": [
+    "social-proof",
+    "consistent-color",
+    "dark-ui",
+    "real-ui",
+    "rhythm-copy"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Dark-to-orange brand gradient behind every device, award on shot 1, terse rhythm ('Lift it. Log it. See your gains.'); headlines are a bit small."
+  },
+  {
+   "app_id": 399857015,
+   "layout": "mixed",
+   "techniques": [
+    "sentence-across-shots",
+    "giant-type",
+    "people-photo",
+    "offer",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Giant 'PROGRESS STARTS HERE' opener and sentences continued across shots with ellipses; strong purple brand, uneven type sizes."
+  },
+  {
+   "app_id": 1038369065,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tier-copy",
+    "highlight-box",
+    "zoom-crop",
+    "consistent-color",
+    "real-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "One lilac ground, a two-line headline with the key phrase in a white box (Predict your | next period) and UI cropped to the single card that proves it."
+  },
+  {
+   "app_id": 1502936453,
+   "layout": "device-frame",
+   "techniques": [
+    "social-proof",
+    "wide-caps",
+    "people-photo",
+    "dark-ui",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Neon-yellow opener with real press awards, then black shots with wide heavy caps and real coaches inside the UI: looks like a sports brand, not a template."
+  },
+  {
+   "app_id": 429047995,
+   "layout": "photo-led",
+   "techniques": [
+    "seasonal-campaign",
+    "content-showcase",
+    "consistent-color",
+    "real-ui",
+    "short-headline"
+   ],
+   "first_shot": "hook",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Seasonal refresh (a Halloween set: 'Embrace spooky season'), moody real photography and 3-word headlines; the content is the product, so it fills the frame."
+  },
+  {
+   "app_id": 369111943,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "mascot",
+    "sub-brand-logos",
+    "consistent-color",
+    "small-caption"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Turkish captions with sub-brand badges and a racing-driver mascot; the rhythm 'Alırken, Satarken, Kullanırken' is good, but the type is too small for search results."
+  },
+  {
+   "app_id": 6499423131,
+   "layout": "device-frame",
+   "techniques": [
+    "gradient-bg",
+    "locale-mismatch",
+    "tilted-device",
+    "exclamation"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Rainbow gradients, floating bottles and 'DOA is here for you!' in English for a Turkish deposit scheme: generic and mis-localised."
+  },
+  {
+   "app_id": 547702041,
+   "layout": "photo-led",
+   "techniques": [
+    "serif-type",
+    "emphasis-word",
+    "people-photo",
+    "humour",
+    "color-per-shot"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Witty serif headlines with one italic word ('Attract people who actually get you', 'You wanted a sign, here's twelve') over real-looking people; every shot sounds like a person wrote it."
+  },
+  {
+   "app_id": 1605170923,
+   "layout": "device-frame",
+   "techniques": [
+    "social-proof",
+    "gradient-bg",
+    "real-ui",
+    "verb-led"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Clean and readable but generic: pale blue gradient, small headlines, a 'No.1 Wishlist app' laurel."
+  },
+  {
+   "app_id": 1662982304,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tier-copy",
+    "stickers",
+    "gradient-bg",
+    "verb-led",
+    "real-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Title-Case headline plus one-sentence sub on dark gradients, with sticker-like UI fragments; the real party content keeps it human."
+  },
+  {
+   "app_id": 1111876388,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "icon-overline",
+    "comparison",
+    "people-photo"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Magenta system with a small icon above each headline; the coverage comparison (93% vs 45%) is the one shot that persuades."
+  },
+  {
+   "app_id": 6749828493,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "outdated-ui",
+    "localized"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Channel grids with no captions; nothing says why this beats the TV remote."
+  },
+  {
+   "app_id": 6766888832,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "verb-led",
+    "social-proof",
+    "tilted-device",
+    "two-tier-copy",
+    "gradient-bg"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Short Turkish imperatives (Haberi Hızlı Oku, İlanları Kaçırma) for a clear niche audience; the award laurels give no source."
+  },
+  {
+   "app_id": 830521905,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tone-headline",
+    "dark-ui",
+    "specific-pain",
+    "real-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Black ground with the key words in red; 'Get rid of clickbait headlines' names a real pain, unlike the generic 'Keep Up With The World' opener."
+  },
+  {
+   "app_id": 1670474179,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "verb-led",
+    "color-per-shot",
+    "heavy-type",
+    "gradient-bg"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Heavy rounded Turkish caps (GÜNDEMİ TAKİP ET) on a new gradient each shot: bold and readable, but four shots repeat 'TAKİP ET'."
+  },
+  {
+   "app_id": 284862083,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tier-copy",
+    "serif-type",
+    "brand-font",
+    "consistent-color",
+    "content-showcase"
+   ],
+   "first_shot": "brand",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Editorial system: a small bold overline (Follow Today, Listen Today, Play Today) above a serif headline; each shot is one section of the paper."
+  },
+  {
+   "app_id": 331786748,
+   "layout": "device-frame",
+   "techniques": [
+    "dark-ui",
+    "consistent-color",
+    "content-showcase",
+    "verb-led"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Navy-to-red brand ground with short verb-led headlines; relies on live news content inside the device."
+  },
+  {
+   "app_id": 1324203419,
+   "layout": "device-frame",
+   "techniques": [
+    "specific-pain",
+    "social-proof",
+    "consistent-color",
+    "real-ui",
+    "verb-led"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Every headline names a concrete job (Check your news blindspot, See the bias, factuality and ownership of any outlet) on a calm paper-beige ground; real award on shot 1."
+  },
+  {
+   "app_id": 6752842196,
+   "layout": "device-frame",
+   "techniques": [
+    "testimonials",
+    "wordplay",
+    "dark-ui",
+    "stat-number",
+    "specific-pain"
+   ],
+   "first_shot": "social-proof",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Copy with a point of view ('Trade fear for faith in 5 minutes', 'Same headlines, different headspace') and a whole shot of short user quotes."
+  },
+  {
+   "app_id": 980446169,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "real-ui",
+    "localized"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Shot 1 is the splash screen, shot 3 a login form: raw screens in capture order, no captions."
+  },
+  {
+   "app_id": 1539508996,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tier-copy",
+    "paragraph-copy",
+    "small-caption",
+    "locale-mismatch"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Tiny two-line captions on pale mint, a logo repeated on every shot; English copy for a Turkish appointment system."
+  },
+  {
+   "app_id": 6740533412,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "two-tier-copy",
+    "cards-break-out",
+    "tilted-device",
+    "consistent-color"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Turkish government emergency app done carefully: consistent teal, a concrete headline per shot (Ses ve Data Yoksa Bile İletişimsiz Kalma), cards lifted out of the UI."
+  },
+  {
+   "app_id": 1141379201,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "color-per-shot",
+    "paragraph-copy",
+    "outdated-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Long Turkish sentences, old device frames and dense forum text inside the screen."
+  },
+  {
+   "app_id": 382952264,
+   "layout": "illustration-led",
+   "techniques": [
+    "flat-illustration",
+    "color-per-shot",
+    "tilted-device",
+    "social-proof"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Flat illustrated people in everyday scenes, one pastel per shot; warm and human, but the headlines are thin and low-contrast."
+  },
+  {
+   "app_id": 395545555,
+   "layout": "device-frame",
+   "techniques": [
+    "cards-break-out",
+    "gradient-bg",
+    "real-ui",
+    "verb-led"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Plain pastel template, readable verb-led headlines; key cards (coupon, price) pop out of the screen."
+  },
+  {
+   "app_id": 335364882,
+   "layout": "mixed",
+   "techniques": [
+    "arch-frame",
+    "serif-type",
+    "people-photo",
+    "two-tier-copy",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "An arch shape frames serif headlines over a warm grey; lifestyle photos alternate with UI. Pleasant, but the copy is generic (Save time, Be informed)."
+  },
+  {
+   "app_id": 1348316600,
+   "layout": "device-frame",
+   "techniques": [
+    "serif-type",
+    "consistent-color",
+    "tilted-device",
+    "stat-number"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Navy ground with white serif headlines; 'Estimate costs to plan ahead' with a $2,151 estimate is the one concrete shot."
+  },
+  {
+   "app_id": 6754755473,
+   "layout": "device-frame",
+   "techniques": [
+    "stock-photo",
+    "emoji-stickers",
+    "gradient-bg",
+    "title-case-slogans",
+    "generic-claim"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Stock models laughing at phones, 3D emoji stickers and broken Title-Case English (Share Amazing Sound With Friend)."
+  },
+  {
+   "app_id": 324684580,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "caps-headline",
+    "emphasis-word",
+    "real-ui",
+    "content-showcase"
+   ],
+   "first_shot": "brand",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Pink-on-green brand frame with caps headlines and one bold word each (CONNECT WITH FRIENDS...); content inside the UI is real and locale-specific."
+  },
+  {
+   "app_id": 1017492454,
+   "layout": "device-frame",
+   "techniques": [
+    "gradient-bg",
+    "small-caption",
+    "real-ui",
+    "content-showcase"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Moody gradients sampled from the album art; captions are small but the photos carry the mood."
+  },
+  {
+   "app_id": 1254981556,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "real-ui",
+    "caption-band",
+    "outdated-ui"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Bare UI states with small labels (Record from microphone, Play recording); describes buttons, not benefits."
+  },
+  {
+   "app_id": 6480136315,
+   "layout": "device-frame",
+   "techniques": [
+    "serif-type",
+    "gradient-bg",
+    "real-ui",
+    "verb-led",
+    "dark-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Warm red-orange gradient that is the brand, light condensed serif headlines and the real prompt UI; 'Make any song you can imagine' says the whole app in one line."
+  },
+  {
+   "app_id": 6777936893,
+   "layout": "device-frame",
+   "techniques": [
+    "generic-claim",
+    "title-case-slogans",
+    "glow-effects",
+    "dark-ui",
+    "ai-imagery"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Neon-lime glow, Title-Case slogans (Create Stunning AI Covers With Any Voice, AI-Powered Premium Song Recommendations): the AI-app template."
+  },
+  {
+   "app_id": 585027354,
+   "layout": "device-frame",
+   "techniques": [
+    "real-ui",
+    "verb-led",
+    "consistent-color",
+    "locale-mismatch"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Google's white template with short verb-led headlines; works on brand recognition. The Turkish store shows London maps in English."
+  },
+  {
+   "app_id": 1600651996,
+   "layout": "device-frame",
+   "techniques": [
+    "paragraph-copy",
+    "localized",
+    "small-caption",
+    "gradient-bg"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Each caption is a 4-6 line Turkish paragraph in small type; unreadable at store size - the clearest example of what not to do for a city-transit app."
+  },
+  {
+   "app_id": 1610978415,
+   "layout": "device-frame",
+   "techniques": [
+    "wordplay",
+    "tilted-device",
+    "paragraph-copy",
+    "brand-waves",
+    "localized"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "A clever 'Go.more / Earn.more / Play.more' system ruined by tiny paragraphs and phones floating in empty white space."
+  },
+  {
+   "app_id": 498477945,
+   "layout": "device-frame",
+   "techniques": [
+    "transit-lines",
+    "cards-break-out",
+    "consistent-color",
+    "social-proof",
+    "verb-led"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Coloured transit lines run through every shot as the brand motif; key moments ('Your bus is arriving NOW', 'Significant DELAYS') pop out as tilted pills."
+  },
+  {
+   "app_id": 323229106,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "specific-pain",
+    "verb-led",
+    "real-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Flat cyan with bold dark headlines that each name a real driving moment ('Ditch the parking search stress', 'Stay informed with speed camera & police alerts')."
+  },
+  {
+   "app_id": 1410234033,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "real-ui",
+    "verb-led"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Shell yellow everywhere, plain sentence headlines and full screens; on-brand but nothing pulled forward."
+  },
+  {
+   "app_id": 365399299,
+   "layout": "mixed",
+   "techniques": [
+    "social-proof",
+    "zoom-crop",
+    "stat-number",
+    "consistent-color",
+    "feature-list"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Shows the timer as a big number (15min, 2:19:59) instead of a whole screen; the icon-list shot is a cheap way to cover many features."
+  },
+  {
+   "app_id": 333903271,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "dark-ui",
+    "short-headline",
+    "icon-overline",
+    "social-proof"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Black with 2-word headlines and a line icon above each (Reach anyone, Watch live); disciplined but cold."
+  },
+  {
+   "app_id": 1064216828,
+   "layout": "mixed",
+   "techniques": [
+    "color-per-shot",
+    "sticker-captions",
+    "mascot",
+    "real-content",
+    "playful-type"
+   ],
+   "first_shot": "brand",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Every shot a different loud colour, captions in white sticker strips, real (funny) posts as content: unmistakably the brand's voice."
+  },
+  {
+   "app_id": 1581650857,
+   "layout": "device-frame",
+   "techniques": [
+    "serif-type",
+    "real-ui",
+    "consistent-color",
+    "short-headline"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Quiet beige and serif 2-3 word headlines that suit a writing platform; too quiet to stand out in search."
+  },
+  {
+   "app_id": 6746114452,
+   "layout": "device-frame",
+   "techniques": [
+    "disclaimer",
+    "dark-ui",
+    "two-tone-headline",
+    "verb-led"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Clear two-colour headlines over a dark map, with a small honest disclaimer line on every shot ('Not an official report')."
+  },
+  {
+   "app_id": 6745820631,
+   "layout": "device-frame",
+   "techniques": [
+    "two-line-rhythm",
+    "heavy-type",
+    "dark-ui",
+    "before-after",
+    "ai-imagery",
+    "consistent-color"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": true,
+   "note": "Strong typographic rhythm (one bold word + a lighter line: 'Restore / your old photos') on pure black; the content itself is AI portraits, so the set looks synthetic."
+  },
+  {
+   "app_id": 1500855883,
+   "layout": "device-frame",
+   "techniques": [
+    "small-caption",
+    "real-ui",
+    "content-showcase",
+    "generic-claim"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Small bold labels over vivid real effect results; the content carries it but 'Amazing templates' and 'Super transitions' say little."
+  },
+  {
+   "app_id": 6738967378,
+   "layout": "device-frame",
+   "techniques": [
+    "dark-ui",
+    "real-content",
+    "verb-led",
+    "consistent-color"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Black template with real creator footage; plain verb-led captions ('Export in 4K with no watermark' is the only real differentiator)."
+  },
+  {
+   "app_id": 544007664,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tier-copy",
+    "real-ui",
+    "short-headline"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "One-word headlines (Create, Watch, Discover) with thin sub-lines on white; relies entirely on brand recognition."
+  },
+  {
+   "app_id": 389801252,
+   "layout": "device-frame",
+   "techniques": [
+    "hand-drawn-annotation",
+    "dark-ui",
+    "real-content",
+    "consistent-color"
+   ],
+   "first_shot": "feature",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Hand-drawn circles and arrows annotate the feature on each shot; looks human and points the eye exactly where the copy talks."
+  },
+  {
+   "app_id": 447188370,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "short-headline",
+    "two-tier-copy",
+    "real-content",
+    "brand-font"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Snap-yellow ground, one-word bold headlines naming each tab (Chat, Lenses, Map); unmistakable brand, little persuasion."
+  },
+  {
+   "app_id": 6477489729,
+   "layout": "device-frame",
+   "techniques": [
+    "emphasis-word",
+    "real-ui",
+    "specific-use-case",
+    "consistent-color"
+   ],
+   "first_shot": "feature",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Each headline names a concrete job with one word in brand blue ('Turn class notes into custom quizzes'); the UI shows that exact conversation."
+  },
+  {
+   "app_id": 6448311069,
+   "layout": "device-frame",
+   "techniques": [
+    "short-headline",
+    "gradient-bg",
+    "real-ui",
+    "specific-use-case",
+    "consistent-color"
+   ],
+   "first_shot": "feature",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Short two-line headlines and soft gradients sampled from the brand; every screen is a believable real prompt (translating a menu, a sleep routine)."
+  },
+  {
+   "app_id": 6473753684,
+   "layout": "mixed",
+   "techniques": [
+    "serif-type",
+    "people-photo",
+    "localized-content",
+    "warm-dark",
+    "real-ui",
+    "specific-use-case"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Warm dark photography with serif headlines; the example prompts are localised per market (Cotswolds pub in the UK-English set, Miami Beach in the US)."
+  },
+  {
+   "app_id": 422689480,
+   "layout": "device-frame",
+   "techniques": [
+    "alternating-caption-position",
+    "two-tier-copy",
+    "real-ui",
+    "cards-break-out"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Bold headline + thin sub, placed top or bottom around the UI; the Undo-send toast pulled out of the frame is the best shot."
+  },
+  {
+   "app_id": 6760173601,
+   "layout": "device-frame",
+   "techniques": [
+    "real-ui",
+    "specific-use-case",
+    "gradient-bg",
+    "small-caption"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Very specific examples in the UI (a field-trip form, a stroller under $320) but small headlines and a template-y blue fade."
+  },
+  {
+   "app_id": 976505454,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "small-caption",
+    "outdated-ui",
+    "duplicate-shots"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Small two-line Turkish captions on grey, repeated headlines across shots and an old device frame; the only free signal is the official brand."
+  },
+  {
+   "app_id": 6758387571,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "dark-ui",
+    "real-content",
+    "small-caption"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Calm dark green with real widget content and photography; captions are a little small but consistent."
+  },
+  {
+   "app_id": 6789030250,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tone-headline",
+    "brand-pattern",
+    "overline-label",
+    "cards-break-out",
+    "two-tier-copy"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Event app with a strong painted brand pattern, a small feature label above each headline and the key word in green; sub-lines are long."
+  },
+  {
+   "app_id": 6759714761,
+   "layout": "device-frame",
+   "techniques": [
+    "serif-type",
+    "painted-backdrop",
+    "social-proof",
+    "title-case-slogans"
+   ],
+   "first_shot": "social-proof",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Painterly AI-style mosque backdrops and serif Title-Case slogans ('Every Moment A Verse Every Verse Inner Peace'); heavy and samey."
+  },
+  {
+   "app_id": 6448849666,
+   "layout": "device-frame",
+   "techniques": [
+    "serif-type",
+    "testimonials",
+    "social-proof",
+    "consistent-color",
+    "two-tier-copy"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Soft sage gradient and serif headlines; a whole shot given to one long user testimonial works better than any laurel."
+  },
+  {
+   "app_id": 451157430,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "outdated-ui"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Raw 2021 government screens with a carrier status bar; no captions."
+  },
+  {
+   "app_id": 414706506,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "real-ui"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Bare white UI screens with no captions or framing; disappears in search results."
+  },
+  {
+   "app_id": 282935706,
+   "layout": "device-frame",
+   "techniques": [
+    "hand-drawn-annotation",
+    "serif-type",
+    "emphasis-word",
+    "testimonials",
+    "color-per-shot"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Red hand-drawn loops tie the shots together, serif headlines put one word in italic ('No Ads or Purchases'), and a testimonial shot uses short real-sounding quotes."
+  },
+  {
+   "app_id": 1644664646,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "sub-brand-logos",
+    "gradient-bg",
+    "small-caption"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Each shot introduces one sub-service by its logo with a short Turkish line; tidy, but the pastel gradients and small text are generic."
+  },
+  {
+   "app_id": 481035064,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "seasonal-campaign",
+    "3d-objects",
+    "heavy-type",
+    "offer"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": true,
+   "note": "Heavy white Turkish headlines with concrete offers (Peşin Fiyatına 9 Taksit) for a 'Efsane Kasım' campaign; glossy 3D chrome hearts and bells add AI-render noise."
+  },
+  {
+   "app_id": 397585390,
+   "layout": "device-frame",
+   "techniques": [
+    "color-per-shot",
+    "locale-mismatch",
+    "stat-number",
+    "sub-brand-logos"
+   ],
+   "first_shot": "offer",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Colourful, with concrete numbers (Over 40,000 Products), but English captions on a Turkish grocery app with Turkish UI inside."
+  },
+  {
+   "app_id": 524362642,
+   "layout": "device-frame",
+   "techniques": [
+    "3d-objects",
+    "gradient-bg",
+    "caps-headline",
+    "locale-mismatch",
+    "footnote-claim"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Pink-orange gradient with floating 3D hearts and stars; English caps captions in the Turkish store."
+  },
+  {
+   "app_id": 632064380,
+   "layout": "mixed",
+   "techniques": [
+    "serif-type",
+    "sentence-across-shots",
+    "people-photo",
+    "wordplay",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "One teal ground, serif headlines with personality ('Don't wear it? Sell it!', 'Help old favorites find new love' spanning a garment) and real clothes."
+  },
+  {
+   "app_id": 1641486558,
+   "layout": "device-frame",
+   "techniques": [
+    "giant-type",
+    "consistent-color",
+    "caps-headline",
+    "generic-claim"
+   ],
+   "first_shot": "hook",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Loud orange with a giant type poster opener; later shots are category labels (Women's Fashion, Home & Kitchen) - effective for its audience, not distinctive copy."
+  },
+  {
+   "app_id": 1089294040,
+   "layout": "device-frame",
+   "techniques": [
+    "offer",
+    "stat-number",
+    "social-proof",
+    "testimonials",
+    "partner-logos",
+    "emphasis-word"
+   ],
+   "first_shot": "offer",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Concrete money everywhere ($10 bonus, coupons at 100,000 stores, 'You saved $9.52'), a review shot and real retailer logos: every claim is checkable."
+  },
+  {
+   "app_id": 518684914,
+   "layout": "mixed",
+   "techniques": [
+    "people-photo",
+    "heavy-type",
+    "offer",
+    "consistent-color",
+    "alternating-caption-position"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Red brand ground alternating with real fashion photography; heavy white headlines lead with a money benefit ('Keep more of your cash with no selling fees')."
+  },
+  {
+   "app_id": 6446901002,
+   "layout": "device-frame",
+   "techniques": [
+    "highlight-box",
+    "dark-ui",
+    "consistent-color",
+    "real-content",
+    "short-headline"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Black ground, three-word headlines with one phrase in a hand-placed yellow highlight block (Join the | conversation); the UI shows believable posts."
+  },
+  {
+   "app_id": 284882215,
+   "layout": "device-frame",
+   "techniques": [
+    "color-per-shot",
+    "real-content",
+    "verb-led",
+    "small-caption"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "A new saturated colour per shot with real-looking people and posts; the headlines are small for the amount of text."
+  },
+  {
+   "app_id": 686449807,
+   "layout": "device-frame",
+   "techniques": [
+    "single-adjective",
+    "gradient-bg",
+    "two-tier-copy",
+    "color-per-shot"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "One adjective per shot (Fast, Powerful, Private, Secure) with a one-line proof below; works because each word is the brand's real positioning, but the gradient template is generic."
+  },
+  {
+   "app_id": 310633997,
+   "layout": "device-frame",
+   "techniques": [
+    "rhythm-copy",
+    "emphasis-word",
+    "consistent-color",
+    "real-content",
+    "alternating-bg"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "'Simple. Reliable. Private.' as a three-beat opener, then bold-keyword headlines alternating brand green and off-white; the UI shows ordinary, warm conversations."
+  },
+  {
+   "app_id": 6742024490,
+   "layout": "mixed",
+   "techniques": [
+    "people-photo",
+    "conversational",
+    "cards-break-out",
+    "sticker-captions",
+    "stat-number"
+   ],
+   "first_shot": "hook",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "'Let's get real.' over a candid photo, then conversational blue headlines with product cards stuck onto real video frames."
+  },
+  {
+   "app_id": 1477847073,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "heavy-type",
+    "consistent-color",
+    "caps-headline",
+    "offer"
+   ],
+   "first_shot": "offer",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Betting app: heavy italic Turkish caps on brand green-yellow, punchy but every shot shouts at the same volume."
+  },
+  {
+   "app_id": 534981561,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "consistent-color",
+    "caps-headline",
+    "short-headline",
+    "3d-objects"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Betting app: short Turkish caps labels (CANLI BAHİS, KUPONDAŞ) on flat yellow with sports balls; readable, feature-label copy."
+  },
+  {
+   "app_id": 398157427,
+   "layout": "device-frame",
+   "techniques": [
+    "caps-headline",
+    "consistent-color",
+    "social-proof",
+    "generic-claim",
+    "locale-mismatch"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Consistent navy caps headlines; 'USER-FRIENDLY EXPERIENCE' is filler, and English copy for a Turkish brand."
+  },
+  {
+   "app_id": 775686649,
+   "layout": "device-frame",
+   "techniques": [
+    "localized",
+    "3d-objects",
+    "heavy-type",
+    "offer",
+    "glow-effects"
+   ],
+   "first_shot": "offer",
+   "quality": "weak",
+   "ai_smell": true,
+   "note": "Betting app: glossy 3D balls, gems and glow on royal blue with stacked caps lists; noisy."
+  },
+  {
+   "app_id": 1375031369,
+   "layout": "mixed",
+   "techniques": [
+    "condensed-type",
+    "consistent-color",
+    "offer",
+    "disclaimer",
+    "emphasis-word"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Betting app: condensed caps on a split green/black ground with required disclaimers; strong system, dense."
+  },
+  {
+   "app_id": 1437843273,
+   "layout": "mixed",
+   "techniques": [
+    "condensed-type",
+    "glow-effects",
+    "offer",
+    "people-photo"
+   ],
+   "first_shot": "offer",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Fantasy sports: loud condensed type, purple-neon grids and offers; matches the audience but every shot is maximal."
+  },
+  {
+   "app_id": 6742177802,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "small-caption",
+    "real-ui",
+    "title-case-slogans"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Rounded blue cards with small Title-Case captions (Track Runners Seamlessly); real race content inside but nothing ownable."
+  },
+  {
+   "app_id": 1514665962,
+   "layout": "mixed",
+   "techniques": [
+    "condensed-type",
+    "color-per-shot",
+    "offer",
+    "brand-shapes",
+    "wordplay"
+   ],
+   "first_shot": "offer",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Fantasy sports: condensed headlines with dog puns (Lettin' dogs out coast to coast) and a bright colour per shot; on-brand and energetic."
+  },
+  {
+   "app_id": 1454358771,
+   "layout": "device-frame",
+   "techniques": [
+    "panorama",
+    "tilted-device",
+    "exclamation",
+    "locale-mismatch",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "A green panorama across shots 1-3, then plain white shots with exclamation-mark sentences in English for a Turkish scooter app."
+  },
+  {
+   "app_id": 472650686,
+   "layout": "device-frame",
+   "techniques": [
+    "3d-objects",
+    "consistent-color",
+    "condensed-type",
+    "short-headline",
+    "generic-claim"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Flat brand yellow, condensed black headlines and one custom 3D object per service (burger, scooter, parcel); the 'Easy to...' copy repeats."
+  },
+  {
+   "app_id": 596039443,
+   "layout": "device-frame",
+   "techniques": [
+    "consistent-color",
+    "icon-overline",
+    "social-proof",
+    "real-ui",
+    "verb-led"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Red with a line icon above each verb-led headline; 'Get your bus ticket in 2 minutes' is the one concrete claim."
+  },
+  {
+   "app_id": 723672499,
+   "layout": "device-frame",
+   "techniques": [
+    "highlight-box",
+    "two-tier-copy",
+    "small-caption",
+    "paragraph-copy"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Small two-line captions with a yellow highlight box on pale blue; eight shots that look the same at thumbnail size."
+  },
+  {
+   "app_id": 368677368,
+   "layout": "device-frame",
+   "techniques": [
+    "giant-type",
+    "dark-ui",
+    "consistent-color",
+    "story-sequence",
+    "real-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Shots follow one ride in order (destination, ride, price, pickup, safety, rating) with a progress line on top; the 'GO ANY-WHERE' poster breaks the grid on shot 2."
+  },
+  {
+   "app_id": 529379082,
+   "layout": "photo-led",
+   "techniques": [
+    "people-photo",
+    "rhythm-copy",
+    "consistent-color",
+    "real-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Real riders in real cars behind each phone, with human two-beat lines ('Be there soon. Really soon.', 'Schedule ahead, leave stress behind')."
+  },
+  {
+   "app_id": 401626263,
+   "layout": "device-frame",
+   "techniques": [
+    "icon-overline",
+    "consistent-color",
+    "real-content",
+    "short-headline"
+   ],
+   "first_shot": "benefit",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Warm beige with a small brand illustration above each two-line headline; the real listing photos do the selling."
+  },
+  {
+   "app_id": 382698565,
+   "layout": "device-frame",
+   "techniques": [
+    "icon-overline",
+    "consistent-color",
+    "live-activity",
+    "real-ui",
+    "stat-number"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Sky-blue brand ground, line icon + short headline; the Live Activity shot ('Boards in 25 minutes') shows a concrete moment."
+  },
+  {
+   "app_id": 284815942,
+   "layout": "device-frame",
+   "techniques": [
+    "emphasis-word",
+    "brand-colors-in-type",
+    "real-ui",
+    "consistent-color"
+   ],
+   "first_shot": "feature",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "One word per headline in a Google colour (Shop from a screenshot); clean and specific, light on persuasion."
+  },
+  {
+   "app_id": 535886823,
+   "layout": "device-frame",
+   "techniques": [
+    "emphasis-word",
+    "highlight-pill",
+    "icon-in-text",
+    "real-ui"
+   ],
+   "first_shot": "feature",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "The feature name sits in a blue pill with its icon inside the headline ('Search what you see with [Lens]'), tying each caption to a visible UI element."
+  },
+  {
+   "app_id": 335162906,
+   "layout": "device-frame",
+   "techniques": [
+    "mascot",
+    "small-caption",
+    "paragraph-copy",
+    "locale-mismatch",
+    "tilted-device"
+   ],
+   "first_shot": "brand",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Mascot opener, then three-line small captions in English over dense UI."
+  },
+  {
+   "app_id": 6738610571,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "dark-ui"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Four raw dark screens with no captions."
+  },
+  {
+   "app_id": 388497605,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "real-ui",
+    "onboarding-screens"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Onboarding screens used as store screenshots: small grey text and 'Get started' buttons."
+  },
+  {
+   "app_id": 1510944943,
+   "layout": "device-frame",
+   "techniques": [
+    "two-line-rhythm",
+    "stat-number",
+    "before-after",
+    "social-proof",
+    "consistent-color"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Bold verb + lighter object (Delete / Duplicate Photos) and a concrete number on every screen (Delete 20GB, 437MB > 2.9MB); proves the value but feels like a template."
+  },
+  {
+   "app_id": 6822456382,
+   "layout": "device-frame",
+   "techniques": [
+    "brand-motif",
+    "consistent-color",
+    "conversational",
+    "humour",
+    "rhythm-copy",
+    "real-ui"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "A knitted-rope motif wraps every phone, warm cream/maroon palette, and copy with a voice ('Not degrees, a decision.', 'Cardigan or coat? One glance.', 'Heads-up, just like mom')."
+  },
+  {
+   "app_id": 1161387262,
+   "layout": "device-frame",
+   "techniques": [
+    "dark-ui",
+    "tilted-device",
+    "small-caption",
+    "content-showcase",
+    "stat-number"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "The data visualisations are beautiful enough to sell themselves; captions are small spec labels (50+ Interactive Maps)."
+  },
+  {
+   "app_id": 6502614325,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tone-headline",
+    "colon-headline",
+    "dark-ui",
+    "specific-use-case",
+    "consistent-color"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "'Label: specifics' headlines with the label in blue ('Exact rain timing: start to finish', 'No ads: hourly, 15 days, pollen'): instantly scannable and concrete."
+  },
+  {
+   "app_id": 509200200,
+   "layout": "full-bleed-ui",
+   "techniques": [
+    "no-caption",
+    "outdated-ui",
+    "localized"
+   ],
+   "first_shot": "ui-only",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Old raw screens with a carrier status bar and no captions."
+  },
+  {
+   "app_id": 295646461,
+   "layout": "device-frame",
+   "techniques": [
+    "two-tier-copy",
+    "emphasis-word",
+    "seasonal-campaign",
+    "people-photo",
+    "cards-break-out"
+   ],
+   "first_shot": "benefit",
+   "quality": "exemplary",
+   "ai_smell": false,
+   "note": "Seasonal autumn photography behind the UI, bold 2-3 word headline + coloured specifics (15-day forecast for fall weekends & game days) and life-context use cases."
+  },
+  {
+   "app_id": 6473724440,
+   "layout": "device-frame",
+   "techniques": [
+    "caps-headline",
+    "gradient-bg",
+    "cards-break-out",
+    "stat-number",
+    "title-case-slogans"
+   ],
+   "first_shot": "brand",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Strong storm-blue look and data cards popped out (Hurricane Milton wind speeds); headlines are feature names."
+  },
+  {
+   "app_id": 300048137,
+   "layout": "device-frame",
+   "techniques": [
+    "social-proof",
+    "testimonials",
+    "overline-label",
+    "emphasis-word",
+    "small-caption"
+   ],
+   "first_shot": "social-proof",
+   "quality": "solid",
+   "ai_smell": false,
+   "note": "Credibility first (MORE THAN 12,000 LIVES SAVED) and a single user quote on the storm shot; captions are thin and long."
+  },
+  {
+   "app_id": 322439990,
+   "layout": "device-frame",
+   "techniques": [
+    "color-per-shot",
+    "small-caption",
+    "generic-claim",
+    "tilted-device"
+   ],
+   "first_shot": "feature",
+   "quality": "weak",
+   "ai_smell": false,
+   "note": "Thin centred captions in vague superlatives ('Delivering You the Most Hyper-Local Forecast on the Planet') on loud gradient backgrounds."
+  }
+ ],
+ "shots": [
+  {
+   "image_id": "ce7e3056d1a5",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "6506210bc75a",
+   "headline": "1 million+ audiobooks and e-books",
+   "language": "en"
+  },
+  {
+   "image_id": "57583b4594c9",
+   "headline": "Create your personal library",
+   "language": "en"
+  },
+  {
+   "image_id": "1c10a39b636c",
+   "headline": "Tons of famous podcasts",
+   "language": "en"
+  },
+  {
+   "image_id": "7db8f42ca565",
+   "headline": "Audiobooks you'll love. Podcasts you'll binge.",
+   "language": "en"
+  },
+  {
+   "image_id": "46541b5057c0",
+   "headline": "Hear A-list casts read best-selling books",
+   "language": "en"
+  },
+  {
+   "image_id": "530fce846c8f",
+   "headline": "Discover the stories everyone's listening to",
+   "language": "en"
+  },
+  {
+   "image_id": "2cc2224931c7",
+   "headline": "Share titles with your children",
+   "language": "en"
+  },
+  {
+   "image_id": "67ec38152c6a",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "cb1a94bed745",
+   "headline": "Free from your local library.",
+   "language": "en"
+  },
+  {
+   "image_id": "43b0aac2224d",
+   "headline": "Listen to audiobooks anytime.",
+   "language": "en"
+  },
+  {
+   "image_id": "d9e5d88d251e",
+   "headline": "Read ebooks anywhere.",
+   "language": "en"
+  },
+  {
+   "image_id": "f16a9b841b1a",
+   "headline": "A world of reading right at your fingertips.",
+   "language": "en"
+  },
+  {
+   "image_id": "473f3bf4f1eb",
+   "headline": "Challenges — Build a habit. Share your success.",
+   "language": "en"
+  },
+  {
+   "image_id": "e89f9753143b",
+   "headline": "Customization — Day or night. You're covered.",
+   "language": "en"
+  },
+  {
+   "image_id": "19b87e1d640b",
+   "headline": "Notebook — Save the words that move you.",
+   "language": "en"
+  },
+  {
+   "image_id": "7a1f5a5c0c3f",
+   "headline": "Get hired 30% faster with the app*",
+   "language": "en"
+  },
+  {
+   "image_id": "b536ad7b1249",
+   "headline": "Discover jobs that work for you",
+   "language": "en"
+  },
+  {
+   "image_id": "2ca4cf23145a",
+   "headline": "Introducing your personal career coach",
+   "language": "en"
+  },
+  {
+   "image_id": "139c77e954a7",
+   "headline": "Chat your way to better opportunities",
+   "language": "en"
+  },
+  {
+   "image_id": "98c38fe30e6b",
+   "headline": "learn 40+ languages for free",
+   "language": "en"
+  },
+  {
+   "image_id": "5aae28d6f18f",
+   "headline": "fun, bite-sized lessons",
+   "language": "en"
+  },
+  {
+   "image_id": "8ebd31a5c6ab",
+   "headline": "solve chess puzzles",
+   "language": "en"
+  },
+  {
+   "image_id": "98c5ca80383f",
+   "headline": "build language skills",
+   "language": "en"
+  },
+  {
+   "image_id": "442bb1a49a62",
+   "headline": "Everyone has a take. What's yours?",
+   "language": "en"
+  },
+  {
+   "image_id": "c41a5f3b8672",
+   "headline": "Trade real-world basketball events",
+   "language": "en"
+  },
+  {
+   "image_id": "c3bfa1306928",
+   "headline": "Follow markets in real time",
+   "language": "en"
+  },
+  {
+   "image_id": "c408bc25799e",
+   "headline": "Take a position on any outcome",
+   "language": "en"
+  },
+  {
+   "image_id": "3cb7d8dadbcc",
+   "headline": "The app for every money move",
+   "language": "en"
+  },
+  {
+   "image_id": "b814a0d2d29b",
+   "headline": "Send money instantly",
+   "language": "en"
+  },
+  {
+   "image_id": "1096f3449205",
+   "headline": "New: Earn 3.5% interest on savings",
+   "language": "en"
+  },
+  {
+   "image_id": "d0b5c225eb3c",
+   "headline": "Save with exclusive discounts",
+   "language": "en"
+  },
+  {
+   "image_id": "945ed1274073",
+   "headline": "Shop with buyer protection.",
+   "language": "en"
+  },
+  {
+   "image_id": "d7fe43f8204b",
+   "headline": "Send money securely.",
+   "language": "en"
+  },
+  {
+   "image_id": "605667df2f79",
+   "headline": "Earn 5% back in rewards on a monthly category you choose.*",
+   "language": "en"
+  },
+  {
+   "image_id": "c65f743df4b9",
+   "headline": "Buy now, Pay Later. No late fees.*",
+   "language": "en"
+  },
+  {
+   "image_id": "95b5dc7c7452",
+   "headline": "İndirim mmmmm",
+   "language": "tr"
+  },
+  {
+   "image_id": "33d20af9d61c",
+   "headline": "Yemek",
+   "language": "en"
+  },
+  {
+   "image_id": "5749e9a9f858",
+   "headline": "Market",
+   "language": "en"
+  },
+  {
+   "image_id": "af1832abd268",
+   "headline": "Su",
+   "language": "en"
+  },
+  {
+   "image_id": "4067710321c3",
+   "headline": "Earn points for Free McDonald's",
+   "language": "en"
+  },
+  {
+   "image_id": "20ce3f5797f7",
+   "headline": "Order ahead to save time (& avoid the line)",
+   "language": "en"
+  },
+  {
+   "image_id": "39cc5b62d9df",
+   "headline": "Order McDelivery® to earn points & redeem rewards anywhere",
+   "language": "en"
+  },
+  {
+   "image_id": "59b92b39985c",
+   "headline": "A one-stop shop for everything you need",
+   "language": "en"
+  },
+  {
+   "image_id": "ff7c55f50138",
+   "headline": "Get groceries to flowers to takeout",
+   "language": "en"
+  },
+  {
+   "image_id": "58ed868dfefa",
+   "headline": "Delivered in as little as an hour*",
+   "language": "en"
+  },
+  {
+   "image_id": "71849982d690",
+   "headline": "Save more and get $0 delivery fees with DashPass.",
+   "language": "en"
+  },
+  {
+   "image_id": "564e0ff85a74",
+   "headline": "Collect resources!",
+   "language": "en"
+  },
+  {
+   "image_id": "d3e1193cc0d0",
+   "headline": "Fill orders!",
+   "language": "en"
+  },
+  {
+   "image_id": "0e280276e8e3",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "672ffc56bb05",
+   "headline": "Collect treasures!",
+   "language": "en"
+  },
+  {
+   "image_id": "0210a67fd857",
+   "headline": "Ne yediğini artık bil.",
+   "language": "tr"
+  },
+  {
+   "image_id": "109947792abb",
+   "headline": "Ürün neyi saklıyor?",
+   "language": "tr"
+  },
+  {
+   "image_id": "a3aa6567f706",
+   "headline": "Riskleri anında gör.",
+   "language": "tr"
+  },
+  {
+   "image_id": "5890b8dafcc8",
+   "headline": "Tam sana göre.",
+   "language": "tr"
+  },
+  {
+   "image_id": "1259e116200e",
+   "headline": "Predict your next period",
+   "language": "en"
+  },
+  {
+   "image_id": "0badc189f5a6",
+   "headline": "Maximize your connection",
+   "language": "en"
+  },
+  {
+   "image_id": "5e4306f8b76e",
+   "headline": "Got symptoms? Get answers",
+   "language": "en"
+  },
+  {
+   "image_id": "f3872cec4bf2",
+   "headline": "Monitor your fertile days",
+   "language": "en"
+  },
+  {
+   "image_id": "bd81a20bbd06",
+   "headline": "Get stronger, with a plan.",
+   "language": "en"
+  },
+  {
+   "image_id": "30f8fd91ea5d",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "9474e18eba0c",
+   "headline": "A plan for every workout",
+   "language": "en"
+  },
+  {
+   "image_id": "b417bc96abe5",
+   "headline": "Find the perfect plan for you",
+   "language": "en"
+  },
+  {
+   "image_id": "bee1da57b631",
+   "headline": "Embrace spooky season",
+   "language": "en"
+  },
+  {
+   "image_id": "24692cf9ab02",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "170a551872c0",
+   "headline": "Inspire your style",
+   "language": "en"
+  },
+  {
+   "image_id": "28a5dcfa84a1",
+   "headline": "Shop what you see",
+   "language": "en"
+  },
+  {
+   "image_id": "e2936ad8e9e5",
+   "headline": "It starts with a swipe",
+   "language": "en"
+  },
+  {
+   "image_id": "0476ea8dd94c",
+   "headline": "Attract people who actually get you",
+   "language": "en"
+  },
+  {
+   "image_id": "7250218a07be",
+   "headline": "First dates hit different with friends",
+   "language": "en"
+  },
+  {
+   "image_id": "d33bd001d60b",
+   "headline": "Connect with confidence",
+   "language": "en"
+  },
+  {
+   "image_id": "9076d5f22f5a",
+   "headline": "The app for every today.",
+   "language": "en"
+  },
+  {
+   "image_id": "490d53d39246",
+   "headline": "Follow Today — Breaking news and live reporting.",
+   "language": "en"
+  },
+  {
+   "image_id": "cd1f40a86401",
+   "headline": "Lift the veil on media bias",
+   "language": "en"
+  },
+  {
+   "image_id": "00f9ea3211cf",
+   "headline": "Compare how multiple sources are covering the same story",
+   "language": "en"
+  },
+  {
+   "image_id": "a31bb9ae0259",
+   "headline": "Check your news blindspot",
+   "language": "en"
+  },
+  {
+   "image_id": "0b0afaff8e7e",
+   "headline": "Dive deeper with coverage analysis",
+   "language": "en"
+  },
+  {
+   "image_id": "4f53bdde54ee",
+   "headline": "Join 1.5 million Christians already trusting our news",
+   "language": "en"
+  },
+  {
+   "image_id": "1d75256b7449",
+   "headline": "Find calm in the chaos",
+   "language": "en"
+  },
+  {
+   "image_id": "1284adc159c6",
+   "headline": "Trade fear for faith in 5 minutes",
+   "language": "en"
+  },
+  {
+   "image_id": "de4cc84d3823",
+   "headline": "Same headlines, different headspace",
+   "language": "en"
+  },
+  {
+   "image_id": "6730672fa2b8",
+   "headline": "Music, podcasts and audiobooks in one place",
+   "language": "en"
+  },
+  {
+   "image_id": "aa263373c791",
+   "headline": "Find podcasts you love",
+   "language": "en"
+  },
+  {
+   "image_id": "cf98294baa38",
+   "headline": "Handpicked playlists for you",
+   "language": "en"
+  },
+  {
+   "image_id": "44cd42fa4e13",
+   "headline": "Connect with friends through playlists",
+   "language": "en"
+  },
+  {
+   "image_id": "100cba6bd3d4",
+   "headline": "Make any song you can imagine",
+   "language": "en"
+  },
+  {
+   "image_id": "320548b82d0d",
+   "headline": "Adjust the genre, lyrics, and more",
+   "language": "en"
+  },
+  {
+   "image_id": "1e30eb9b1d3c",
+   "headline": "Explore music from other creators",
+   "language": "en"
+  },
+  {
+   "image_id": "2befc8a3d453",
+   "headline": "Upload or record audio to create",
+   "language": "en"
+  },
+  {
+   "image_id": "12db89551ecf",
+   "headline": "All local mobility options in one app",
+   "language": "en"
+  },
+  {
+   "image_id": "d8caeebd1267",
+   "headline": "Choose the best route",
+   "language": "en"
+  },
+  {
+   "image_id": "c08e9eceba4b",
+   "headline": "See nearby lines",
+   "language": "en"
+  },
+  {
+   "image_id": "0199570932b1",
+   "headline": "Find shared mobility services",
+   "language": "en"
+  },
+  {
+   "image_id": "e4b208904178",
+   "headline": "Get there faster with live traffic updates & precise ETAs",
+   "language": "en"
+  },
+  {
+   "image_id": "540894e12a5b",
+   "headline": "Get real-time road alerts from drivers ahead",
+   "language": "en"
+  },
+  {
+   "image_id": "25ea8545591e",
+   "headline": "Stay informed with speed camera & police alerts",
+   "language": "en"
+  },
+  {
+   "image_id": "ea0a8b594085",
+   "headline": "Get directions from the voice you love",
+   "language": "en"
+  },
+  {
+   "image_id": "c165d8e9bd62",
+   "headline": "Dive into anything",
+   "language": "en"
+  },
+  {
+   "image_id": "11873d5d044e",
+   "headline": "Explore & create communities",
+   "language": "en"
+  },
+  {
+   "image_id": "4a8709057782",
+   "headline": "Join conversations you care about",
+   "language": "en"
+  },
+  {
+   "image_id": "96726b473128",
+   "headline": "Vote for stuff you care about",
+   "language": "en"
+  },
+  {
+   "image_id": "9bf44c69a3a0",
+   "headline": "Discover entertaining videos with Reels",
+   "language": "en"
+  },
+  {
+   "image_id": "34f52f8ba419",
+   "headline": "Discover entertaining videos with Reels",
+   "language": "en"
+  },
+  {
+   "image_id": "46c0cdf48cc8",
+   "headline": "Engage with your favorite creators",
+   "language": "en"
+  },
+  {
+   "image_id": "ddc87a6fc907",
+   "headline": "Share with the people who get you",
+   "language": "en"
+  },
+  {
+   "image_id": "5db4de6f050c",
+   "headline": "Generate and edit custom images with Nano Banana",
+   "language": "en"
+  },
+  {
+   "image_id": "23ce8af99145",
+   "headline": "Talk, type, or share your camera to explore ideas",
+   "language": "en"
+  },
+  {
+   "image_id": "c8886e9a2739",
+   "headline": "Dive deep into any topic",
+   "language": "en"
+  },
+  {
+   "image_id": "e33ae9ed2e82",
+   "headline": "Generate and edit videos with Gemini Omni",
+   "language": "en"
+  },
+  {
+   "image_id": "5f873cb8145b",
+   "headline": "Create new worlds",
+   "language": "en"
+  },
+  {
+   "image_id": "2f8df10b4605",
+   "headline": "Talk it out anytime",
+   "language": "en"
+  },
+  {
+   "image_id": "ad9161df8963",
+   "headline": "Get quick answers",
+   "language": "en"
+  },
+  {
+   "image_id": "80417180c177",
+   "headline": "Edit your look",
+   "language": "en"
+  },
+  {
+   "image_id": "79d8edbf8e5f",
+   "headline": "Get useful answers wherever you are",
+   "language": "en"
+  },
+  {
+   "image_id": "e1456a2d3aa9",
+   "headline": "Talk it through with voice mode",
+   "language": "en"
+  },
+  {
+   "image_id": "c8c9b67d9a31",
+   "headline": "Plug in your everyday tools",
+   "language": "en"
+  },
+  {
+   "image_id": "889fbd2e1fac",
+   "headline": "Build your own app solutions",
+   "language": "en"
+  },
+  {
+   "image_id": "77cddb16f258",
+   "headline": "Start your day with God's Word",
+   "language": "en"
+  },
+  {
+   "image_id": "1edd7c5b5430",
+   "headline": "No Ads or Purchases",
+   "language": "en"
+  },
+  {
+   "image_id": "414bf63ea998",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "21ba407a1358",
+   "headline": "Listen to the Bible wherever you go",
+   "language": "en"
+  },
+  {
+   "image_id": "9f37df265a94",
+   "headline": "Sell across categories",
+   "language": "en"
+  },
+  {
+   "image_id": "a810374a8269",
+   "headline": "Earning is as simple as",
+   "language": "en"
+  },
+  {
+   "image_id": "d2b21921c4a8",
+   "headline": "We've got you covered",
+   "language": "en"
+  },
+  {
+   "image_id": "4a8b4d5381a9",
+   "headline": "Millions of listings",
+   "language": "en"
+  },
+  {
+   "image_id": "a0b50b084d60",
+   "headline": "Get a $10 rewards bonus and save with free automatic coupons!",
+   "language": "en"
+  },
+  {
+   "image_id": "b2c505000ba8",
+   "headline": "Automatically apply coupons at 100,000 stores",
+   "language": "en"
+  },
+  {
+   "image_id": "00928c69a179",
+   "headline": "Free shopping rewards you can redeem for free gift cards",
+   "language": "en"
+  },
+  {
+   "image_id": "ca0bfebd6e79",
+   "headline": "Get a better deal with price comparison",
+   "language": "en"
+  },
+  {
+   "image_id": "6a568cdda14e",
+   "headline": "Keep more of your cash with no selling fees",
+   "language": "en"
+  },
+  {
+   "image_id": "2bd151944104",
+   "headline": "Free shipping on your first order!",
+   "language": "en"
+  },
+  {
+   "image_id": "118ef44a9ed8",
+   "headline": "List with ease with AI-powered listing",
+   "language": "en"
+  },
+  {
+   "image_id": "245f4a8db7a4",
+   "headline": "Convenient, stress-free shipping",
+   "language": "en"
+  },
+  {
+   "image_id": "3f9c8fe16d14",
+   "headline": "Join the conversation",
+   "language": "en"
+  },
+  {
+   "image_id": "3adaddc7513d",
+   "headline": "Discover new takes",
+   "language": "en"
+  },
+  {
+   "image_id": "c21529c9869a",
+   "headline": "Find your community",
+   "language": "en"
+  },
+  {
+   "image_id": "b4679d321283",
+   "headline": "Connect over live chat",
+   "language": "en"
+  },
+  {
+   "image_id": "2d0eed2aefa9",
+   "headline": "Simple. Reliable. Private.",
+   "language": "en"
+  },
+  {
+   "image_id": "0f37c44c49e2",
+   "headline": "Message privately with end-to-end encryption",
+   "language": "en"
+  },
+  {
+   "image_id": "04840afea5b1",
+   "headline": "Make calls across the world",
+   "language": "en"
+  },
+  {
+   "image_id": "0243e3ecba0e",
+   "headline": "Group chat with friends and family",
+   "language": "en"
+  },
+  {
+   "image_id": "ff8081069f1c",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "5daae6838526",
+   "headline": "GO ANY-WHERE",
+   "language": "en"
+  },
+  {
+   "image_id": "60783e065df6",
+   "headline": "Your destination is at your fingertips",
+   "language": "en"
+  },
+  {
+   "image_id": "00ad195677d4",
+   "headline": "Find the ride you want",
+   "language": "en"
+  },
+  {
+   "image_id": "15e2e07d5a51",
+   "headline": "One app. All the rides.",
+   "language": "en"
+  },
+  {
+   "image_id": "3b39f72e0e58",
+   "headline": "Top-rated drivers, extra legroom",
+   "language": "en"
+  },
+  {
+   "image_id": "c9a77a826f27",
+   "headline": "How you get there is up to you",
+   "language": "en"
+  },
+  {
+   "image_id": "01ca254b1bed",
+   "headline": "Be there soon. Really soon.",
+   "language": "en"
+  },
+  {
+   "image_id": "ab0fa69a1adb",
+   "headline": "Browse fast with Google Chrome",
+   "language": "en"
+  },
+  {
+   "image_id": "bf6361f2b016",
+   "headline": "Ask Gemini while you browse",
+   "language": "en"
+  },
+  {
+   "image_id": "a0c7b2975ef5",
+   "headline": "Search what you see with Lens",
+   "language": "en"
+  },
+  {
+   "image_id": "acb7d545681e",
+   "headline": "Translate websites instantly",
+   "language": "en"
+  },
+  {
+   "image_id": "9eb13832f5f4",
+   "headline": "Not degrees, a decision.",
+   "language": "en"
+  },
+  {
+   "image_id": "54b78cfd6768",
+   "headline": "Swipe to build your outfit",
+   "language": "en"
+  },
+  {
+   "image_id": "cc6e25a2d903",
+   "headline": "Cardigan or coat? One glance.",
+   "language": "en"
+  },
+  {
+   "image_id": "ae1a0d56ab59",
+   "headline": "What to wear, hour by hour",
+   "language": "en"
+  },
+  {
+   "image_id": "565abf913508",
+   "headline": "AI radar: rain, hail, lightning",
+   "language": "en"
+  },
+  {
+   "image_id": "b1cf3820eac3",
+   "headline": "Exact rain timing: start to finish",
+   "language": "en"
+  },
+  {
+   "image_id": "4ddce6f17feb",
+   "headline": "Personal alerts: frost, sea, trail, commute",
+   "language": "en"
+  },
+  {
+   "image_id": "b8ec90775786",
+   "headline": "Not only detect storms, but also forecast them",
+   "language": "en"
+  },
+  {
+   "image_id": "209010015676",
+   "headline": "Ready for Cooler Days — Hourly forecast for every temperature swing",
+   "language": "en"
+  },
+  {
+   "image_id": "c76e6c9538fc",
+   "headline": "Stay Safe and Dry — Live weather radar and rain alerts",
+   "language": "en"
+  },
+  {
+   "image_id": "fd509931d45d",
+   "headline": "Plan Around the Weather — Forecasts for your plans & daily routines",
+   "language": "en"
+  },
+  {
+   "image_id": "5eda4a627aef",
+   "headline": "Look Ahead — 15-day forecast for fall weekends & game days",
+   "language": "en"
+  },
+  {
+   "image_id": "85ba5bb5d8ca",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "ce4120e4c545",
+   "headline": "Premium Immersive Drama Series",
+   "language": "en"
+  },
+  {
+   "image_id": "72b21d50d223",
+   "headline": "Enjoy Drama Time To The Fullest",
+   "language": "en"
+  },
+  {
+   "image_id": "b774b8ef390a",
+   "headline": "Meet, chat, collaborate – all in one app",
+   "language": "en"
+  },
+  {
+   "image_id": "216fc792d626",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "f4c572cb56c3",
+   "headline": "Connect with anyone on video meetings and calls",
+   "language": "en"
+  },
+  {
+   "image_id": "c2e5df66cad5",
+   "headline": "Zoom Workplace — Your AI-Powered Collaboration Platform",
+   "language": "en"
+  },
+  {
+   "image_id": "36899ea31999",
+   "headline": "One app that helps you get more done",
+   "language": "en"
+  },
+  {
+   "image_id": "287e01569193",
+   "headline": "Focus on the conversation, not on writing notes",
+   "language": "en"
+  },
+  {
+   "image_id": "31cea6b0f4b8",
+   "headline": "KlingAI 4.0 — You Call the Shots",
+   "language": "en"
+  },
+  {
+   "image_id": "cd5a3a81757d",
+   "headline": "30-Second Generation — Tell a Complete Story in One Generation",
+   "language": "en"
+  },
+  {
+   "image_id": "59fceb85419b",
+   "headline": "Multi-Reference Fusion — Precise Recognition of Up to 15 References",
+   "language": "en"
+  },
+  {
+   "image_id": "c35bc68a9d28",
+   "headline": "One Sentence Generates Exclusive Music",
+   "language": "en"
+  },
+  {
+   "image_id": "ee12f26b20c4",
+   "headline": "Multiple Types And Styles To Choose From",
+   "language": "en"
+  },
+  {
+   "image_id": "f1b2fa8ea76f",
+   "headline": "Create Stunning AI Covers With Any Voice",
+   "language": "en"
+  },
+  {
+   "image_id": "63747a3fd8fd",
+   "headline": "Easily Reverse Funny Audio & Song",
+   "language": "en"
+  },
+  {
+   "image_id": "b8767473b765",
+   "headline": "Record Voice, Sound, Anything Fun",
+   "language": "en"
+  },
+  {
+   "image_id": "f53c56697efa",
+   "headline": "Explore Top Trending Now",
+   "language": "en"
+  },
+  {
+   "image_id": "fa739fd3f702",
+   "headline": "Kullanıcı dostu arayüzleri ve yenilenen altyapısı ile Otobüsüm Nerede?, İstanbul'daki yolculuklarınızı daha verimli ve keyifli hale getirmek için gelişiyor.",
+   "language": "tr"
+  },
+  {
+   "image_id": "422432e23a76",
+   "headline": "Tek adımda kolayca hesap oluşturun. Bilgilerinizi kaydederek yolculuklarınızı kişiselleştirin. Tek bir kullanıcı hesabı ile tüm cihazlarınızda senkron kalın.",
+   "language": "tr"
+  },
+  {
+   "image_id": "37b2db66658f",
+   "headline": "İstanbul'un dilediğiniz noktasından ulaşmak istediğiniz konuma nasıl gidebileceğinizi öğrenin. Hemen şimdi veya ileri bir tarihte yapacağınız yolculuğun detaylarını Otobüsüm Nerede? size söylesin.",
+   "language": "tr"
+  },
+  {
+   "image_id": "cec7a60f6414",
+   "headline": "Yeniliğin fazlası var!",
+   "language": "tr"
+  },
+  {
+   "image_id": "460a382fc169",
+   "headline": "Go.more",
+   "language": "en"
+  },
+  {
+   "image_id": "df1218c4a187",
+   "headline": "Earn.more",
+   "language": "en"
+  },
+  {
+   "image_id": "d675803cd630",
+   "headline": "Reach your weight loss goals",
+   "language": "en"
+  },
+  {
+   "image_id": "3ccce8f95906",
+   "headline": "Track the calories and macros in your food each day",
+   "language": "en"
+  },
+  {
+   "image_id": "99e7316d3be6",
+   "headline": "Quickly scan meals or use voice logging for fast, easy tracking",
+   "language": "en"
+  },
+  {
+   "image_id": "05a2b0af2bbf",
+   "headline": "We renewed the Ziraat Bank Mobile App for you!",
+   "language": "en"
+  },
+  {
+   "image_id": "743a1b109e5a",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "b4a0017e7924",
+   "headline": "You can personalize your homepage according to your own needs and use habits.",
+   "language": "en"
+  },
+  {
+   "image_id": "7e59408101ab",
+   "headline": "RELAXING",
+   "language": "en"
+  },
+  {
+   "image_id": "0ffddb99763b",
+   "headline": "COLLECT",
+   "language": "en"
+  },
+  {
+   "image_id": "22f3b019457e",
+   "headline": "SIMPLE FUN",
+   "language": "en"
+  },
+  {
+   "image_id": "0130905d63c6",
+   "headline": "All-In-One Study Buddy",
+   "language": "en"
+  },
+  {
+   "image_id": "cacfc4a95363",
+   "headline": "Smart Problem Solver",
+   "language": "en"
+  },
+  {
+   "image_id": "8bc7087786e0",
+   "headline": "Pro-Level Explanation",
+   "language": "en"
+  },
+  {
+   "image_id": "aca827331019",
+   "headline": "MEBİ Bireysel Öğrenme Platformu — MEBİ ile her yerde, her zaman öğren!",
+   "language": "tr"
+  },
+  {
+   "image_id": "bbac6352ef67",
+   "headline": "KANKA Her An Yanında — Yapay zekâ desteğiyle eksiklerini tamamla, güçlü yönlerini geliştir.",
+   "language": "tr"
+  },
+  {
+   "image_id": "48db22ca3cc9",
+   "headline": "Herkes İçin Erişilebilir Bir Platform — Öğrenciler, mezunlar, öğretmenler ve veliler için ücretsiz.",
+   "language": "tr"
+  },
+  {
+   "image_id": "4806b0e68847",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "8f8bf11b657d",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "679c27f72652",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "d24d1511e1f1",
+   "headline": "Home Efficient Management — Unified management of multiple devices, clear status at a glance",
+   "language": "en"
+  },
+  {
+   "image_id": "969cb398c92c",
+   "headline": "Real-time HD preview — Low latency, remote monitoring with an immersive experience",
+   "language": "en"
+  },
+  {
+   "image_id": "9891c366a694",
+   "headline": "AI intelligent service — AI has sharp eyes and a keen understanding of security protection",
+   "language": "en"
+  },
+  {
+   "image_id": "bc7d5e15ab4a",
+   "headline": "At club, at home, or outdoor... Wherever you are, your workout is there!",
+   "language": "en"
+  },
+  {
+   "image_id": "a37bfde08390",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "33d794b66d0f",
+   "headline": "Choose from dozens of categories and hundreds of workouts — Find the perfect one for you and start today!",
+   "language": "en"
+  },
+  {
+   "image_id": "dfd8233c686b",
+   "headline": "DOA is here for you!",
+   "language": "en"
+  },
+  {
+   "image_id": "f707cc43cb79",
+   "headline": "Recycle your beverage containers, protect the environment.",
+   "language": "en"
+  },
+  {
+   "image_id": "f13cf2ad4fbc",
+   "headline": "Return the deposited bottles to the nearest return points.",
+   "language": "en"
+  },
+  {
+   "image_id": "285e9394e8a6",
+   "headline": "trendyol — The latest trends and more, all in one place",
+   "language": "en"
+  },
+  {
+   "image_id": "cfe5b5037c32",
+   "headline": "A little welcome treat on your first order*",
+   "language": "en"
+  },
+  {
+   "image_id": "a0f7578d0cc5",
+   "headline": "The latest trends — Pick what speaks to you",
+   "language": "en"
+  },
+  {
+   "image_id": "eeb4a8fa641f",
+   "headline": "Start your day with Allah's Word",
+   "language": "en"
+  },
+  {
+   "image_id": "ed8d3dfd9054",
+   "headline": "Prayer Times Dhikr Verse Widgets",
+   "language": "en"
+  },
+  {
+   "image_id": "cafc86eab19c",
+   "headline": "Every Glance A Dhikr And A Verse",
+   "language": "en"
+  },
+  {
+   "image_id": "770e27a20069",
+   "headline": "Fast and Accurate High Definition Radar",
+   "language": "en"
+  },
+  {
+   "image_id": "6fec091723e6",
+   "headline": "Patent Pending Technology Delivering You the Most Hyper-Local Forecast on the Planet",
+   "language": "en"
+  },
+  {
+   "image_id": "0baca71917f7",
+   "headline": "To the Minute Push Notifications Keeping You Ahead of the Storm",
+   "language": "en"
+  },
+  {
+   "image_id": "33ab4d8e5c88",
+   "headline": "Dive into the romance world",
+   "language": "en"
+  },
+  {
+   "image_id": "18ad937407a1",
+   "headline": "1M+ NOVELS — Just for you",
+   "language": "en"
+  },
+  {
+   "image_id": "5ec52cab38e7",
+   "headline": "BINGE — Bite-sized romance alongside your novels",
+   "language": "en"
+  },
+  {
+   "image_id": "bc754ccec366",
+   "headline": "A Universe of Romance & Fantasy",
+   "language": "en"
+  },
+  {
+   "image_id": "cfc6a706501f",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "6dbb9cdc9532",
+   "headline": "Explore All Genres: Romance, Werewolf & CEO",
+   "language": "en"
+  },
+  {
+   "image_id": "fcb61d3c9b7e",
+   "headline": "TikTok Pro - Events — Follow football action!",
+   "language": "en"
+  },
+  {
+   "image_id": "b2700dc31d70",
+   "headline": "TikTok Pro - Events — Discover your fandom!",
+   "language": "en"
+  },
+  {
+   "image_id": "45972ada9c16",
+   "headline": "TikTok Pro - Events — Keep up with festival vibes!",
+   "language": "en"
+  },
+  {
+   "image_id": "3efe3a621e98",
+   "headline": "Choosing a Seat is Comfortable, Liberating and Flexible with Easy Seat!",
+   "language": "en"
+  },
+  {
+   "image_id": "499467e0af1d",
+   "headline": "Get immediate updates on exclusive mobile offers",
+   "language": "en"
+  },
+  {
+   "image_id": "d2726e3762fa",
+   "headline": "Stay Informed Regarding all flight updates",
+   "language": "en"
+  },
+  {
+   "image_id": "5ec971b1c287",
+   "headline": "All in One for Every Run",
+   "language": "en"
+  },
+  {
+   "image_id": "2a1e329b5d8a",
+   "headline": "Discover Races & Programs",
+   "language": "en"
+  },
+  {
+   "image_id": "78c5b2143996",
+   "headline": "Track Runners Seamlessly",
+   "language": "en"
+  },
+  {
+   "image_id": "c8e5cf854940",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "7e73b8f477d9",
+   "headline": "",
+   "language": null
+  },
+  {
+   "image_id": "d7ac03419db8",
+   "headline": "",
+   "language": null
+  }
+ ],
+ "lite": [
+  "ce7e3056d1a5",
+  "6506210bc75a",
+  "57583b4594c9",
+  "1c10a39b636c",
+  "7db8f42ca565",
+  "46541b5057c0",
+  "530fce846c8f",
+  "2cc2224931c7",
+  "67ec38152c6a",
+  "cb1a94bed745",
+  "43b0aac2224d",
+  "d9e5d88d251e",
+  "f16a9b841b1a",
+  "473f3bf4f1eb",
+  "e89f9753143b",
+  "19b87e1d640b",
+  "7a1f5a5c0c3f",
+  "b536ad7b1249",
+  "2ca4cf23145a",
+  "139c77e954a7",
+  "98c38fe30e6b",
+  "5aae28d6f18f",
+  "8ebd31a5c6ab",
+  "98c5ca80383f",
+  "442bb1a49a62",
+  "c41a5f3b8672",
+  "c3bfa1306928",
+  "c408bc25799e",
+  "3cb7d8dadbcc",
+  "b814a0d2d29b",
+  "1096f3449205",
+  "d0b5c225eb3c",
+  "945ed1274073",
+  "d7fe43f8204b",
+  "605667df2f79",
+  "c65f743df4b9",
+  "95b5dc7c7452",
+  "33d20af9d61c",
+  "5749e9a9f858",
+  "af1832abd268",
+  "4067710321c3",
+  "20ce3f5797f7",
+  "39cc5b62d9df",
+  "59b92b39985c",
+  "ff7c55f50138",
+  "58ed868dfefa",
+  "71849982d690",
+  "564e0ff85a74",
+  "d3e1193cc0d0",
+  "0e280276e8e3",
+  "672ffc56bb05",
+  "0210a67fd857",
+  "109947792abb",
+  "a3aa6567f706",
+  "5890b8dafcc8",
+  "1259e116200e",
+  "0badc189f5a6",
+  "5e4306f8b76e",
+  "f3872cec4bf2",
+  "bd81a20bbd06",
+  "30f8fd91ea5d",
+  "9474e18eba0c",
+  "b417bc96abe5",
+  "bee1da57b631",
+  "24692cf9ab02",
+  "170a551872c0",
+  "28a5dcfa84a1",
+  "e2936ad8e9e5",
+  "0476ea8dd94c",
+  "7250218a07be",
+  "d33bd001d60b",
+  "9076d5f22f5a",
+  "490d53d39246",
+  "cd1f40a86401",
+  "00f9ea3211cf",
+  "a31bb9ae0259",
+  "0b0afaff8e7e",
+  "4f53bdde54ee",
+  "1d75256b7449",
+  "1284adc159c6",
+  "de4cc84d3823",
+  "6730672fa2b8",
+  "aa263373c791",
+  "cf98294baa38",
+  "44cd42fa4e13",
+  "100cba6bd3d4",
+  "320548b82d0d",
+  "1e30eb9b1d3c",
+  "2befc8a3d453",
+  "12db89551ecf",
+  "d8caeebd1267",
+  "c08e9eceba4b",
+  "0199570932b1",
+  "e4b208904178",
+  "540894e12a5b",
+  "25ea8545591e",
+  "ea0a8b594085",
+  "c165d8e9bd62",
+  "11873d5d044e",
+  "4a8709057782",
+  "96726b473128",
+  "9bf44c69a3a0",
+  "34f52f8ba419",
+  "46c0cdf48cc8",
+  "ddc87a6fc907",
+  "5db4de6f050c",
+  "23ce8af99145",
+  "c8886e9a2739",
+  "e33ae9ed2e82",
+  "5f873cb8145b",
+  "2f8df10b4605",
+  "ad9161df8963",
+  "80417180c177",
+  "79d8edbf8e5f",
+  "e1456a2d3aa9",
+  "c8c9b67d9a31",
+  "889fbd2e1fac",
+  "77cddb16f258",
+  "1edd7c5b5430",
+  "414bf63ea998",
+  "21ba407a1358",
+  "9f37df265a94",
+  "a810374a8269",
+  "d2b21921c4a8",
+  "4a8b4d5381a9",
+  "a0b50b084d60",
+  "b2c505000ba8",
+  "00928c69a179",
+  "ca0bfebd6e79",
+  "6a568cdda14e",
+  "2bd151944104",
+  "118ef44a9ed8",
+  "245f4a8db7a4",
+  "3f9c8fe16d14",
+  "3adaddc7513d",
+  "c21529c9869a",
+  "b4679d321283",
+  "2d0eed2aefa9",
+  "0f37c44c49e2",
+  "04840afea5b1",
+  "0243e3ecba0e",
+  "ff8081069f1c",
+  "5daae6838526",
+  "60783e065df6",
+  "00ad195677d4",
+  "15e2e07d5a51",
+  "3b39f72e0e58",
+  "c9a77a826f27",
+  "01ca254b1bed",
+  "ab0fa69a1adb",
+  "bf6361f2b016",
+  "a0c7b2975ef5",
+  "acb7d545681e",
+  "9eb13832f5f4",
+  "54b78cfd6768",
+  "cc6e25a2d903",
+  "ae1a0d56ab59",
+  "565abf913508",
+  "b1cf3820eac3",
+  "4ddce6f17feb",
+  "b8ec90775786",
+  "209010015676",
+  "c76e6c9538fc",
+  "fd509931d45d",
+  "5eda4a627aef",
+  "85ba5bb5d8ca",
+  "ce4120e4c545",
+  "72b21d50d223",
+  "b774b8ef390a",
+  "216fc792d626",
+  "f4c572cb56c3",
+  "c2e5df66cad5",
+  "36899ea31999",
+  "287e01569193",
+  "31cea6b0f4b8",
+  "cd5a3a81757d",
+  "59fceb85419b",
+  "c35bc68a9d28",
+  "ee12f26b20c4",
+  "f1b2fa8ea76f",
+  "63747a3fd8fd",
+  "b8767473b765",
+  "f53c56697efa",
+  "fa739fd3f702",
+  "422432e23a76",
+  "37b2db66658f",
+  "cec7a60f6414",
+  "460a382fc169",
+  "df1218c4a187",
+  "d675803cd630",
+  "3ccce8f95906",
+  "99e7316d3be6",
+  "05a2b0af2bbf",
+  "743a1b109e5a",
+  "b4a0017e7924",
+  "7e59408101ab",
+  "0ffddb99763b",
+  "22f3b019457e",
+  "0130905d63c6",
+  "cacfc4a95363",
+  "8bc7087786e0",
+  "aca827331019",
+  "bbac6352ef67",
+  "48db22ca3cc9",
+  "4806b0e68847",
+  "8f8bf11b657d",
+  "679c27f72652",
+  "d24d1511e1f1",
+  "969cb398c92c",
+  "9891c366a694",
+  "bc7d5e15ab4a",
+  "a37bfde08390",
+  "33d794b66d0f",
+  "dfd8233c686b",
+  "f707cc43cb79",
+  "f13cf2ad4fbc",
+  "285e9394e8a6",
+  "cfe5b5037c32",
+  "a0f7578d0cc5",
+  "eeb4a8fa641f",
+  "ed8d3dfd9054",
+  "cafc86eab19c",
+  "770e27a20069",
+  "6fec091723e6",
+  "0baca71917f7",
+  "33ab4d8e5c88",
+  "18ad937407a1",
+  "5ec52cab38e7",
+  "bc754ccec366",
+  "cfc6a706501f",
+  "6dbb9cdc9532",
+  "fcb61d3c9b7e",
+  "b2700dc31d70",
+  "45972ada9c16",
+  "3efe3a621e98",
+  "499467e0af1d",
+  "d2726e3762fa",
+  "5ec971b1c287",
+  "2a1e329b5d8a",
+  "78c5b2143996",
+  "c8e5cf854940",
+  "7e73b8f477d9",
+  "d7ac03419db8",
+  "7e6d47c33201",
+  "80ef9cd1586e",
+  "a362b4db518d",
+  "2d87927e8d33",
+  "58f34c1013fe",
+  "70b5bc4b49b3",
+  "abacc18f01bb",
+  "a9771f34b427",
+  "c92c9bcb82eb",
+  "c2824b682fca",
+  "0ddcf7c510c1",
+  "8b6330cb3f37",
+  "a2861521a34c",
+  "53cce852f1f2",
+  "47319a40b469",
+  "e3a2e2497188",
+  "754c827273d9",
+  "3c32bba380b7",
+  "5118bfc38b60",
+  "f66e39d85a98",
+  "f18215bba43d",
+  "57ed33908d7e",
+  "58335349674d",
+  "1decf228bd40",
+  "c2cd6a2b2048",
+  "7cad936fcb06",
+  "f20c76a0e43f",
+  "2e108085057b",
+  "5ebeec31d071",
+  "d301d99771b0",
+  "6647d26d5712",
+  "98b8748ba461",
+  "d348acd29334",
+  "3765992ad7ba",
+  "dc1bcedfe837",
+  "6c2be81f2cb7",
+  "5448656d91b2",
+  "fb6beaf19f3d",
+  "495c9dbfe4fa",
+  "7f040e6f6a67",
+  "5d0b77d39007",
+  "ef5c9c251430",
+  "85c9886a6195",
+  "54464f155682",
+  "2502dab3a9d9",
+  "4508f316c64d",
+  "1abe44abebec",
+  "82748c256927",
+  "5ae6a4653850",
+  "e3b7e74b05ba",
+  "446b2db4c628",
+  "a612a4186f7f",
+  "d16e7fd02bb0",
+  "fd5aebee6cec",
+  "fc399f9546cb",
+  "8c712c319e50",
+  "01967eb1b323",
+  "c811497cab73",
+  "eae8c35b16e4",
+  "acfe16edf88f",
+  "e300d68d7f93",
+  "85869b83804a",
+  "881303c45d29",
+  "c1074655f8d6",
+  "a758cda90035",
+  "e8aac2108bfb",
+  "7190c21d0e63",
+  "2e7665eb8b59",
+  "1c8eaf91490d",
+  "1d2ebf53816a",
+  "71eceee6c297",
+  "321fc3b609b1",
+  "817651716bfe",
+  "8d57d85ff421",
+  "b84d70524396",
+  "28e0dbfd984f",
+  "a4de3ff8cc6c",
+  "178b67485559",
+  "601a76a274c7",
+  "a7f505884375",
+  "ecebe5e9cffa",
+  "054f71d9bf3e",
+  "37cc64a7204e",
+  "ff716b9deaee",
+  "f0f0c88384b9",
+  "a73f0a1ca6fd",
+  "b1afd4c9a82d",
+  "c95f9898de5e",
+  "1f18bf6e6e75",
+  "026360db91c9",
+  "4b864aba74da",
+  "a41d2781b5b3",
+  "e455fd7180b2",
+  "4d1a172fdb35",
+  "741f38248718",
+  "e9818ac94e4c",
+  "7a53be643219",
+  "a38aade88996",
+  "74cf4310a109",
+  "b1e9bbf21b42",
+  "a67a427d3c9b",
+  "225300d557b6",
+  "b4e5fa220f91",
+  "5087cfaf3a6e",
+  "e6213cc50db1",
+  "b833ceb905cc",
+  "767adecf547a",
+  "bbb753192584",
+  "863d9edde8aa",
+  "a2eab34cc033",
+  "d7abf97fdb24",
+  "f56de89fcd4c",
+  "7de0249b1d87",
+  "32b9ccd78955",
+  "37693c5999ce",
+  "f2a0e584fb49",
+  "ec663deeb8e8",
+  "833f95534b8d",
+  "eef85e958dc2",
+  "29952398d2e9",
+  "baf278d841e2",
+  "942863529dba",
+  "62b725d2c19d",
+  "14f84489ffdc",
+  "9a16621e8b7e",
+  "7e3940882a73",
+  "e96ba2c13d4d",
+  "ac9417defec5",
+  "7ebb7630cc3c",
+  "baa34f825361",
+  "68eef6b102dd",
+  "5ad3c2184c91",
+  "c5e44b402206",
+  "b5769fa8b89f",
+  "27a2ad539b4c",
+  "edae64761812",
+  "09d7ee8b850e",
+  "c804487217dd",
+  "cfcd7b82f0e6",
+  "deffe2f1d954",
+  "81fe061d9351",
+  "6798be8b19dd",
+  "c7674fe3ff86",
+  "278e32f76958",
+  "e9492c0ad43a",
+  "61b5026b2800",
+  "e60a5a8c8779",
+  "f4bf47e5d6f6",
+  "e2082f4cd1b0",
+  "74b77637fe74",
+  "45eeeca99c7e",
+  "ecbd293abfb3",
+  "76d648cba944",
+  "9ad1633e06d7",
+  "7f5845e2a34e",
+  "fa3c72d645b3",
+  "6823b84bc0b0",
+  "d9d130c7fe37",
+  "ea4019739892",
+  "f6997e69de11",
+  "6a0abc5300a0",
+  "444ffc2cdae8",
+  "6fa270619126",
+  "3382641a29f7",
+  "dde9c170902c",
+  "8c0d2df6d905",
+  "20eb000fae4c",
+  "2360787e6d19",
+  "73443e65c067",
+  "c8ebf4b8f820",
+  "5cc14b0145d2",
+  "89e9478cf81e",
+  "f965150ec46e",
+  "31c58c8dc2ee",
+  "1a0e867a04d0",
+  "8523860cc0ea",
+  "d3c571a0f5df",
+  "ef409f944a25",
+  "b87f9254ec54",
+  "f707c2a1b2f3",
+  "36e3f4624973",
+  "0798cae16ac2",
+  "76150d528792",
+  "e5cda6460f34",
+  "c670a4bef42d",
+  "5c33c97304cc",
+  "037068007da9",
+  "4c4eaf56133e",
+  "f3146fc64a42",
+  "78465308735d",
+  "58bc2c2d16d5",
+  "90f4dc2d8fe2",
+  "0df0b6b3598c",
+  "ed4b6801fb39",
+  "026dab61501f",
+  "d8b87700b784",
+  "3d8ee21be3e4",
+  "e2e6c8d0ebfa",
+  "c6219141bc20",
+  "b178f6dee5dd",
+  "4d2069b1775f",
+  "751a163d0bb4",
+  "9be566d9117a",
+  "5e70ac71bb8b",
+  "f7348079c92c",
+  "c9b5f3d94f4f",
+  "42c746ba3ed2",
+  "cf13e22d96d3",
+  "fa4908cb860d",
+  "553e75ff76cd",
+  "e4c9316d4061",
+  "6cf3b3ba3104",
+  "a750767c3fcc",
+  "adec13091517",
+  "3368fa3caf78",
+  "971ce1986009",
+  "5fd40c810e3e",
+  "a1a12251d86f",
+  "1fa7886b1281",
+  "48a2fc8cfc46",
+  "e027ef52cb45",
+  "2320ed8c32dc",
+  "a94ca8593b8a",
+  "646e631490dc",
+  "daa2d20ea834",
+  "530940f4e423",
+  "4766aff2174d",
+  "270dcf31dd46",
+  "df1d95bc7d92",
+  "364187cf7ac3",
+  "ba1ad8223604",
+  "1d67f04b214b",
+  "e9bd9a93c835",
+  "390128c29aab",
+  "661e304a8a4a",
+  "d18cee2cb567",
+  "2bcfd5f5d282",
+  "4f1049cb1357",
+  "77e4d30f8469",
+  "6c6057ebdb57",
+  "835b5d0ba59e",
+  "756f4eb03bfb",
+  "f00fbf33e690",
+  "157344d03c28",
+  "1195be75c4f2",
+  "49f643df05b7",
+  "6aeb0c10f9ea",
+  "f501057dbe57",
+  "32f51918d03a",
+  "77e472a02592",
+  "b9bf1e0bf8d7",
+  "8a9f063fd5d0",
+  "f00cafb5dc34",
+  "0237f9e251cd",
+  "f2755227255b",
+  "368f22e22159",
+  "104e933c018b",
+  "59a38e3b3211",
+  "9f802c7342c5",
+  "8c878425e0b2",
+  "345859b707b5",
+  "3790c45fefb1",
+  "9130a4c7240b",
+  "ef0276ac895e",
+  "2089de0b9bec",
+  "2fc45aa3788f",
+  "aadc6c1f0a16",
+  "9c5d8d0d6940",
+  "162bc7f27d47",
+  "3871fa3e53b4",
+  "10bc202f63a1",
+  "d371e6180413",
+  "07c96f3e8a19",
+  "cefad1f071bc",
+  "a5c185be0ed1",
+  "50cd31b65c13",
+  "075376a3ac9b",
+  "7caed5dfa00f",
+  "cf7486b321ff",
+  "7d474ccd51fc",
+  "6c4b938cc8e7",
+  "a42cb55f6136",
+  "9cea51b02e38",
+  "570523c9bac4",
+  "2bdea20fc3c0",
+  "1a860da09525",
+  "8b495830cf49",
+  "a0946d60b4d9",
+  "5f2f6fe86738",
+  "6ec1b142e41a",
+  "38477737700c",
+  "e911649071b3",
+  "c6191ce601f2",
+  "08f45dc71681",
+  "2082e2609bd5",
+  "cf4982743c89",
+  "dd5f859d51a9",
+  "de145bea2e79",
+  "304707791c07",
+  "8a374de5fa82",
+  "0d7b8cf74911",
+  "327e4d049d4e",
+  "56b2a893f7e3",
+  "4bae5efecfc8",
+  "5ee9765d6728",
+  "835fdab0de37"
+ ]
+}

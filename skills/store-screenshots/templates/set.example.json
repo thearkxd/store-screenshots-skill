@@ -1,0 +1,67 @@
+{
+  "_doc": "Example spec for render_set.py. Paths are relative to this file. Keys starting with _ are ignored. Headline emphasis: wrap words in *asterisks*; \\n forces a line break. Layouts: device (default), zoom, full, poster. Sizes: see render_set.py --presets.",
+  "app": "Dizilog (fictional example)",
+  "lang": "tr",
+  "sizes": ["ios", "android"],
+
+  "style": {
+    "_doc_background": "{\"color\": \"#hex\"} | {\"gradient\": [\"#top\", \"#bottom\"]} | {\"image\": \"photo.jpg\", \"overlay\": \"#00000066\"}",
+    "background": {"color": "#14213D"},
+    "text_color": "#FFFFFF",
+    "sub_color": "#C9D3EA",
+    "_doc_font": "path to the brand .ttf/.otf; null = first installed sans (the report says which)",
+    "font": null,
+    "sub_font": null,
+    "align": "center",
+    "_doc_case": "none | upper (Turkish-safe when lang is tr)",
+    "case": "none",
+    "headline_size": 0.092,
+    "min_headline_size": 0.055,
+    "max_lines": 2,
+    "line_height": 1.1,
+    "text_width": 0.84,
+    "caption_top": 0.085,
+    "sub_scale": 0.5,
+    "_doc_emphasis": "style: color | box (color, text_color) | marker (color) | font (font: path to italic/bold file)",
+    "emphasis": {"style": "color", "color": "#FCA311"},
+    "_doc_device": "width = fraction of canvas width; radius/border = fraction of device width; bleed lets the device run off the bottom",
+    "device": {"width": 0.80, "radius": 0.11, "border": 0.016, "border_color": "#0B1324", "shadow": true, "gap": 0.07, "bleed": true},
+    "card": {"radius": 0.045, "shadow": true, "width": 0.86}
+  },
+
+  "shots": [
+    {
+      "_role": "promise",
+      "headline": "Kaldığın bölüm *hep hazır*",
+      "screen": "example-screens/01-continue.png"
+    },
+    {
+      "_role": "differentiator, with the key card pulled out of the screen",
+      "headline": "Yeni bölüm çıkınca *ilk sen* bil",
+      "screen": "example-screens/02-calendar.png",
+      "callouts": [{"crop": [0.04, 0.155, 0.96, 0.255], "scale": 1.12}]
+    },
+    {
+      "_role": "proof - a zoomed card instead of the whole screen",
+      "headline": "Bu hafta *6 saat* dizi izledin",
+      "sub": "Haftalık izleme istatistiklerin",
+      "screen": "example-screens/03-stats.png",
+      "layout": "zoom",
+      "crop": [0.04, 0.13, 0.96, 0.505]
+    },
+    {
+      "_role": "social - a second brand colour from the fixed rotation",
+      "headline": "Arkadaşların *ne izliyor?*",
+      "screen": "example-screens/04-friends.png",
+      "background": {"color": "#FCA311"},
+      "text_color": "#14213D",
+      "emphasis": {"style": "box", "color": "#14213D", "text_color": "#FFFFFF"},
+      "device": {"border_color": "#14213D"}
+    },
+    {
+      "_role": "poster - one per set at most",
+      "headline": "*Spoiler* yok.\nSöz.",
+      "layout": "poster"
+    }
+  ]
+}
