@@ -1,6 +1,10 @@
 {
+ "_doc": "One spec, two locales: {\"tr\": …, \"en\": …} values are picked per locale; output goes to out/<locale>/<preset>/. The English captions reuse the Turkish UI (README demo); for a real US listing capture the screens in English and give \"screen\": {\"tr\": …, \"en\": …}.",
  "app": "Seenfy: Ne İzlesem? Film Dizi",
- "lang": "en",
+ "locales": [
+  "tr",
+  "en"
+ ],
  "sizes": [
   "ios",
   "android"
@@ -47,7 +51,10 @@
  "shots": [
   {
    "_role": "promise: personal, not popular - proof is the match score",
-   "headline": "Not what's popular.\n*What you'll love.*",
+   "headline": {
+    "tr": "Popüler olanı değil,\n*seveceğini* izle",
+    "en": "Not what's popular.\n*What you'll love.*"
+   },
    "screen": "screens/02-sana-uygun.jpg",
    "callouts": [
     {
@@ -64,7 +71,10 @@
   },
   {
    "_role": "differentiator: mood collections",
-   "headline": "In the mood for\na *plot twist*?",
+   "headline": {
+    "tr": "Bu akşam *plot twist*\nmi istiyorsun?",
+    "en": "In the mood for\na *plot twist*?"
+   },
    "screen": "screens/06-koleksiyonlar.jpg",
    "layout": "zoom",
    "crops": [
@@ -85,7 +95,10 @@
   },
   {
    "_role": "tracker: continue where you left off",
-   "headline": "Your next episode,\n*always ready*",
+   "headline": {
+    "tr": "Kaldığın bölüm\n*hep hazır*",
+    "en": "Your next episode,\n*always ready*"
+   },
    "screen": "screens/05-anasayfa.png",
    "callouts": [
     {
@@ -102,7 +115,10 @@
   },
   {
    "_role": "control: watched / liked / list in one tap",
-   "headline": "Watch, like,\n*check it off*",
+   "headline": {
+    "tr": "İzle, beğen,\n*işaretle*",
+    "en": "Watch, like,\n*check it off*"
+   },
    "screen": "screens/04-detay.jpg",
    "callouts": [
     {
@@ -120,13 +136,22 @@
   },
   {
    "_role": "closer: the app's own question, answered",
-   "headline": "Stop wondering\n*what to watch*",
+   "headline": {
+    "tr": "Ne izlesem diye\n*düşünme*",
+    "en": "Stop wondering\n*what to watch*"
+   },
    "screen": "screens/01-kesfet.jpg"
   },
   {
    "_role": "poster: spoiler-free comments (a real feature)",
-   "headline": "*No* spoilers.\nPromise.",
-   "sub": "Comments with spoilers stay hidden until you open them.",
+   "headline": {
+    "tr": "*Spoiler* yok.\nSöz.",
+    "en": "*No* spoilers.\nPromise."
+   },
+   "sub": {
+    "tr": "Spoiler içeren yorumlar, sen açmadıkça gizli.",
+    "en": "Comments with spoilers stay hidden until you open them."
+   },
    "layout": "poster",
    "poster_size": 0.22,
    "background": {
@@ -139,5 +164,14 @@
    }
   }
  ],
- "_note": "English captions over the Turkish UI: README demo only. For the US store, capture the screens with the app in English."
+ "feature_graphic": {
+  "headline": {
+   "tr": "Popüler olanı değil,\n*seveceğini* izle",
+   "en": "Not what's popular.\n*What you'll love.*"
+  },
+  "screen": "screens/02-sana-uygun.jpg",
+  "device_top": 0.1,
+  "device_width": 0.3,
+  "device_x": 0.79
+ }
 }

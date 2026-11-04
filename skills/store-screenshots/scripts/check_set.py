@@ -40,6 +40,8 @@ BANNED = {
 PLAY_FORBIDDEN = [r"#\s?1\b", r"\bno\.?\s?1\b", r"\bbest\b", r"\bapp of the year\b", r"\bpopular\b", r"\btop[- ]rated\b",
                   r"\d+\s?%\s?(off|indirim)", r"\bfree\b", r"\bücretsiz\b", r"\bindirim\b", r"\bdiscount\b",
                   r"[$€£₺]\s?\d", r"\d\s?(tl|₺)\b", r"\baward", r"\bödül", r"\ben iyi\b", r"\bpopüler\b"]
+RANKING = {r"\bbest\b", r"\bpopular\b", r"\ben iyi\b", r"\bpopüler\b", r"\btop[- ]rated\b"}
+NEGATION = r"\b(not|no|never|isn't|aren't|değil|olmayan|yerine)\b"
 EN_STOP = {"the", "and", "your", "you", "with", "for", "to", "in", "on", "all", "get", "of", "every", "from"}
 TR_CHARS = set("şğıİŞĞçÇöÖüÜ")
 
@@ -78,9 +80,15 @@ def copy_checks(h, lang, store):
         out.append("looks English in a Turkish set")
     if store == "android":
         for pat in PLAY_FORBIDDEN:
-            if re.search(pat, low):
-                out.append(f"Google Play disallows ranking/price/promo/award claims: matches {pat!r}")
-                break
+            m = re.search(pat, low)
+            if not m:
+                continue
+            # "not what's popular", "popüler olanı değil" are the opposite of a ranking claim
+            ctx = low[max(0, m.start() - 16): m.end() + 22]
+            if pat in RANKING and re.search(NEGATION, ctx):
+                continue
+            out.append(f"Google Play disallows ranking/price/promo/award claims: matches {pat!r}")
+            break
     return out
 
 
@@ -134,6 +142,17 @@ def main():
         warns.append("fewer than 4 screenshots: not eligible for Play screenshot-based promotion formats")
     if len(files) < 3:
         warns.append("fewer than 3 screenshots: search results will look empty")
+    if a.store == "android":
+        fg = next((p for p in (os.path.join(a.folder, "feature-graphic.png"),
+                               os.path.join(os.path.dirname(os.path.abspath(a.folder)), "feature-graphic.png")) if os.path.exists(p)), None)
+        if not fg:
+            warns.append("no feature-graphic.png (Google Play needs a 1024x500 feature graphic; add \"feature_graphic\" to the spec)")
+        else:
+            im = Image.open(fg)
+            if im.size != (1024, 500):
+                errors.append(f"feature graphic is {im.size[0]}x{im.size[1]}, must be 1024x500")
+            if has_alpha(im):
+                errors.append("feature graphic has an alpha channel")
 
     sizes = set()
     for f in files:

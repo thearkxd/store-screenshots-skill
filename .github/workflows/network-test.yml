@@ -48,6 +48,15 @@ jobs:
               print(f"   description: {len(d.get('description') or '')} chars | release notes: {len(d.get('release_notes') or '')} chars")
               print(f"   screenshots: {len(d.get('screenshots') or [])} urls, {len(shots)} saved | icon: {bool(d.get('icon_url'))}")
               print("   first 300 chars:", (d.get("description") or "")[:300].replace("\n", " "))
+              print("   subtitle:", d.get("subtitle"))
+              print("   release notes start:", (d.get("release_notes") or "")[:200].replace("\n", " "))
+              print("   same as description?", (d.get("release_notes") or "")[:80] == (d.get("description") or "")[:80])
+              print("   first urls:", (d.get("screenshots") or [])[:3])
+              try:
+                  from PIL import Image
+                  print("   saved sizes:", [Image.open(x).size for x in sorted(shots)])
+              except Exception as e:
+                  print("   sizes: n/a", e)
               for k in ("name", "description"):
                   if not d.get(k):
                       print(f"   !! missing {k}"); ok = False

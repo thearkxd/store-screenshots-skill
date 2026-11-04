@@ -9,7 +9,10 @@ Writes out/<preset>/01.png … (RGB, no alpha, exact pixels) and out/<preset>/_r
 fonts, warnings) that check_set.py reads. See templates/set.example.json for every option.
 
 Layouts per shot: "device" (default) · "zoom" (cropped card) · "full" (full-bleed screen + band/pill caption)
-· "poster" (type only). Device styles: "phone" (thin bezel + island) · "none" (rounded screen, shadow).
+· "poster" (type only). Device styles: "phone" (thin bezel + island) · "android" (punch-hole camera, used
+automatically for android presets) · "none" (rounded screen, shadow). "feature_graphic" renders Google Play's
+1024x500 graphic. "locales": ["tr", "en"] + {"tr": …, "en": …} values render every language from one spec
+into out/<locale>/<preset>/.
 Headline emphasis: wrap words in *asterisks*; "\\n" forces a line break.
 """
 import argparse
@@ -74,7 +77,7 @@ DEFAULT_STYLE = {
     "sub_scale": 0.42,
     "sub_gap": 0.32,           # gap between headline and sub-line, in headline sizes
     "emphasis": {"style": "color", "color": "#E5482D"},
-    "device": {"style": "phone", "width": 0.82, "radius": 0.15, "border": 0.022, "border_color": "#0E0E10",
+    "device": {"style": "phone", "android_style": "android", "width": 0.82, "radius": 0.15, "border": 0.022, "border_color": "#0E0E10",
                "island": True, "shadow": True, "gap": 0.075, "bleed": True},
     "card": {"radius": 0.045, "shadow": True, "width": 0.86},
     "band_color": None,
@@ -264,7 +267,7 @@ class Caption:
     def x_for(self, lw):
         if self.s["align"] == "center":
             return (self.W - lw) / 2
-        return self.W * (1 - self.s["text_width"]) / 2
+        return self.W * self.s.get("text_x", (1 - self.s["text_width"]) / 2)
 
     def draw(self, img, text, top, max_lines=None, max_size=None, center_v=None, color=None):
         """Draw the headline; returns (bottom_y, size, warnings)."""
@@ -430,13 +433,13 @@ def crop_frac(img, box):
 
 def device_geometry(screen, dv, W):
     dw = int(W * dv["width"])
-    border = int(dw * dv["border"]) if dv.get("style", "phone") == "phone" else 0
+    border = int(dw * dv["border"] * (0.8 if dv.get("style") == "android" else 1)) if dv.get("style", "phone") in ("phone", "android") else 0
     sw = dw - 2 * border
     sh = int(screen.height * sw / screen.width)
     return dw, border, sw, sh, sh + 2 * border
 
 
-def draw_device(canvas, screen, s, W, H, top, bottom_limit=None):
+def draw_device(canvas, screen, s, W, H, top, bottom_limit=None, cx=None):
     dv = s["device"]
     style = dv.get("style", "phone")
     dw, border, sw, sh, dh = device_geometry(screen, dv, W)
@@ -446,11 +449,12 @@ def draw_device(canvas, screen, s, W, H, top, bottom_limit=None):
         dv = dict(dv, width=dv["width"] * k)
         dw, border, sw, sh, dh = device_geometry(screen, dv, W)
     scr = screen.resize((sw, sh), Image.LANCZOS)
-    x = (W - dw) // 2
-    r_out = int(dw * (dv["radius"] if style == "phone" else dv.get("screen_radius", 0.07)))
+    x = (W - dw) // 2 if cx is None else int(cx - dw / 2)
+    radius = {"phone": dv["radius"], "android": dv.get("android_radius", 0.085)}.get(style, dv.get("screen_radius", 0.07))
+    r_out = int(dw * radius)
     if dv.get("shadow", True):
         canvas = shadow(canvas, (x, top, x + dw, top + dh), r_out)
-    if style == "phone" and border > 0:
+    if style in ("phone", "android") and border > 0:
         frame = Image.new("RGB", (dw, dh), hexrgb(dv["border_color"]))
         paste_rounded(canvas, frame, (x, top), r_out)
     paste_rounded(canvas, scr, (x + border, top + border), max(r_out - border, 0))
@@ -459,6 +463,12 @@ def draw_device(canvas, screen, s, W, H, top, bottom_limit=None):
         iw, ih = sw * 0.305, sw * 0.088
         cx, iy = x + dw / 2, top + border + sw * 0.028
         d.rounded_rectangle([cx - iw / 2, iy, cx + iw / 2, iy + ih], radius=int(ih / 2), fill=(0, 0, 0))
+    if style == "android" and dv.get("island", True):
+        # neutral punch-hole camera, not an iPhone island
+        d = ImageDraw.Draw(canvas)
+        r = sw * 0.017
+        cx, cy = x + dw / 2, top + border + sw * 0.034
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(0, 0, 0))
     return canvas, (x + border, top + border, sw / screen.width)
 
 
@@ -582,56 +592,119 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang):
     return canvas, warnings, size
 
 
+LOCALE_KEY = re.compile(r"^[a-z]{2}(-[A-Za-z]{2,4})?$")
+
+
+def localize(obj, loc, locales):
+    """Pick the locale's value wherever a dict is keyed by locales: {"tr": "...", "en": "..."}."""
+    if isinstance(obj, dict):
+        keys = set(obj)
+        if keys and keys <= set(locales) | {"default"}:
+            return localize(obj.get(loc, obj.get("default", obj[next(iter(obj))])), loc, locales)
+        return {k: localize(v, loc, locales) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [localize(v, loc, locales) for v in obj]
+    return obj
+
+
+def render_feature_graphic(fg, style, fonts, spec_dir, lang, out_path):
+    """Google Play feature graphic, 1024x500: headline left, the app's screen on a phone at the right."""
+    W, H = 1024, 500
+    s = merge(style, {"align": "left", "text_x": 0.065, "text_width": 0.53, "headline_size": 0.068,
+                      "min_headline_size": 0.042, "max_lines": 2, "line_height": 1.06})
+    for k in ("background", "text_color", "sub_color", "emphasis", "font", "device"):
+        if k in fg:
+            s[k] = merge(s[k], fg[k]) if k in ("emphasis", "device") else fg[k]
+    canvas = background(W, H, s["background"], spec_dir)
+    warnings = []
+    if fg.get("screen"):
+        screen = load_screen(spec_dir, fg["screen"])
+        if fg.get("crop"):
+            screen = crop_frac(screen, fg["crop"])
+        dv = merge(s["device"], {"width": fg.get("device_width", 0.3), "style": s["device"].get("android_style") or s["device"]["style"]})
+        canvas, _ = draw_device(canvas, screen, dict(s, device=dv), W, H, int(H * fg.get("device_top", 0.12)),
+                                cx=W * fg.get("device_x", 0.76))
+    cap = Caption(fonts, s, W, lang)
+    lines = fg.get("max_lines", 2)
+    block, size = cap.block_height(fg.get("headline", ""), fg.get("sub"), max_lines=lines)
+    top = int((H - block) / 2)
+    bottom, size, w = cap.draw(canvas, fg.get("headline", ""), top, max_lines=lines)
+    warnings += w
+    if fg.get("sub"):
+        cap.draw_sub(canvas, fg["sub"], bottom + size * s["sub_gap"], size)
+    warnings += cap.warnings
+    canvas.convert("RGB").save(out_path, optimize=True)
+    return warnings
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("spec", nargs="?")
     p.add_argument("--out", default="out")
     p.add_argument("--size", help="render only this preset (or WxH)")
+    p.add_argument("--locale", help="render only this locale (specs with \"locales\")")
     p.add_argument("--presets", action="store_true")
     a = p.parse_args()
     if a.presets:
         for k, (w, h) in PRESETS.items():
             print(f"{k:13} {w} x {h}")
+        print("feature graphic: 1024 x 500 (spec \"feature_graphic\", rendered with Android sizes)")
         print("\nfont aliases: " + ", ".join(FONT_ALIASES))
         return
     if not a.spec:
         p.error("spec is required")
     spec_dir = os.path.dirname(os.path.abspath(a.spec))
     with open(a.spec, encoding="utf-8") as f:
-        spec = json.load(f)
-    style = merge(DEFAULT_STYLE, spec.get("style"))
-    lang = spec.get("lang", "en")
-    sizes = [a.size] if a.size else spec.get("sizes", ["ios"])
+        raw_spec = json.load(f)
+    locales = raw_spec.get("locales")
+    runs = [(loc, os.path.join(a.out, loc)) for loc in locales] if locales else [(None, a.out)]
+    if a.locale:
+        runs = [r for r in runs if r[0] == a.locale] or sys.exit(f"locale {a.locale!r} not in spec locales {locales}")
     fonts = Fonts(spec_dir)
     exit_code = 0
-    for name in sizes:
-        if name in PRESETS:
-            W, H = PRESETS[name]
-        elif re.fullmatch(r"\d+x\d+", name):
-            W, H = map(int, name.split("x"))
-        else:
-            sys.exit(f"unknown size {name!r}; use --presets")
-        out_dir = os.path.join(a.out, name)
-        os.makedirs(out_dir, exist_ok=True)
-        report = {"preset": name, "size": [W, H], "lang": lang, "shots": []}
-        for i, shot in enumerate(spec["shots"], start=1):
-            try:
-                img, warnings, size = render_shot(shot, style, W, H, fonts, spec_dir, lang)
-            except FileNotFoundError as e:
-                print(f"x shot {i}: {e}", file=sys.stderr)
-                exit_code = 1
-                continue
-            path = os.path.join(out_dir, f"{i:02d}.png")
-            img.convert("RGB").save(path, optimize=True)
-            report["shots"].append({"file": os.path.basename(path), "headline": shot.get("headline", "").replace("*", "").replace("\n", " "),
-                                    "sub": shot.get("sub", ""), "layout": shot.get("layout", "device"),
-                                    "headline_px": size, "warnings": warnings})
-            for w in warnings:
-                print(f"! {name} {i:02d}: {w}")
-        report["fonts"] = sorted(fonts.used)
-        with open(os.path.join(out_dir, "_render.json"), "w", encoding="utf-8") as f:
-            json.dump(report, f, ensure_ascii=False, indent=1)
-        print(f"{name}: {len(report['shots'])} shots → {out_dir}   fonts: {', '.join(report['fonts'])}")
+    for loc, out_root in runs:
+        spec = localize(raw_spec, loc, locales) if loc else raw_spec
+        lang = (loc.split("-")[0] if loc else spec.get("lang", "en"))
+        base_style = merge(DEFAULT_STYLE, spec.get("style"))
+        sizes = [a.size] if a.size else spec.get("sizes", ["ios"])
+        for name in sizes:
+            if name in PRESETS:
+                W, H = PRESETS[name]
+            elif re.fullmatch(r"\d+x\d+", name):
+                W, H = map(int, name.split("x"))
+            else:
+                sys.exit(f"unknown size {name!r}; use --presets")
+            style = base_style
+            if name.startswith("android") and base_style["device"].get("style") == "phone" and base_style["device"].get("android_style"):
+                style = merge(base_style, {"device": {"style": base_style["device"]["android_style"]}})
+            out_dir = os.path.join(out_root, name)
+            os.makedirs(out_dir, exist_ok=True)
+            report = {"preset": name, "size": [W, H], "lang": lang, "locale": loc, "shots": []}
+            for i, shot in enumerate(spec["shots"], start=1):
+                if name.startswith("android") and isinstance(shot.get("device"), dict) and shot["device"].get("style") == "phone":
+                    shot = merge(shot, {"device": {"style": style["device"]["style"]}})
+                try:
+                    img, warnings, size = render_shot(shot, style, W, H, fonts, spec_dir, lang)
+                except FileNotFoundError as e:
+                    print(f"x shot {i}: {e}", file=sys.stderr)
+                    exit_code = 1
+                    continue
+                path = os.path.join(out_dir, f"{i:02d}.png")
+                img.convert("RGB").save(path, optimize=True)
+                report["shots"].append({"file": os.path.basename(path), "headline": shot.get("headline", "").replace("*", "").replace("\n", " "),
+                                        "sub": shot.get("sub", ""), "layout": shot.get("layout", "device"),
+                                        "headline_px": size, "warnings": warnings})
+                for w in warnings:
+                    print(f"! {loc or ''} {name} {i:02d}: {w}")
+            report["fonts"] = sorted(fonts.used)
+            with open(os.path.join(out_dir, "_render.json"), "w", encoding="utf-8") as f:
+                json.dump(report, f, ensure_ascii=False, indent=1)
+            print(f"{(loc + ' ') if loc else ''}{name}: {len(report['shots'])} shots → {out_dir}   fonts: {', '.join(report['fonts'])}")
+        if spec.get("feature_graphic") and (any(n.startswith("android") for n in sizes) or a.size is None):
+            fg_path = os.path.join(out_root, "feature-graphic.png")
+            for w in render_feature_graphic(spec["feature_graphic"], base_style, fonts, spec_dir, lang, fg_path):
+                print(f"! {loc or ''} feature graphic: {w}")
+            print(f"{(loc + ' ') if loc else ''}feature graphic → {fg_path}")
     sys.exit(exit_code)
 
 

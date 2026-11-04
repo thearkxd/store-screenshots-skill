@@ -208,14 +208,33 @@ def fetch_play(ref):
 def save_images(info, folder, max_shots):
     os.makedirs(os.path.join(folder, "screenshots"), exist_ok=True)
     files = []
-    urls = info["screenshots"][:max_shots]
-    for i, u in enumerate(urls, start=1):
+    # Play pages mix phone, tablet and Chromebook screenshots: keep the phone set (portrait, same ratio)
+    urls = info["screenshots"][: max_shots * (4 if info["store"] == "play" else 1)]
+    ratio = None
+    for u in urls:
+        if len(files) >= max_shots:
+            break
+        i = len(files) + 1
         src = appstore_shot_url(u) if info["store"] == "appstore" else u
         dest = os.path.join(folder, "screenshots", f"{i:02d}.png")
         try:
             blob = get(src)
         except Exception:
             blob = get(u)
+        if info["store"] == "play":
+            try:
+                import io
+                from PIL import Image
+                w, h = Image.open(io.BytesIO(blob)).size
+                r = h / w
+                if ratio is None:
+                    if r < 1.2:  # first image is a tablet/landscape shot: wait for a portrait one
+                        continue
+                    ratio = r
+                elif abs(r - ratio) / ratio > 0.08:
+                    continue
+            except Exception:
+                pass
         with open(dest, "wb") as f:
             f.write(blob)
         files.append(dest)
