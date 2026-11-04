@@ -200,6 +200,179 @@ def size_tests(tmp):
     run(s("concepts.py"), fx, "--size", "android", "--directions", "poster", "-o", os.path.join(tmp, "android-concepts.jpg"))
 
 
+def design_tests(tmp):
+    """The design route: evidence, DNA, scenes on both backends, every size, and the truth/claim/campaign/store
+    checks - each warning is provoked once on purpose."""
+    import json
+    import shutil
+    from PIL import Image, ImageChops, ImageStat
+    sys.path.insert(0, SCRIPTS)
+    import scene as sc
+    tdir = os.path.join(SKILL, "templates")
+    ex = os.path.join(tdir, "scene.example.json")
+    ev_path = os.path.join(tdir, "scene-evidence.json")
+    d = os.path.join(tmp, "design")
+    os.makedirs(d)
+    # evidence: ids, hashes, kept regions, named regions, the grid view
+    ev = os.path.join(d, "ev.json")
+    run(s("evidence.py"), "build", DEMO, "-o", ev, "--no-ocr")
+    e = json.load(open(ev, encoding="utf-8"))
+    assert sorted(e["screens"]) == ["calendar", "detail", "friends", "home", "stats"], e["screens"].keys()
+    assert all(len(v["sha256"]) == 64 for v in e["screens"].values())
+    run(s("evidence.py"), "name", ev, "home", "hero", "0.04,0.15,0.95,0.57")
+    run(s("evidence.py"), "build", DEMO, "-o", ev, "--no-ocr")
+    assert json.load(open(ev, encoding="utf-8"))["screens"]["home"]["regions"]["hero"] == [0.04, 0.15, 0.95, 0.57]
+    run(s("evidence.py"), "name", ev, "home", "bad", "0.5,0.5,0.4,0.6", expect=1)
+    run(s("evidence.py"), "show", ev, "home", "-o", os.path.join(d, "grid.png"))
+    shipped = json.load(open(ev_path, encoding="utf-8"))
+    if shutil.which("tesseract"):
+        assert "312" in shipped["screens"]["stats"]["region_text"]["total"], shipped["screens"]["stats"]["region_text"]
+    # DNA: the demo app's orange accent and dark UI are found; font sheet and board render
+    dna = os.path.join(d, "dna.json")
+    run(s("dna.py"), "measure", ev, "--app", "Dizilog", "-o", dna)
+    m = json.load(open(dna, encoding="utf-8"))["measured"]
+    assert m["ui"] == "dark", m["ui"]
+    acc = [c for c in m["palette"] if c["role"] == "accent"]
+    assert acc and int(acc[0]["hex"][1:3], 16) > 200 and int(acc[0]["hex"][3:5], 16) < 140, m["palette"]
+    run(s("dna.py"), "fonts", ev, "home", "--region", "0.05,0.035,0.8,0.06", "--text", "İyi akşamlar, Elif",
+        "--candidates", "sans", "serif", "grotesk", "-o", os.path.join(d, "fonts.jpg"))
+    run(s("dna.py"), "board", dna, "-o", os.path.join(d, "board.jpg"))
+    # the bundled scene example: every size, PNG + SVG, feature graphic, clean report
+    out_dir = os.path.join(d, "out")
+    out = run(s("compose.py"), "render", ex, "--out", out_dir, both=True)
+    assert "!" not in out.replace("!=", ""), out  # the example renders without a single warning
+    for preset, store, size in (("ios", "ios", (1206, 2622)), ("ios-large", "ios", (1320, 2868)), ("android", "android", (1080, 1920))):
+        folder = os.path.join(out_dir, preset)
+        pngs = sorted(f for f in os.listdir(folder) if f.endswith(".png"))
+        assert pngs == [f"{i:02d}.png" for i in range(1, 6)], pngs
+        assert all(Image.open(os.path.join(folder, p)).size == size for p in pngs)
+        assert len([f for f in os.listdir(folder) if f.endswith(".svg")]) == 5
+        rep = json.load(open(os.path.join(folder, "_render.json"), encoding="utf-8"))
+        assert rep["renderer"] == "compose" and not rep["set_warnings"], rep["set_warnings"]
+        out = run(s("check_set.py"), folder, "--store", store, "--lang", "tr")
+        assert "WARN" not in out and "ERROR" not in out, out
+    assert Image.open(os.path.join(out_dir, "feature-graphic.png")).size == (1024, 500)
+    svg = open(os.path.join(out_dir, "ios", "01.svg"), encoding="utf-8").read()
+    assert 'data-evidence="home"' in svg and "<text" in svg and "font-family=" in svg
+    # both backends draw the same picture
+    if sc.have_resvg():
+        pil_dir = os.path.join(d, "pil")
+        run(s("compose.py"), "render", ex, "--out", pil_dir, "--size", "ios", "--backend", "pillow")
+        for i in range(1, 6):
+            a = Image.open(os.path.join(out_dir, "ios", f"{i:02d}.png")).convert("RGB")
+            b = Image.open(os.path.join(pil_dir, "ios", f"{i:02d}.png")).convert("RGB")
+            diff = sum(ImageStat.Stat(ImageChops.difference(a, b)).mean) / 3
+            assert diff < 6, f"shot {i}: backends differ by {diff:.1f}"
+    # a partial re-render keeps the numbering and the rest of the report
+    run(s("compose.py"), "render", ex, "--out", out_dir, "--size", "ios", "--shots", "friends")
+    rep = json.load(open(os.path.join(out_dir, "ios", "_render.json"), encoding="utf-8"))
+    assert [e["shot"] for e in rep["shots"]] == ["resume", "tonight", "year", "friends", "episodes"], rep["shots"]
+    run(s("compose.py"), "xray", ex, "--shot", "year", "-o", os.path.join(d, "xray.png"))
+    run(s("compose.py"), "concepts", ex, ex, "--board", os.path.join(d, "board.jpg"), "-o", os.path.join(d, "concepts.jpg"))
+    assert Image.open(os.path.join(d, "concepts.jpg")).width > 600
+    # the Seenfy pilot (three concepts + the chosen set)
+    v2 = os.path.join(ROOT, "examples", "seenfy-v2")
+    run(s("compose.py"), "render", os.path.join(v2, "set.json"), "--out", os.path.join(d, "seenfy"), "--size", "android")
+    run(s("compose.py"), "concepts", *[os.path.join(v2, "concepts", f) for f in sorted(os.listdir(os.path.join(v2, "concepts")))],
+        "-o", os.path.join(d, "seenfy-concepts.jpg"))
+
+    # --- in-process: anchors, kept line breaks, the ink box
+    base = json.load(open(ex, encoding="utf-8"))
+    import compose
+    fonts = __import__("render_set").Fonts(tdir)
+    ctx = compose.context(base, tdir, "tr", fonts, "ios", 1206, 2622)
+
+    def scene_of(layers, W=1206, H=2622, span=1, **shot):
+        return sc.Scene(dict({"id": "t", "proof": [{"evidence": "home"}], "background": {"fill": "$ground"}, "layers": layers,
+                              "span": span}, **shot), W, H, ctx).build()
+    t = scene_of([{"type": "text", "id": "h", "role": "headline", "style": "headline", "text": "Bir iki üç\naltı", "w": 0.45, "x": 0.08, "y": 0.1},
+                  {"type": "text", "id": "sub", "role": "sub", "style": "sub", "text": "alt satır", "x": 0.08, "below": "h", "gap": 0.05}])
+    h, sub = t.by_id["h"], t.by_id["sub"]
+    assert h["meta"]["lines"] == 2, "a written line break must be kept (shrink, don't re-wrap)"
+    assert abs(sub["meta"]["bbox"][1] - (h["meta"]["bbox"][3] + 0.05 * t.c.U)) < 2
+    assert h["meta"]["ink"][1] >= h["meta"]["bbox"][1] and h["meta"]["ink"][3] <= h["meta"]["bbox"][3] + 1
+
+    # --- refused: these must not render
+    def bad_set(name, shots, **extra):
+        p = os.path.join(d, f"bad-{name}.json")
+        json.dump(dict(base, evidence=ev_path, sizes=["ios"], shots=shots, **extra), open(p, "w", encoding="utf-8"), ensure_ascii=False)
+        return p
+    head = {"type": "text", "id": "head", "role": "headline", "style": "headline", "text": "Kaldığın *bölüm* hazır", "x": 0.08, "y": 0.12, "w": 0.84}
+    refusals = {
+        "stretch": ({"type": "screen", "evidence": "home", "w": 0.8, "h": 1.0}, "not both"),
+        "filter": ({"type": "screen", "evidence": "home", "w": 0.8, "blur": 4}, "isn't allowed"),
+        "fade": ({"type": "screen", "evidence": "home", "w": 0.8, "opacity": 0.5}, "isn't allowed"),
+        "unknown": ({"type": "screen", "evidence": "settings", "w": 0.8}, "isn't in the evidence"),
+        "svgtext": ({"type": "svg", "role": "decor", "motive": "x", "markup": "<text x='0.1' y='0.2'>99</text>"}, "shapes only"),
+        "svgimage": ({"type": "svg", "role": "decor", "motive": "x", "markup": "<image href='a.png'/>"}, "shapes only"),
+    }
+    for name, (layer, msg) in refusals.items():
+        out = run(s("compose.py"), "render", bad_set(name, [{"id": name, "proof": [{"evidence": "home"}], "background": {"fill": "$ground"},
+                                                                "layers": [head, layer]}]),
+                  "--out", os.path.join(d, "bad", name), expect=1, both=True)
+        assert msg in out, (name, out)
+    # an edited screen: the hash no longer matches
+    edited = os.path.join(d, "edited")
+    shutil.copytree(DEMO, edited)
+    ev2 = os.path.join(d, "ev-edited.json")
+    run(s("evidence.py"), "build", edited, "-o", ev2, "--no-ocr")
+    im = Image.open(os.path.join(edited, "01-home.jpg"))
+    im.putpixel((10, 10), (255, 0, 255))
+    im.save(os.path.join(edited, "01-home.jpg"), quality=95)
+    p = bad_set("edited", [{"id": "e", "proof": [{"evidence": "home"}], "background": {"fill": "$ground"},
+                            "layers": [head, {"type": "screen", "evidence": "home", "w": 0.8, "cx": "50%", "y": 0.5}]}])
+    j = json.load(open(p, encoding="utf-8"))
+    j["evidence"] = ev2
+    json.dump(j, open(p, "w", encoding="utf-8"))
+    assert "changed since evidence.json" in run(s("compose.py"), "render", p, "--out", os.path.join(d, "bad", "edited"), expect=1, both=True)
+
+    # --- warned: one shot per rule
+    shot = lambda i, layers, **kw: dict({"id": i, "proof": [{"evidence": "stats"}], "background": {"fill": "$ground"}, "layers": layers}, **kw)
+    scr = {"type": "screen", "id": "s", "evidence": "stats", "w": 0.8, "cx": "50%", "y": 0.62, "radius": 0.06}
+    cases = [
+        shot("paint", [head, scr, {"type": "text", "role": "headline", "style": "headline", "text": "Üstüne yazı", "x": 0.2, "y": 0.9}]),
+        shot("claim", [dict(head, text="Bu yıl *999 saat* izledin"), scr]),
+        shot("motive", [head, scr, {"type": "ellipse", "role": "decor", "x": 0.6, "y": 0.3, "w": 0.2, "fill": "$accent"}]),
+        shot("palette", [head, scr, {"type": "rect", "role": "decor", "motive": "test", "x": 0.08, "y": 0.45, "w": 0.3, "h": 0.01, "fill": "#00FF00"}]),
+        shot("contrast", [dict(head, color="#26252B"), scr]),
+        shot("small", [dict(head, size=0.04, min_size=0.04), scr]),
+        shot("lift", [head, scr, {"type": "screen", "evidence": "stats", "crop": "tiles", "lift": {"from": "s", "scale": 1.05, "dx": 0.3}}]),
+        shot("soft", [head, {"type": "screen", "evidence": "stats", "crop": [0.1, 0.6, 0.3, 0.65], "w": 0.84, "x": 0.08, "y": 0.6}]),
+        shot("touch", [head, dict(scr, below="head", gap=0.0)]),
+        shot("lookalike", [head, scr, {"type": "rect", "role": "decor", "motive": "test", "x": 0.1, "y": 0.45, "w": 0.4, "h": 0.08, "radius": 0.04, "fill": "$accent"},
+                           {"type": "text", "role": "label", "style": "sub", "text": "Hemen izle", "x": 0.13, "y": 0.465, "w": 0.35, "color": "$ink"}]),
+        shot("seam", [dict(head, text="Bir resim iki slot boyunca uzanıyor", w=1.8), dict(scr, cx="42%")], span=2),
+    ]
+    p = bad_set("warn", cases, promise_words=["kitap"])
+    out = run(s("compose.py"), "render", p, "--out", os.path.join(d, "warn"), both=True)
+    for msg in ("covers", "number '999'", 'without a "motive"', "outside the campaign palette: #00FF00", "low contrast",
+                "too small for search results", "doesn't cover its place", "will look soft", "touches the screen",
+                "looks like app UI", "crosses the seam", "off-centre", "names what the app does"):
+        assert msg in out, (msg, out)
+    same = [shot(f"m{i}", [head, dict(scr, evidence=ev_id)]) for i, ev_id in enumerate(("stats", "home", "calendar"))]
+    out = run(s("compose.py"), "render", bad_set("same", same), "--out", os.path.join(d, "same"), both=True)
+    assert "share one composition" in out, out
+    # Google Play: no device frame, taglines under 20 % - big type counts
+    play = [shot("frame", [head, dict(scr, frame={"style": "phone"})]),
+            shot("tall", [head, {"type": "text", "role": "display", "style": "headline", "text": "312", "size": 0.6, "x": 0.08, "y": 0.5}, dict(scr, y=1.3)])]
+    p = bad_set("play", play)
+    j = json.load(open(p, encoding="utf-8"))
+    j["sizes"] = ["android"]
+    json.dump(j, open(p, "w", encoding="utf-8"))
+    out = run(s("compose.py"), "render", p, "--out", os.path.join(d, "play"), both=True)
+    assert "device frame in a Google Play set" in out and "caption covers" in out, out
+    # free vector work: an svg layer in units, drawn by resvg in both backends
+    if sc.have_resvg():
+        mot = {"type": "svg", "role": "decor", "motive": "the app's progress bar", "x": 0.08, "y": 0.5,
+               "markup": "<rect x='0' y='0' width='0.84' height='0.012' rx='0.006' fill='$accent'/>"}
+        p = bad_set("svg", [shot("svg", [head, mot, scr])], promise_words=["bölüm"])
+        for backend in ("svg", "pillow"):
+            o = os.path.join(d, "svg-" + backend)
+            out = run(s("compose.py"), "render", p, "--out", o, "--backend", backend, both=True)
+            px = Image.open(os.path.join(o, "ios", "01.png")).convert("RGB").getpixel((600, round(0.506 * 1206)))
+            assert px[0] > 200 and px[1] < 140, (backend, px, out)
+
+
 def quality_tests(tmp):
     """The checks that catch a set that looks fine but doesn't sell: no promise in shots 1-3, the same proof
     twice, thin demo data."""
@@ -308,6 +481,7 @@ def main():
         span_tests(tmp)
         size_tests(tmp)
         quality_tests(tmp)
+        design_tests(tmp)
         # every bundled font covers Turkish
         sys.path.insert(0, SCRIPTS)
         import render_set

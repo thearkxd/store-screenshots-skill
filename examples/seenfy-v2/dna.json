@@ -1,0 +1,119 @@
+{
+ "_doc": "Visual DNA (dna.py). measured = what the screens/website show; the rest is filled in by the designer after looking at the screens - then dna.py board renders it for the user to confirm.",
+ "app": "Seenfy",
+ "measured": {
+  "palette": [
+   {
+    "hex": "#121212",
+    "role": "surface",
+    "share": 0.4784
+   },
+   {
+    "hex": "#000000",
+    "role": "surface-2",
+    "share": 0.0658
+   },
+   {
+    "hex": "#EAF6F6",
+    "role": "ink",
+    "share": 0.0055
+   },
+   {
+    "hex": "#5460F0",
+    "role": "accent",
+    "share": 0.0069,
+    "screens": 3
+   },
+   {
+    "hex": "#5A0600",
+    "role": "danger",
+    "share": 0.0056,
+    "screens": 2
+   },
+   {
+    "hex": "#D2E4EA",
+    "role": "neutral",
+    "share": 0.0242
+   },
+   {
+    "hex": "#2A2A2A",
+    "role": "neutral",
+    "share": 0.0195
+   }
+  ],
+  "ui": "dark",
+  "type_scale": {
+   "body": 0.0291,
+   "large": 0.0434,
+   "largest": 0.065,
+   "note": "word box height / screen width (OCR) - title vs body ratio"
+  },
+  "screens": [
+   "kesfet",
+   "sana-uygun",
+   "detay",
+   "anasayfa",
+   "koleksiyonlar"
+  ]
+ },
+ "website": null,
+ "fonts": {
+  "display": "fonts/Poppins_600SemiBold.ttf",
+  "text": "fonts/Poppins_400Regular.ttf",
+  "source": "closest match (font-match sheet): Poppins, OFL"
+ },
+ "palette": {
+  "surface": "#121212",
+  "surface-2": "#000000",
+  "ink": "#EAF6F6",
+  "accent": "#5460F0",
+  "neutral": "#2A2A2A"
+ },
+ "shape": {
+  "radius": "large, soft (cards ~4% of width)",
+  "elevation": "flat dark cards, no shadows",
+  "density": "medium, poster-led",
+  "icons": "line icons, rounded"
+ },
+ "signatures": [
+  {
+   "name": "%88 Sana Uygun match badge",
+   "evidence": "sana-uygun",
+   "crop": [
+    0.06,
+    0.2,
+    0.5,
+    0.27
+   ]
+  },
+  {
+   "name": "continue-watching card with S2E5",
+   "evidence": "anasayfa",
+   "crop": [
+    0.04,
+    0.2,
+    0.8,
+    0.44
+   ]
+  },
+  {
+   "name": "mood collections",
+   "evidence": "koleksiyonlar",
+   "crop": [
+    0.03,
+    0.3,
+    0.97,
+    0.56
+   ]
+  }
+ ],
+ "voice": "Warm, spoken Turkish with film slang (plot twist, spoiler); sen, never siz.",
+ "output": "Personal film/series picks, mood collections, a watch tracker - the posters are the content.",
+ "avoid": [
+  "cinema-room AI renders",
+  "tilted floating phones",
+  "generic purple gradients"
+ ],
+ "evidence": "evidence.json",
+ "type_sample": "Popüler olanı değil, seveceğini izle"
+}

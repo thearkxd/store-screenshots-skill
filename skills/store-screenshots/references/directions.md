@@ -1,4 +1,10 @@
-# Design directions
+# Design directions (presets: the fast path and fallback)
+
+> **New sets are designed, not picked:** the default route is `design-process.md` - the app's DNA, three
+> app-specific concepts, free scenes rendered by `compose.py`. Use these presets when the user wants a quick
+> conventional set, the brand already has a screenshot system to match, or scenes can't be rendered - and say
+> so. They also work as a reference: each preset is one coherent campaign system (ground, type, emphasis,
+> device, motif), worth studying when you write your own.
 
 A **direction** is a complete visual system - ground, type pairing, emphasis device, device treatment,
 motif and a per-shot colour rotation - stored as a preset in `assets/directions/<name>.json`. It replaces

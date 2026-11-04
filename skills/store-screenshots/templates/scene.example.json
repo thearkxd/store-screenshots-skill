@@ -1,0 +1,417 @@
+{
+ "_doc": "Example version-2 set for compose.py (design-driven): every shot is a free scene of layers - see references/scene-format.md and references/design-process.md. The screens are the fictional Dizilog app (example-screens/, built by tools/demo_screens/build.py); scene-evidence.json registers them (evidence.py) with named regions. Keys starting with _ are ignored.",
+ "version": 2,
+ "app": "Dizilog (fictional example)",
+ "lang": "tr",
+ "evidence": "scene-evidence.json",
+ "sizes": [
+  "ios",
+  "ios-large",
+  "android"
+ ],
+ "promise_words": [
+  "dizi",
+  "bölüm",
+  "izle"
+ ],
+ "concept": {
+  "name": "Tek Turuncu",
+  "idea": "Dizilog turuncuyu her ekranda tek bir şey için kullanır: ilerleme, bu akşamki bölüm, en uzun çubuk, işaretler. Kampanya da öyle: sessiz, koyu bir set; turuncu yalnızca başlığın anlattığı şeyde - vurgu kelimesinde ve ekrandan öne çıkan öğede."
+ },
+ "_doc_campaign": "The system that stays the same while every composition changes: tokens from the app's DNA (dna.py), one headline face, one text face, one emphasis device.",
+ "campaign": {
+  "tokens": {
+   "ground": "#0E0E10",
+   "card": "#1A191E",
+   "edge": "#2A2930",
+   "ink": "#FFFFFF",
+   "muted": "#9C9AA3",
+   "accent": "#FF5A3C"
+  },
+  "fonts": {
+   "display": "sans-bold",
+   "text": "text"
+  },
+  "type": {
+   "headline": {
+    "font": "display",
+    "size": 0.1,
+    "min_size": 0.072,
+    "line_height": 1.08,
+    "tracking": -0.024,
+    "color": "$ink",
+    "max_lines": 3,
+    "emphasis": {
+     "style": "color",
+     "color": "$accent"
+    }
+   },
+   "sub": {
+    "font": "text",
+    "size": 0.037,
+    "line_height": 1.35,
+    "tracking": 0,
+    "color": "$muted"
+   }
+  }
+ },
+ "shots": [
+  {
+   "id": "resume",
+   "message": "Pick up the episode where you stopped",
+   "proof": [
+    {
+     "evidence": "home",
+     "region": "resume"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Kaldığın bölüm\n*hep hazır*",
+     "x": 0.08,
+     "y": 0.14,
+     "w": 0.86
+    },
+    {
+     "type": "text",
+     "role": "sub",
+     "style": "sub",
+     "text": "Bıraktığın dakikadan, tek dokunuşla devam.",
+     "x": 0.08,
+     "below": "head",
+     "gap": 0.035,
+     "w": 0.8
+    },
+    {
+     "type": "screen",
+     "id": "main",
+     "evidence": "home",
+     "w": "92%",
+     "x": "13%",
+     "y": 0.62,
+     "radius": 0.075,
+     "frame": {
+      "default": {
+       "style": "plain",
+       "border": 0.005,
+       "color": "$edge",
+       "island": false
+      },
+      "android": null
+     }
+    },
+    {
+     "type": "screen",
+     "evidence": "home",
+     "crop": "resume",
+     "lift": {
+      "from": "main",
+      "scale": 1.12
+     },
+     "radius": 0.035,
+     "shadow": "deep"
+    }
+   ]
+  },
+  {
+   "id": "tonight",
+   "message": "New episodes of your shows, on a calendar, with a reminder",
+   "proof": [
+    {
+     "evidence": "calendar",
+     "region": "tonight"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "screen",
+     "id": "cal",
+     "evidence": "calendar",
+     "crop": [
+      0,
+      0.02,
+      1,
+      0.66
+     ],
+     "w": "90%",
+     "cx": "50%",
+     "y": 0.1,
+     "radius": 0.06,
+     "frame": {
+      "default": {
+       "style": "plain",
+       "border": 0.005,
+       "color": "$edge",
+       "island": false
+      },
+      "android": null
+     }
+    },
+    {
+     "type": "screen",
+     "evidence": "calendar",
+     "crop": "tonight",
+     "lift": {
+      "from": "cal",
+      "scale": 1.1
+     },
+     "radius": 0.035,
+     "shadow": "deep"
+    },
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Yeni bölüm çıkınca\n*ilk sen* bil",
+     "x": 0.08,
+     "w": 0.86,
+     "below": "cal",
+     "gap": 0.12
+    },
+    {
+     "default": {
+      "type": "text",
+      "role": "sub",
+      "style": "sub",
+      "text": "Takip ettiğin dizilerin yeni bölümleri tek takvimde.",
+      "x": 0.08,
+      "below": "head",
+      "gap": 0.035,
+      "w": 0.8
+     },
+     "android": null
+    }
+   ]
+  },
+  {
+   "id": "year",
+   "message": "Your year in series, in hours",
+   "proof": [
+    {
+     "evidence": "stats",
+     "region": "total"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Bu yıl *312 saat*\ndizi izledin",
+     "x": 0.08,
+     "y": 0.14,
+     "w": 0.86
+    },
+    {
+     "type": "screen",
+     "id": "total",
+     "evidence": "stats",
+     "crop": "total",
+     "w": "100%",
+     "x": "8%",
+     "below": "head",
+     "gap": 0.14,
+     "radius": 0.05
+    },
+    {
+     "type": "screen",
+     "evidence": "stats",
+     "crop": "tiles",
+     "w": "84%",
+     "x": "8%",
+     "below": "total",
+     "gap": 0.05,
+     "radius": 0.04
+    }
+   ]
+  },
+  {
+   "id": "friends",
+   "message": "See what your friends are watching - without spoilers",
+   "proof": [
+    {
+     "evidence": "friends",
+     "region": "first-post"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Arkadaşların\n*ne izliyor?*",
+     "x": 0.08,
+     "y": 0.14,
+     "w": 0.86
+    },
+    {
+     "type": "screen",
+     "id": "feed",
+     "evidence": "friends",
+     "w": "78%",
+     "cx": "50%",
+     "below": "head",
+     "gap": 0.16,
+     "radius": 0.07,
+     "frame": {
+      "default": {
+       "style": "phone",
+       "border": 0.02,
+       "color": "#050506"
+      },
+      "android": null
+     },
+     "shadow": "deep"
+    },
+    {
+     "type": "screen",
+     "evidence": "friends",
+     "crop": "first-post",
+     "lift": {
+      "from": "feed",
+      "scale": 1.1
+     },
+     "radius": 0.03,
+     "shadow": "deep"
+    }
+   ]
+  },
+  {
+   "id": "episodes",
+   "message": "Tick episodes off one by one",
+   "proof": [
+    {
+     "evidence": "detail",
+     "region": "episodes"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "screen",
+     "id": "list",
+     "evidence": "detail",
+     "crop": [
+      0,
+      0.3,
+      1,
+      0.9
+     ],
+     "w": "92%",
+     "cx": "50%",
+     "y": 0.1,
+     "radius": 0.06,
+     "frame": {
+      "default": {
+       "style": "plain",
+       "border": 0.005,
+       "color": "$edge",
+       "island": false
+      },
+      "android": null
+     }
+    },
+    {
+     "type": "screen",
+     "evidence": "detail",
+     "crop": "season",
+     "lift": {
+      "from": "list",
+      "scale": 1.12
+     },
+     "radius": 0.03,
+     "shadow": "deep"
+    },
+    {
+     "type": "mark",
+     "kind": "circle",
+     "on": "list",
+     "region": [
+      0.86,
+      0.855,
+      0.95,
+      0.89
+     ],
+     "color": "$accent",
+     "width": 0.008,
+     "pad": 0.012
+    },
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Bölüm bölüm\n*işaretle*",
+     "x": 0.08,
+     "bottom": 0.26,
+     "w": 0.86
+    },
+    {
+     "type": "text",
+     "role": "sub",
+     "style": "sub",
+     "text": "Hangi bölümde kaldığın hep belli.",
+     "x": 0.08,
+     "below": "head",
+     "gap": 0.035,
+     "w": 0.8
+    }
+   ]
+  }
+ ],
+ "feature_graphic": {
+  "proof": [
+   {
+    "evidence": "home",
+    "region": "resume"
+   }
+  ],
+  "background": {
+   "fill": "$ground"
+  },
+  "layers": [
+   {
+    "type": "text",
+    "id": "head",
+    "role": "headline",
+    "style": "headline",
+    "text": "Kaldığın bölüm\n*hep hazır*",
+    "x": 0.35,
+    "cy": "50%",
+    "w": 2.2,
+    "size": 0.26,
+    "min_size": 0.2
+   },
+   {
+    "type": "screen",
+    "evidence": "home",
+    "crop": "hero",
+    "h": "80%",
+    "right": 0.35,
+    "cy": "50%",
+    "radius": 0.08
+   }
+  ]
+ }
+}

@@ -24,6 +24,9 @@ python3 scripts/search_library.py --ai-smell --format paths --limit 12      # th
 | **Machine-translated copy** | "AI intelligent service", "Share Amazing Sound With Friend" | O-KAM, Reverse Audio | Write natively per language |
 | **Typos left in** | "Onginals", "Mutilingual" | DramaBox, Kling AI | Proofread every headline at full size |
 | **"AI-powered" as the claim** | "Your AI-Powered Collaboration Platform" | Zoom, Gauth | Say what the AI does for the user, concretely |
+| **The template look** | Headline on top, phone in the middle, a card beside it - in every shot, for every app | most of the "solid" sets | A concept from the app's DNA; vary placement, scale and crop per shot (`design-process.md` §5) |
+| **Decoration without a reason** | Blobs, rings, confetti, random lines, a glow behind the phone | DOA, Oley | Every shape needs a motive from the app (its progress bar, its card radius) - or delete it |
+| **Fake UI** | A redrawn badge, button or chart that isn't cropped from the app | - | Crop the real element from a screen; never draw UI (`design-process.md` §1) |
 
 ## What human-made sets have instead
 
@@ -39,7 +42,9 @@ From the exemplary sets:
 
 - [ ] Every headline passes the swap and say-it tests; none uses a banned phrase (`copy-rules.md` §4).
 - [ ] Shots 1–3 explain the app at search-result size (`_search-preview.jpg`).
-- [ ] One background rule, one type family, one emphasis device across the set.
+- [ ] One campaign system across the set (ground family, type family, emphasis device, motif) - and no two
+      neighbours with the same composition.
+- [ ] Every decorative layer has a motive from the app's DNA or the concept.
 - [ ] No tilted floating phones, 3D props, glow, sparkles, emoji stickers or stock smiles.
 - [ ] Every screen is real UI from the app (cropped/zoomed is fine), with realistic data in the right language.
 - [ ] Captions and UI are in the same language as the store listing.

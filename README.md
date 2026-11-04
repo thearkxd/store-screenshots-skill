@@ -1,9 +1,9 @@
 # Store Screenshots Skill for Claude, ChatGPT & AI agents
 
 A skill that turns Claude, ChatGPT or any agent that supports **Agent Skills** (`SKILL.md`) into an app-marketing
-designer for **App Store and Google Play screenshots**: from the app's promise to headline copy, layout and
-pixel-exact PNGs - built from the app's real screens, with copy that passes the "swap test" and doesn't read
-as AI-generated.
+designer for **App Store and Google Play screenshots**: from the app's promise to headline copy, an
+app-specific design and pixel-exact PNGs (plus editable SVGs). Everything is built from the app's real screens
+and its own visual DNA, with copy that passes the "swap test" and doesn't read as AI-generated.
 
 ![Seenfy App Store screenshots made with this skill, Turkish](docs/images/seenfy-tr.jpg)
 
@@ -14,12 +14,22 @@ as AI-generated.
   (Turkish and US stores) plus 2 well-rated small/mid-size "challengers" per category. Every app is labelled
   (layout, techniques, first-shot type, quality, AI smell, why); every screenshot has headline text (355
   human-verified), position, language and colour data. Searchable from the command line; refreshed monthly.
+- **Design-driven, not template-driven** - the skill measures the app's **visual DNA** from its real screens
+  (and website): palette with roles, fonts, shape language, the signature elements only this app has. From
+  that it writes **three app-specific concepts**, and composes every screenshot freely as a **scene** of
+  layers - the real screens and crops of them, lifted elements, type, shapes, SVG, hand marks - instead of
+  filling one layout. A campaign system (one ground family, one type pairing, one emphasis device, one motif)
+  holds the set together while each composition changes. Output: PNGs at every store size plus **editable
+  SVGs** (Figma, Illustrator).
+- **Truth built into the renderer** - screens come only from an evidence manifest (SHA-256 checked), can't be
+  stretched, recoloured, filtered or painted over. Every number on the canvas is checked against the text read
+  from the screens the shot shows, and a UI look-alike that isn't cropped from the app gets flagged. Further
+  checks: decoration without a motive, colours and fonts outside the campaign, contrast measured on the
+  rendered pixels, three shots with the same composition, and Google Play's 20 % text rule.
 - **Niche, not generic** - a step that finds the app's *angle* (the exact person, the enemy, the ritual,
   the insider word, the proof only it has), a playbook per category (what the chart does, what the best
-  sets do differently, the clichés to avoid, where the room is), and **seven design directions** -
-  editorial, poster, playful, cinematic, crafted, native, utility - each a full visual system driven by the
-  app's brand colours. A concept sheet shows the first three shots in three directions before anything is
-  rendered, so the look is a choice, not a template.
+  sets do differently, the clichés to avoid, where the room is), and - as a fast path and fallback - **seven
+  preset design directions** (editorial, poster, playful, cinematic, crafted, native, utility).
 - **Checks that catch a set that looks fine but doesn't sell** - none of the first three headlines saying
   what the app does (`"promise_words"`), the same screen used as proof twice, and thin demo data (the same
   figure repeated on a screen, read with tesseract).
@@ -34,7 +44,60 @@ as AI-generated.
   callouts, posters, Turkish-safe capitals), check it against store and copy rules with a search-result
   preview, and peer-test it next to exemplary sets.
 
-## Real example: Seenfy
+## Design-driven pipeline (v2): the Seenfy pilot
+
+```
+evidence.py (raw screens, regions, OCR) → dna.py (measure · fonts · board) → three concepts as set files
+→ compose.py concepts (checkpoint) → composition brief per shot → compose.py render → xray · check_set · look → fix
+```
+
+The pilot was built from Seenfy's raw screens ([`examples/seenfy-v2/`](examples/seenfy-v2/)).
+
+The DNA board shows what was measured and completed:
+- dark UI #121212, indigo accent #5460F0;
+- Poppins as the closest open match to the app's font;
+- flat cards with a large radius;
+- the signature elements, cropped from the real screens.
+
+Under it are the three concepts. They differ in their idea, not their colours:
+- **A "Sana Uygun"** - the app's indigo pill sets every emphasis word, and the proving element lifts out of the
+  screen.
+- **B "Ekrandaki Sayı"** - one real datum from the screen, poster-size, opens each shot.
+- **C "Açık Sayfa"** - the dark app on its own ink colour, with a progress line that advances through the set.
+
+![Seenfy DNA board and three concepts, shots 1-3 each](docs/images/design-concepts.jpg)
+
+**Concept B was chosen**: %88, Plot twist, S2E5 and 8.5 are all on the app's screens, and nobody in the category
+leads with its own numbers.
+
+Every shot keeps the system: ground #121212, Poppins, indigo for data and emphasis. Every shot changes its
+composition: where the datum sits, what's biggest, the crop, what lifts out.
+
+![Seenfy concept B, App Store set](docs/images/design-set.jpg)
+
+The Google Play variant comes from the same file:
+- no device frame;
+- big type scaled down, so every word stays within 20 % of the height;
+- the feature graphic.
+
+![Seenfy concept B, Google Play set and feature graphic](docs/images/design-android.jpg)
+
+```bash
+S=skills/store-screenshots/scripts
+python3 $S/compose.py concepts examples/seenfy-v2/concepts/*.json --board dna-board.jpg -o concepts.jpg
+python3 $S/compose.py render examples/seenfy-v2/set.json --out out/       # ios, ios-large, android + feature graphic
+```
+
+> The Seenfy example screens are 738 px wide, so the renderer warns where a crop is enlarged past 1.8× - real
+> captures (1206+ px) don't have that problem.
+
+<details><summary>The bundled scene example (fictional app, <code>templates/scene.example.json</code>, concept "Tek Turuncu")</summary>
+
+![Scene example rendered by compose.py from the demo screens of a fictional app](docs/images/scene-example.jpg)
+
+</details>
+
+## Real example: Seenfy (preset route, v1)
 
 [Seenfy](https://apps.apple.com/tr/app/id6764370964) is a Turkish film & TV discovery and tracking app. The set
 above was made end to end with the skill:
@@ -178,7 +241,10 @@ python3 $S/prepare_screens.py examples/seenfy/screens --out prepared --status-ba
 python3 $S/crop_helper.py check examples/seenfy/set.json -o crops.jpg
 python3 $S/concepts.py examples/seenfy/set.json -o concepts.jpg        # 3 directions for the category
 python3 $S/concepts.py --list                                          # all seven directions
-python3 $S/render_set.py examples/seenfy/set.json --out out/
+python3 $S/render_set.py examples/seenfy/set.json --out out/            # preset route
+python3 $S/evidence.py build examples/seenfy/screens -o evidence.json     # design route: evidence → DNA → scenes
+python3 $S/dna.py measure evidence.json --app Seenfy -o dna.json
+python3 $S/compose.py render examples/seenfy-v2/set.json --out out-v2/
 python3 $S/check_set.py out/tr/ios --store ios --lang tr
 python3 $S/check_set.py out/tr/android --store android --lang tr
 python3 $S/peer_test.py out/tr/ios --category entertainment -o peer.jpg
@@ -189,17 +255,21 @@ python3 $S/peer_test.py out/tr/ios --category entertainment -o peer.jpg
 ```
 skills/store-screenshots/
   SKILL.md                    workflow, non-negotiables, red flags, tool map
-  references/                 intake · angle · categories · directions · copy-rules · storytelling · layouts ·
-                              anti-ai · localization · store-specs · critique · library-guide
-  scripts/                    fetch_listing · prepare_screens · crop_helper · search_library · concepts ·
+  references/                 intake · angle · design-process · scene-format · categories · directions ·
+                              copy-rules · storytelling · layouts · anti-ai · localization · store-specs ·
+                              critique · library-guide
+  scripts/                    evidence · dna · compose · scene · validate (design route) ·
+                              fetch_listing · prepare_screens · crop_helper · search_library · concepts ·
                               render_set · design · check_set · peer_test · make_sheet · collect_examples ·
                               find_challengers · build_catalog
-  templates/                  set.example.json + demo screens of a fictional app
+  templates/                  scene.example.json + scene-evidence.json (design route), set.example.json
+                              (preset route), demo screens of a fictional app
   assets/directions/          the seven design directions (JSON presets with brand tokens)
   assets/fonts/               10 OFL families - Inter, Instrument Serif, Fraunces, Anton, Baloo 2, Space Grotesk,
                               Bricolage Grotesque, Caveat, JetBrains Mono, Store Serif (Lora) - subset to Latin + Turkish
   assets/library/             catalog.json · classifications.json · stats.json · img/
 examples/seenfy/              a real set: one multi-locale spec (TR + EN) and the raw screens
+examples/seenfy-v2/           the design-route pilot: evidence, DNA, three concepts, the chosen set, Poppins (OFL)
 evals/evals.json              test prompts with expected behaviour
 docs/testing.md               manual checklist for claude.ai / ChatGPT / Claude Code
 tools/package_skill.py        builds the full and lite zips
@@ -227,8 +297,8 @@ the new apps to classify.
 
 ## Releases (CI/CD)
 
-`.github/workflows/release.yml` runs on every push: it installs Pillow, runs `tools/smoke_test.py` (every script,
-an example render, store and copy checks) and builds both zips with `tools/package_skill.py` - which fails the
+`.github/workflows/release.yml` runs on every push: it installs Pillow, resvg-py and tesseract, runs
+`tools/smoke_test.py` (every script, example renders on both backends, the truth and store checks) and builds both zips with `tools/package_skill.py` - which fails the
 build if the lite package grows past 20 MB. Pushes to `main` then publish a GitHub release with both zips.
 
 - Version: `major.minor` comes from `.claude-plugin/plugin.json`, the patch number is the workflow run
@@ -257,6 +327,14 @@ için 20 MB altındaki **lite** paketi, Claude Code ve diğer ajanlar için **ta
 
 İki görselin tek görsel gibi durduğu "span" çiftleri de var: çift genişlikte tek tuval çizilip ortadan
 bölünür, böylece iki yarı her zaman hizalı olur; sette en fazla bir (8+ görselde iki) kez kullanılır.
+
+**Şablon değil, tasarım:** skill önce uygulamanın gerçek ekranlarından (ve varsa web sitesinden) görsel
+DNA'sını çıkarır: renk rolleri, font, şekil dili, yalnızca bu uygulamada olan imza öğeler. Sonra uygulamaya özel
+üç konsept yazar ve her görseli mesajına göre serbest bir sahne olarak kurar. Sahnede gerçek ekranlar ve kesitleri,
+öne çıkan öğeler, tipografi, şekiller, SVG ve el işaretleri yer alır. Seti kampanya sistemi bir arada tutar:
+tek zemin ailesi, tek font eşleşmesi, tek vurgu, tek motif. Gerçek ekranlar esnetilemez, renklendirilemez, üstü
+boyanamaz; ekranda olmayan bir sayı başlığa yazılırsa uyarı verir. Çıktı: her mağaza ölçüsünde PNG ve Figma'da
+düzenlenebilir SVG. Pilot: `examples/seenfy-v2/`. Yedi hazır yön artık hızlı yol ve yedek.
 
 Gerçek örnek: yukarıdaki Seenfy seti skill ile baştan sona üretildi (mağaza sayfası okundu, eski set 13/20
 aldı, storyboard çıkarıldı, 6 ham ekranla render edildi). Türkçe ve İngilizce spec'ler `examples/seenfy/`

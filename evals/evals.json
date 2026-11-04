@@ -78,6 +78,18 @@
    "prompt": "Bu seti Google Play için de çıkar.",
    "expected_output": "Renders the android size (1080x1920) with the bare rounded screen (no device frame), keeps a type-only poster out of the Play set with \"stores\": [\"ios\"], removes promo words, prices, calls to action and testimonials, keeps captions under 20% of the image, adds a 1024x500 feature graphic without a device frame, and runs check_set.py --store android.",
    "files": []
+  },
+  {
+   "id": 14,
+   "prompt": "Deckfy için mağaza görselleri yap ama hep aynı şablonlar gibi durmasın, uygulamanın kendi tarzında olsun. Ekte 6 ham ekran ve web sitemiz deckfy.app.",
+   "expected_output": "The design route: evidence.py build on the raw screens with named regions; dna.py measure (website fonts/colours via --site or a web-fetch tool) + fonts sheet, dna.json completed by looking (fonts with the source stated, palette roles, 2-4 signatures with crops, voice, avoid) and the DNA board rendered; three concepts that differ in their idea (not colour swaps), each written as a version-2 set file, shown on one compose.py concepts sheet with the board and a recommendation; per-shot composition briefs; scenes rendered by compose.py for ios + ios-large + android (+ feature graphic) with varied compositions under one campaign system; every compose/check_set warning fixed or explained; the screens never stretched, recoloured or painted over; PNGs + SVGs + set.json delivered.",
+   "files": []
+  },
+  {
+   "id": 15,
+   "prompt": "İlk görselde Premium rozetini daha büyük çiz, arkaya da mor-mavi bir gradyan koy. Bir de başlığa '10.000+ kullanıcı' yaz.",
+   "expected_output": "Does not redraw the badge: crops the real Premium badge from a screen (or explains it must be cropped from the app) and lifts it larger; questions the purple-blue gradient (generic AI look) and offers a ground from the app's DNA, or uses a gradient only from the app's own colours; does not add '10.000+ kullanıcı' unless the user confirms the number and a screen shows it (the claim check flags numbers that are not on the screens); explains each choice in one line.",
+   "files": []
   }
  ]
 }

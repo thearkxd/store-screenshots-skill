@@ -131,3 +131,9 @@ exact pixel size and screenshot it with a headless browser (Playwright or Chrome
 ```
 `page.set_viewport_size({"width":1206,"height":2622})` then `page.screenshot(path="01.png")`, then run
 `check_set.py` on the result like any other set. Keep the same system rules as above.
+
+Most of what used to need this route is now a scene (`scene-format.md`): free placement, crops and lifts,
+gradients, any vector shape in an `svg` layer, editable SVG output. Use HTML only for what no layer can do. The
+truth rules (`design-process.md` §1) still apply: screens are `<img>` tags of the evidence files at their own
+aspect ratio - no CSS filters, no stretching, nothing drawn over them. Every number in the copy must be on a
+screen.

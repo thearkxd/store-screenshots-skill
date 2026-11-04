@@ -4,15 +4,15 @@
     "name": "Alpiworks"
   },
   "metadata": {
-    "description": "App Store and Google Play screenshot skill: story, copy, layout, pixel-exact export and a classified reference library.",
-    "version": "1.6.0"
+    "description": "App Store and Google Play screenshot skill: story, copy, design-driven compositions from the app's real screens, pixel-exact export and a classified reference library.",
+    "version": "2.0.0"
   },
   "plugins": [
     {
       "name": "store-screenshots",
       "source": "./",
-      "description": "Plan, write and render App Store / Google Play screenshots that explain the app and don't look AI-made, with a classified library of 1,700+ real screenshots, category playbooks and seven design directions.",
-      "version": "1.6.0",
+      "description": "Plan, write and design App Store / Google Play screenshots that explain the app and don't look AI-made: visual DNA from the real screens, app-specific concepts, free compositions with truth checks, PNG + SVG export, and a classified library of 1,700+ real screenshots.",
+      "version": "2.0.0",
       "category": "design",
       "keywords": [
         "app store",

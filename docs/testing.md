@@ -39,8 +39,16 @@ Tick each expected behaviour. The prompts match `evals/evals.json`.
 
 **D. Render** (attach 4–6 raw screens)
 - [ ] The brief has an `Angle:` line chosen from three candidates; the category playbook is used.
-- [ ] Before the full set, `concepts.py` runs and the reply shows the concept sheet (three directions) and
-      asks which one - unless you said "just deliver".
+- [ ] `evidence.py build` registers the raw screens and `dna.py` measures the DNA. The reply shows the DNA board:
+      palette roles, the fonts and where they came from, 2-4 signature elements cropped from the screens.
+- [ ] Three concepts that differ in their **idea**, not their colours, each with a one-line idea. `compose.py
+      concepts` renders them with the board, and the reply recommends one - unless you said "just deliver".
+- [ ] The set is rendered by `compose.py`. Shots keep one system (ground, fonts, emphasis, motif) and **change
+      their composition**: no two neighbours with the same layout. The screens are never stretched,
+      recoloured or painted over. PNG + SVG are delivered, and any compose/check warnings are fixed or explained.
+- [ ] "Rozeti büyüt, arkaya mor-mavi gradyan koy, '10.000+ kullanıcı' yaz" → the badge is cropped and lifted,
+      never redrawn. The generic gradient is questioned. The number is not written unless you confirm it and
+      a screen shows it.
 - [ ] `prepare_screens.py` runs and its report is summarised (resolution, status bars, thin demo data).
 - [ ] The first three headlines say what the app does (`"promise_words"` set from the brief); an app that
       makes something shows its output big; no screen or element is used as proof twice.
@@ -65,6 +73,7 @@ Ask the assistant to run these in the code tool and paste the output:
 python3 -c "import PIL; print(PIL.__version__)"          # Pillow present?
 python3 <skill-dir>/scripts/search_library.py --list-values | tail -1   # library found, images on disk
 python3 <skill-dir>/scripts/render_set.py --presets      # fonts and presets
+python3 -c "import resvg_py" 2>/dev/null && echo resvg || echo "no resvg (compose.py uses its Pillow backend)"
 which tesseract || echo "no tesseract (only needed for OCR of current headlines)"
 ```
 If Pillow is missing and can't be installed, rendering and checks won't work - the skill should say so and

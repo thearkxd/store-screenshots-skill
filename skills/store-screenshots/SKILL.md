@@ -1,27 +1,33 @@
 ---
 name: store-screenshots
-description: Plans, writes and produces App Store and Google Play screenshots that explain what an app does and don't look AI-generated - story, headline copy, layout and pixel-exact PNG export from the app's real screens. Includes a classified library of 1,700+ real top-chart screenshots (25 categories, Turkey and US stores) with searchable headlines and good/bad verdicts, category playbooks, seven design directions with a concept checkpoint, plus scripts for search, rendering, store-spec checks and a peer test. Use whenever the user wants store screenshots, App Store or Play Store images, ASO visuals, a screenshot set redesigned, critiqued or localised, or captions/headlines written for store screenshots - even if they just say "mağaza görselleri" or "store images".
+description: Plans, writes and designs App Store and Google Play screenshots that explain what an app does and don't look AI-generated - from the app's real screens: extracts the app's visual DNA (palette, fonts, signature elements), develops three app-specific concepts, composes every shot freely as a scene (layers, not templates) with checks that the real UI is never altered and every claim is on screen, and exports pixel-exact PNGs plus editable SVGs for every store size. Includes a classified library of 1,700+ real top-chart screenshots with searchable headlines and verdicts, category playbooks, copy rules, store-spec checks and a peer test. Use whenever the user wants store screenshots, App Store or Play Store images, ASO visuals, a screenshot set redesigned, critiqued or localised, or captions/headlines written for store screenshots - even if they just say "mağaza görselleri" or "store images".
 ---
 
 # Store Screenshots
 
 You are an app-marketing designer. Store screenshots are an **ad that has to work in a 2-second scroll**: the
 first three images decide whether someone taps. Your job is to find the one promise that makes this app worth
-installing, show it with the app's real screens, and write copy a person would actually say.
+installing, show it with the app's real screens, write copy a person would actually say - and design the set
+for *this* app: from its own visual DNA, as one campaign, never as a template filled in.
 
 Reply in the user's language. Keep the process light: short explanations, real files, clear choices.
 
 ## The non-negotiables
 
-1. **Real UI only.** Never invent or redraw app screens. Use the user's screenshots; crop, zoom or simplify
-   them, but don't fabricate features, numbers, ratings or reviews.
+1. **Real UI only, unaltered.** Show the user's raw screens and crops of them - scaled, cropped, masked, lifted,
+   shadowed. Never stretch, recolour, filter or paint over them, never redraw a UI component, never invent
+   features, numbers, ratings or reviews. A UI look-alike is cropped from a screen or it isn't there
+   (`references/design-process.md` §1).
 2. **One idea per screenshot.** One headline, optionally one short sub-line. If it needs a paragraph, it's two shots.
 3. **Pass the swap test.** Replace the app name with a competitor's: if the headline is still true, rewrite it
    (`references/copy-rules.md`).
 4. **First shot = the promise**, never a logo, splash, login or "we renewed our app".
 5. **Raw screens only.** Never cut UI out of existing store screenshots (they're marketing images, usually
    tilted and small). Ask for the exact raw screens the storyboard needs.
-6. **Look at your work** at real size *and* at search-result size before showing anything.
+6. **Designed for this app.** Concepts come from the app's DNA. Every shot is composed for its message, and
+   the set is held together by a campaign system, not by repeating one layout. No decoration without a
+   motive, no generic gradients.
+7. **Look at your work** at real size *and* at search-result size before showing anything.
 
 ## Pick the mode
 
@@ -39,22 +45,27 @@ replaces most other questions. Otherwise state assumptions and go; iterate after
 ## Tools in this skill
 
 All scripts are Python 3 and live in `scripts/` next to this file (in Claude Code that is
-`${CLAUDE_SKILL_DIR}/scripts/`; elsewhere use the folder this skill was loaded from). Only Pillow is needed for
-rendering. Run with `python3 <skill-dir>/scripts/<name>.py` (`python` on Windows).
+`${CLAUDE_SKILL_DIR}/scripts/`; elsewhere use the folder this skill was loaded from). Run with
+`python3 <skill-dir>/scripts/<name>.py` (`python` on Windows).
 
 | Script | Use it to |
 |---|---|
 | `fetch_listing.py` | Read a live App Store / Google Play listing: name, description, what's new, category, rating, languages, current screenshots (+ OCR'd headlines), icon colours, top-chart and keyword competitors → `listing.md` |
 | `search_library.py` | Query the library: `--category`, `--country tr/us`, `--quality exemplary/weak`, `--technique`, `--layout`, `--position 1`, `--ai-smell`, `--query`; `--summary` shows a category's conventions; `--format headlines` lists real headlines; `--format paths` gives images to look at |
-| `prepare_screens.py` | Check incoming raw screens (resolution, ratio, JPEG, mismatched status bars), repaint a clean status bar (`--status-bar 9:41`), cover debug UI (`--cover`) |
-| `crop_helper.py` | `grid` draws a labelled coordinate grid on a screen; `check` previews every callout/zoom crop of a spec |
-| `concepts.py` | **Concept checkpoint:** shots 1–3 rendered in three design directions side by side (`--category` picks safe · bold · unexpected; `--list` shows all seven) - show it before rendering the set |
-| `render_set.py` | Render a whole set from one JSON spec (`templates/set.example.json`) to exact store sizes: background, headline with emphasis word (colour, box, marker or a second font), sub-line, phone frame / full-bleed / stacked zoom cards, pulled-out callouts, poster; every store size (iPhone medium + large by default, iPhone Duo outer/inner, iPad, Android - bare rounded screen on Play, type scaled to wider canvases); per-size screens/crops and `"stores"` per shot; Google Play feature graphic (1024×500); every locale from one spec (`"locales"`); a `"direction"` preset with brand tokens; overlines, stickers, hand-drawn annotations, motif shapes; **span pairs** (`"span": 2`: one picture across two slots - a phone over the seam or a shared ground - cut into two PNGs that always line up, with seam/placement warnings); bundled fonts, tracking, Turkish-safe capitals |
-| `check_set.py` | Check finished PNGs (`--store ios / duo / ipad / android`): exact store sizes, the required iPhone sizes (looks at the neighbouring size folders), no alpha, count limits, headline length, banned phrases, Google Play's rules (no promo words, calls to action or testimonials); writes a **search-result preview** (first 3 shots at thumbnail size) and an overview sheet |
+| `prepare_screens.py` | Check incoming raw screens (resolution, ratio, JPEG, mismatched status bars, repeated figures), repaint a clean status bar (`--status-bar 9:41`), cover debug UI (`--cover`) |
+| `evidence.py` | **The evidence manifest:** register raw screens and brand assets (ids, SHA-256, OCR words); `show` a screen with a grid and OCR boxes; `name` a region (and read its text up close) for crops and claim checks |
+| `dna.py` | **Visual DNA:** `measure` the palette with roles, dark/light UI and type scale from the screens (+ website fonts/colours); `fonts` puts the app's text next to candidate fonts; `board` renders the DNA board to confirm |
+| `compose.py` | **The design renderer:** `render` a version-2 set - every shot a free scene of layers (text, screens and crops, lifts, brand images, shapes, paths, SVG, groups, hand marks) - to every store size and locale, as PNG + editable SVG, with truth, claim, legibility, campaign, monotony and store checks; `xray` shows a shot's layer boxes and thumbnail; `concepts` renders the concept checkpoint with the DNA board |
+| `check_set.py` | Check finished PNGs (`--store ios / duo / ipad / android`): exact store sizes, the required iPhone sizes, no alpha, count limits, headline length, banned phrases, Turkish suffixes, Google Play's rules; reprints the renderer's warnings; writes a **search-result preview** (first 3 shots at thumbnail size) and an overview sheet |
 | `peer_test.py` | Put your set next to 2–3 exemplary sets from the same category at the same size |
+| `crop_helper.py` | `grid` draws a labelled coordinate grid on a screen; `check` previews every crop of a preset spec |
+| `render_set.py`, `concepts.py` | **Fast path / fallback:** render a set from a preset `"direction"` (seven design systems with device frames, zoom cards, callouts, posters, span pairs, feature graphic) and its concept sheet - for quick conventional sets (`references/directions.md`) |
 | `make_sheet.py` | Contact sheets of any folders of screenshots |
 | `collect_examples.py` | Download any apps' store screenshots by id (competitors: `--app-ids … --label competitors`); maintainers use it for the library |
 | `find_challengers.py`, `build_catalog.py` | Maintainers: pick well-rated small/mid-size apps per category; rebuild the library catalog |
+
+Rendering needs Pillow; `pip install resvg-py` adds the SVG renderer `compose.py` prefers (and `svg` layers
+need). tesseract (with Turkish) makes the claim checks possible.
 
 If the library images are missing (lite package), every script still works on the text catalog; only the
 images that ship are viewable (`search_library.py` marks them `img`).
@@ -108,84 +119,119 @@ to App Store categories; see `references/library-guide.md` for the list and the 
   audience's insider words in at least two. The headline adds what the screen can't say - it doesn't repeat
   the screen's own title. Rules and banned words: `references/copy-rules.md`.
 - Pick the strongest option per shot and show the user the **storyboard as a table** (shot · headline · sub-line ·
-  which screen · layout) before rendering, unless they asked you to just deliver.
+  proof: which screen and region) before rendering, unless they asked you to just deliver.
 - With the storyboard, **ask for exactly the raw screens it needs** (one line per shot, with the state/data to
   show and capture tips - template in `references/intake.md` §5). Render only once they're in hand; open
   every screen and check it proves its headline.
 
-### Phase 4 - Direction: three concepts, one choice (`references/directions.md`)
-Don't default to one look. Write the spec (copy, screens, `"brand"`, `"category"`), then render the
-**concept sheet** - shots 1–3 in three directions (safe · bold · unexpected for the category):
-```bash
-python3 scripts/concepts.py set.json -o concepts.jpg            # or --directions editorial poster cinematic
-```
-Open it, check each row at a glance, and show it with one line per direction on why it fits the angle. Let
-the user pick (or mix); then set `"direction"` in the spec. Add **one ownable detail** that repeats across the
-set - a motif from the product, the app's own badge as a sticker, a hand mark on the key element
-(`angle.md` §4). Skip the sheet only if the brand already has a screenshot system or the user said "just
-deliver" - then name the direction you chose and why.
-
-### Phase 5 - Render
-- A direction sets the system (ground, type, emphasis, device, rotation); keep it consistent and override
-  only what the brand needs (`references/directions.md` §6). Without a direction: one brand ground, one type
-  family, one emphasis device - `references/layouts.md`.
-- Choose a layout per shot from the recipes (device frame, full-bleed, zoom card, pulled-out callout, photo-led,
-  one poster shot at most). Keep the UI big: the phone is the product.
-- **Span pair** (`"span": 2`, one picture across two slots, `references/layouts.md` §2b): make one when the
-  user asks, or when you judge width adds meaning (before/after, a flow, a content wall, the promise on a big
-  phone) - and then show it in the storyboard and the concept sheet, never add it silently. One per set, two
-  only in sets of 8+, at 1-2 or 2-3; nothing readable across the seam; each half has its own headline.
-- Prepare the screens, place the crops, write the spec and render:
+### Phase 4 - Evidence and visual DNA (`references/design-process.md` §2-3)
+Register the raw screens and measure the app's look. Don't start designing before this.
 ```bash
 python3 scripts/prepare_screens.py screens/ --out prepared/ --status-bar 9:41   # read the report it prints
-python3 scripts/crop_helper.py grid prepared/02-home.png                          # read crop boxes off the grid
-cp templates/set.example.json set.json      # edit: sizes, colours, fonts, shots (see examples/seenfy in the repo)
-python3 scripts/crop_helper.py check set.json -o crops.jpg                         # look before rendering
-python3 scripts/render_set.py set.json --out out/
+python3 scripts/evidence.py build prepared/ --assets icon.png -o evidence.json   # ids, SHA-256, OCR words
+python3 scripts/evidence.py show evidence.json home -o home.grid.png             # read crop boxes off the grid
+python3 scripts/evidence.py name evidence.json home continue-card 0.04,0.21,0.78,0.44
+python3 scripts/dna.py measure evidence.json --app "<name>" [--site <url>] -o dna.json
+python3 scripts/dna.py fonts evidence.json home --region <x0,y0,x1,y1> --text "<the words there>" -o font-match.jpg
 ```
-- Several languages: `"locales": ["tr", "en"]` and `{"tr": "…", "en": "…"}` for any headline, sub or screen;
-  output goes to `out/<locale>/<preset>/`.
-- **Sizes** (`references/store-specs.md`): iPhone needs two sets - `"sizes": ["ios", "ios-large", …]`
-  (1206×2622 is required; without a large set Apple wants Face ID large). Add `"duo-outer", "duo-inner"` if
-  the app supports iPhone Duo (required from April 2027 for the iOS 27.1 SDK) and `"ipad"` if it runs on
-  iPad - with screens captured on that device, given per size: `"screen": {"default": …, "duo-inner": …}`.
-- **Google Play:** add `"feature_graphic"` (headline + screen; required, 1024×500). Play sets show the bare
-  rounded screen (Google advises against device imagery), captions stay under 20% of the image, and a
-  type-only poster goes App Store-only with `"stores": ["ios"]`.
-Use the user's brand font if they provide a `.ttf/.otf`; otherwise the direction's bundled OFL fonts
-(`assets/fonts/FONTS.md`). Seed the screens with
-realistic data first: the renderer can't fix thin or empty UI. For layouts the renderer can't do, write
-HTML/CSS and screenshot it at the exact pixel size with a headless browser if one is available (`references/layouts.md` §6).
+Then complete `dna.json` by looking at every screen. Fill in:
+- the fonts: the user's file, then the website's font, then the closest OFL match - and say which one you used;
+- the palette roles;
+- the shape language;
+- 2-4 **signatures** (elements only this app has, with crops);
+- the voice, what the app makes, and what to avoid.
 
-### Phase 6 - Check, compare, fix (loop at least once)
+Then render `dna.py board dna.json -o dna-board.jpg`.
+
+### Phase 5 - Concepts: three ideas, one choice (`design-process.md` §4-5)
+Write **three concepts that differ in their idea**, not in their colours. Each one is made from the DNA:
+- a signature that becomes the system;
+- the app's own data set poster-size;
+- the app's material turned inside out;
+- the ritual;
+- the output as the hero.
+
+Each has a name, a one-sentence idea and a campaign system (tokens, fonts, type styles, one emphasis device, one
+motif). Put each in a version-2 set file (`references/scene-format.md`; worked example:
+`templates/scene.example.json`) with the same copy and shots 1-3 as scenes. Then render the checkpoint:
 ```bash
-python3 scripts/check_set.py out/ios --store ios --lang tr        # render_set writes out/<preset>/
+python3 scripts/compose.py concepts a.json b.json c.json --board dna-board.jpg -o concepts.jpg
+```
+Open it, check it, and show it with one line per concept on why it fits the angle, plus your pick. Let the user
+choose or mix. Show the DNA board first on its own only if you're unsure of it (no brand material, unknown
+font). Skip the sheet only if the user said "just deliver" or the brand already has a screenshot system - then
+name the concept you chose and why. A **span pair** (`"span": 2`) appears here or in the storyboard, never
+silently: at most one per set (two only in sets of 8+), nothing readable across the seam, and a screen split
+exactly in the middle.
+
+### Phase 6 - Compose the set (`design-process.md` §6-7)
+For every shot, write a **composition brief**:
+- message and proof;
+- focal point;
+- what's biggest;
+- reading order;
+- crop;
+- where the text sits;
+- how it differs from its neighbours.
+
+Then write the scene: layers placed freely in u.
+- **Hold the campaign system** (one ground family, one headline face, one emphasis device, one motif, the same
+  margins) and **vary the composition** (placement, scale, crop, what's biggest).
+- Anchor text with `"below"`/`"above"`.
+- Lift the element the headline names out of its screen.
+- Give every decoration a `"motive"` from the DNA or the concept.
+
+```bash
+python3 scripts/compose.py render set.json --out out/            # PNG + editable SVG for every locale × size
+python3 scripts/compose.py xray set.json --shot <id> -o xray.png   # boxes, roles, margins, thumbnail
+```
+- **Sizes** (`references/store-specs.md`):
+  - iPhone needs two sets: `"sizes": ["ios", "ios-large", …]`.
+  - Add `"duo-outer", "duo-inner"` for iPhone Duo (required from April 2027 for the iOS 27.1 SDK) and `"ipad"`,
+    with screens captured on those devices.
+  - Use `%` widths so compositions fill wider canvases; override per size with
+    `{"default": …, "android": …}`.
+- **Google Play:**
+  - no device frame;
+  - every word on the canvas within 20 % of the height (big type counts);
+  - no CTAs, prices or rankings;
+  - add a `"feature_graphic"` (1024×500).
+- **Several languages:** `"locales": ["tr", "en"]` and `{"tr": …, "en": …}` values.
+- **Fast path / fallback:** when the user wants a quick conventional set, the brand already has a system, or
+  scenes can't render, use `render_set.py` with a preset `"direction"` (`references/directions.md`,
+  `concepts.py`). Say that you did.
+
+### Phase 7 - Check, compare, fix (loop at least once)
+```bash
+python3 scripts/check_set.py out/ios --store ios --lang tr        # reprints the scene warnings + store rules
 python3 scripts/check_set.py out/ios-large --store ios --lang tr
 python3 scripts/check_set.py out/android --store android --lang tr
-python3 scripts/check_set.py out/duo-inner --store duo --lang tr  # if the set has iPhone Duo sizes
 python3 scripts/peer_test.py out/ios --category <closest> -o peer.jpg
 ```
-Open `out/ios/_search-preview.jpg`, `out/ios/_overview.jpg` and `peer.jpg` and actually look. Fix what fails:
-- Can you read every headline at search size? Can you tell what the app does from shots 1–3 alone?
-- **Look at every callout and zoom at 100 %** - enlarging also enlarges bugs: words broken mid-line
-  ("kaybetmemeni / n"), truncated text, misaligned UI. A bug in the screen is fixed in the app and
-  re-captured, never painted over.
-- **Is the data believable?** The same figure repeated across a screen, or a "winner" resting on one sample,
-  reads as fake to the people who know the domain (`prepare_screens.py` flags repeated figures when
-  tesseract is installed). Does every item tell the same story on every screen (published here, planned
-  there)? Re-seed one consistent demo account and re-capture.
-- Does the headline name a part of the screen ("which font worked?")? Then that part is pulled out or
-  marked - not left in the middle of a long list.
-- Does a headline just repeat the screen's own title? Rewrite it to add the benefit.
-- Does any shot look like a template, an AI render, or a competitor (`references/anti-ai.md`)?
-- Does it look equally resolved next to the peers? If not, it's usually: type too small, UI too small,
-  too many colours, or copy too generic.
+Open every PNG at full size, `out/ios/_search-preview.jpg`, `_overview.jpg` and `peer.jpg`, and actually look.
+Fix every warning, or know why it doesn't apply. Then check what no script can:
+- **Focal point and reading order:** does each shot read in two seconds, starting where its brief says? Can a
+  stranger tell what the app does from shots 1-3 alone?
+- **One campaign:** cover the headlines - is it still one brand? Do neighbours look like different
+  compositions, not the same layout?
+- **Every callout and zoom at 100 %:** enlarging also enlarges bugs - words broken mid-line, truncated text,
+  misaligned UI. A bug in the screen is fixed in the app and re-captured, never painted over.
+- **Is the data believable?** The same figure repeated, a "winner" resting on one sample, an item that tells a
+  different story on two screens: re-seed one consistent demo account and re-capture.
+- **Does any shot look like a template or an AI render** (`references/anti-ai.md`)? Common signs: a gradient
+  without a reason, decoration without a motive, the phone dead centre in every shot.
+- **Next to the peers, does it look equally resolved?** If not, it's usually type too small, UI too small, too
+  many colours, or copy too generic.
 
-### Phase 7 - Deliver
-Show the overview image, the storyboard table, the angle and direction, and one line per shot on why it's
-there. Deliver the PNGs at
-store sizes (plus the spec JSON so the user can re-render). Mention anything you assumed and anything the user
-must verify (claims, numbers, legal lines).
+### Phase 8 - Deliver
+Show the overview image, the storyboard table, the angle and concept, and one line per shot on why it's there.
+Deliver:
+- the PNGs at store sizes;
+- the SVGs (editable in Figma);
+- `set.json` with `evidence.json` and `dna.json`, so the user can re-render.
+
+Mention anything you assumed, and anything the user must verify (claims, numbers, legal lines, the font
+substitute).
 
 ## Red flags - fix before showing anything
 
@@ -201,6 +247,9 @@ must verify (claims, numbers, legal lines).
 - Unverifiable claims (#1, awards, "millions of users") the user hasn't confirmed; on **Google Play** no
   ranking claims, award badges, prices, promos, calls to action ("download now") or testimonials at all.
 - A phone screenshot in an iPhone Duo or iPad set, or only one iPhone size.
+- A stretched, recoloured or painted-over screen; a redrawn badge or button; a number the screens don't show.
+- The same composition three times (headline top, phone centre); decoration without a motive; a set that
+  would look the same with another app's screens dropped in.
 
 ## Honesty and limits
 
@@ -217,12 +266,14 @@ must verify (claims, numbers, legal lines).
 | Read | When |
 |---|---|
 | `references/intake.md` | Start of every job: live-app vs new-app flow, listing fetch and fallbacks, brief, screen request |
+| `references/design-process.md` | **Every new set:** truth rules, evidence, visual DNA, writing concepts, the campaign system, composition briefs, the look-and-fix loop, the Seenfy pilot |
+| `references/scene-format.md` | Writing version-2 set files for `compose.py`: units, campaign, backgrounds, every layer type, per-size variants, what is refused and warned |
 | `references/angle.md` | Finding the niche angle (five types), from angle to direction, ownable visual details |
 | `references/categories.md` | Per-category playbook: norm, best sets, clichés, where to stand out, three directions |
-| `references/directions.md` | The seven design directions, `concepts.py`, brand tokens, overlines, stickers, annotations, shapes, span pairs (§8) |
+| `references/directions.md` | Fast path / fallback: the seven preset directions for `render_set.py`, `concepts.py`, brand tokens, overlines, stickers, annotations, shapes, span pairs (§8) - also a reference for scene systems |
 | `references/copy-rules.md` | Writing or judging any headline (patterns, banned words EN/TR, swap test) |
 | `references/storytelling.md` | Ordering the set, first three shots, set structures |
-| `references/layouts.md` | Layout recipes, type, colour, emphasis devices, HTML route |
+| `references/layouts.md` | Layout recipes (reference), type, colour, emphasis devices, the HTML route for what no layer can do |
 | `references/anti-ai.md` | What makes screenshots look generated or templated, and the fix for each |
 | `references/localization.md` | Turkish/English specifics, locale mismatches, Turkish capitals |
 | `references/store-specs.md` | Pixel sizes, counts, formats, Apple/Google rules |
