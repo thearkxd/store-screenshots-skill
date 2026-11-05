@@ -869,7 +869,34 @@ def quality_tests(tmp):
     assert "demo data looks thin" not in out, out  # real, varied data stays quiet
 
 
+def frontmatter_test():
+    """SKILL.md's frontmatter must parse as strict YAML: agents are lenient, but installers (npx skills, the
+    claude.ai upload) skip a skill whose description holds an unquoted ": " or " #"."""
+    text = open(os.path.join(SKILL, "SKILL.md"), encoding="utf-8").read()
+    assert text.startswith("---\n"), "SKILL.md must open with frontmatter"
+    fm = text.split("---\n", 2)[1]
+    keys = {}
+    for line in fm.splitlines():
+        if not line.strip():
+            continue
+        k, sep, v = line.partition(": ")
+        assert sep and k.strip() in ("name", "description", "license", "metadata", "compatibility", "allowed-tools"), f"frontmatter line: {line[:80]}"
+        v = v.strip()
+        if not (v[:1] in "\"'" and v[-1:] == v[:1]):  # a plain scalar: no ": ", no " #", no leading indicator
+            assert ": " not in v and " #" not in v and not v.endswith(":") and v[:1] not in "&*!|>%@`{[", f"{k}: needs quoting ({v[:60]}…)"
+        keys[k.strip()] = v
+    assert keys.get("name") == "store-screenshots", keys
+    assert 0 < len(keys.get("description", "")) <= 1024, len(keys.get("description", ""))
+    try:
+        import yaml
+    except ImportError:
+        return
+    data = yaml.safe_load(fm)
+    assert data["name"] == "store-screenshots" and len(data["description"]) <= 1024
+
+
 def main():
+    frontmatter_test()
     for name in sorted(os.listdir(SCRIPTS)):
         if name.endswith(".py"):
             run(s(name), "--help")
