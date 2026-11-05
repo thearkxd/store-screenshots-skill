@@ -195,24 +195,61 @@ Both work the same way; the scripts only offer images that are on disk. Build th
 
 ## Install
 
-**Claude Code - plugin marketplace**
+The skill is the folder `skills/store-screenshots` - the one with `SKILL.md` in it. Wherever it goes, that
+folder must end up as `<skills folder>/store-screenshots/SKILL.md`: not one level deeper, and not under
+another name.
+
+**Claude Code - plugin marketplace** (also works while the repository is private)
 ```
 /plugin marketplace add thearkxd/store-screenshots-skill
 /plugin install store-screenshots@store-screenshots-skill
 ```
-**Claude Code - manual**
+- **Private repository:** Claude Code clones with the git credentials already on your machine. Run
+  `gh auth login` and then `gh auth setup-git` once.
+- **A branch:** add `#<branch>`, for example `thearkxd/store-screenshots-skill#v2-design-driven`.
+- **Updates:** run `/plugin marketplace update store-screenshots-skill`, or turn on auto-update under `/plugin` →
+  Marketplaces. A new copy arrives when the version in `.claude-plugin/plugin.json` changes.
+
+**Claude Code - clone once, update with `git pull`** (the easiest way to follow a branch)
+
+macOS / Linux:
 ```bash
-git clone https://github.com/thearkxd/store-screenshots-skill.git
-cp -r store-screenshots-skill/skills/store-screenshots ~/.claude/skills/store-screenshots
+git clone https://github.com/thearkxd/store-screenshots-skill.git ~/code/store-screenshots-skill
+mkdir -p ~/.claude/skills
+ln -s ~/code/store-screenshots-skill/skills/store-screenshots ~/.claude/skills/store-screenshots
 ```
-**claude.ai / Claude desktop** - download `store-screenshots-lite.zip` from Releases and upload it in the Skills
-section of your settings (custom skills need code execution enabled).
+Windows (PowerShell). Write `$HOME`, not `~`: Windows PowerShell passes `~` to `git` unexpanded, and git then creates a
+folder literally named `~`.
+```powershell
+git clone https://github.com/thearkxd/store-screenshots-skill.git "$HOME\code\store-screenshots-skill"
+New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
+New-Item -ItemType Junction -Path "$HOME\.claude\skills\store-screenshots" -Target "$HOME\code\store-screenshots-skill\skills\store-screenshots"
+```
+- A junction needs no admin rights. `ln` doesn't exist in PowerShell.
+- If you use another config folder (`CLAUDE_CONFIG_DIR`, for example `.claude-second`), put that name in place
+  of `.claude`.
+- If a copied `store-screenshots` folder is already in `skills`, delete it first.
+- To update, run `git pull` in the clone. To switch branches, run `git checkout <branch>`. The next session
+  loads the new files.
+
+**Claude Code - from the release zip:** `store-screenshots.zip` holds one folder, `store-screenshots/`. Extract
+it straight into your skills folder (`~/.claude/skills/`). Windows' "Extract All" adds a folder named after the
+zip (`store-screenshots\store-screenshots\SKILL.md`), which is one level too deep. Pick the skills folder
+itself as the target, or move the inner folder up.
+
+**claude.ai / Claude desktop** - download `store-screenshots-lite.zip` from Releases and upload the zip as it
+is, without extracting it, in the Skills section of your settings (custom skills need code execution enabled).
 
 **ChatGPT** - Skills → Create → Upload from your computer, and pick `store-screenshots-lite.zip`. (Skills
 availability depends on your ChatGPT plan and workspace settings.)
 
-**Codex CLI, Gemini CLI, Cursor and others** - copy `skills/store-screenshots` into your agent's skills folder
-(for example `~/.codex/skills/`, `~/.gemini/skills/` or `~/.agents/skills/`).
+**Codex CLI, Gemini CLI, Cursor and others** - copy or link `skills/store-screenshots` into your agent's skills
+folder (for example `~/.codex/skills/`, `~/.gemini/skills/` or `~/.agents/skills/`), the same way as above.
+
+**A branch that isn't released yet:** branches don't publish releases. Open the branch's run under Actions →
+"Build & release" and download the artifact `store-screenshots-<commit>`. That zip holds both packages,
+`store-screenshots-lite.zip` and `store-screenshots.zip`: extract it once and use the inner zip as above.
+Artifacts are kept for 14 days.
 
 Skills don't sync between products - install in each one you use. After installing, run the checklist in
 [`docs/testing.md`](docs/testing.md) once to make sure the skill triggers and the scripts run there.
