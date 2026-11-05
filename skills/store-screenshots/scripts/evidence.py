@@ -28,6 +28,26 @@ EXT = re.compile(r"\.(png|jpe?g|webp)$", re.I)
 FONT = os.path.normpath(os.path.join(HERE, "..", "assets", "fonts", "InterDisplay-SemiBold.otf"))
 
 
+def find_tesseract():
+    """tesseract on PATH, or where the Windows installer puts it (then PATH is extended for this process)."""
+    import shutil
+    exe = shutil.which("tesseract")
+    if exe or os.name != "nt":
+        return exe
+    for base in (os.environ.get("ProgramFiles", r"C:\Program Files"), os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"),
+                 os.path.join(os.environ.get("LOCALAPPDATA", ""), "Programs")):
+        cand = os.path.join(base, "Tesseract-OCR", "tesseract.exe")
+        if os.path.exists(cand):
+            os.environ["PATH"] = os.path.dirname(cand) + os.pathsep + os.environ.get("PATH", "")
+            return cand
+    return None
+
+
+TESSERACT_HINT = ("install tesseract with Turkish: Windows - winget install --id tesseract-ocr.tesseract, then tur.traineddata "
+                  "from github.com/tesseract-ocr/tessdata into C:\\Program Files\\Tesseract-OCR\\tessdata; "
+                  "macOS - brew install tesseract tesseract-lang; Linux - apt install tesseract-ocr tesseract-ocr-tur")
+
+
 def sha256(path):
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -42,11 +62,11 @@ def slug(name):
 
 
 def tesseract():
-    exe = shutil.which("tesseract")
+    exe = find_tesseract()
     if not exe:
         return None, None
     try:
-        langs = subprocess.run([exe, "--list-langs"], capture_output=True, text=True, timeout=20).stdout.split()
+        langs = subprocess.run([exe, "--list-langs"], capture_output=True, encoding="utf-8", errors="replace", timeout=20).stdout.split()
     except (OSError, subprocess.SubprocessError):
         return None, None
     return exe, "+".join(l for l in ("eng", "tur") if l in langs) or None
@@ -61,7 +81,7 @@ def ocr_words(path, exe, langs):
         p = os.path.join(tmp, "s.png")
         im.save(p)
         try:
-            out = subprocess.run([exe, p, "-", "-l", langs, "--psm", "11", "tsv"], capture_output=True, text=True, timeout=180).stdout
+            out = subprocess.run([exe, p, "-", "-l", langs, "--psm", "11", "tsv"], capture_output=True, encoding="utf-8", errors="replace", timeout=180).stdout
         except (OSError, subprocess.SubprocessError):
             return []
     words = []
@@ -94,7 +114,7 @@ def region_ocr(path, box, exe, langs):
         p = os.path.join(tmp, "r.png")
         piece.save(p)
         try:
-            out = subprocess.run([exe, p, "-", "-l", langs, "--psm", "6"], capture_output=True, text=True, timeout=60).stdout
+            out = subprocess.run([exe, p, "-", "-l", langs, "--psm", "6"], capture_output=True, encoding="utf-8", errors="replace", timeout=60).stdout
         except (OSError, subprocess.SubprocessError):
             return ""
     return " ".join(out.split())
@@ -147,7 +167,10 @@ def build(a):
         sid = add(f, "assets")
         print(f"asset  {sid:24} {ev['assets'][sid]['size'][0]}x{ev['assets'][sid]['size'][1]}")
     if not (exe and langs) and not a.no_ocr:
-        print("(no tesseract: words not recorded - headline numbers can't be checked against the screens)")
+        print("(no tesseract: words not recorded - headline numbers, repeated content and sliced words can't be checked "
+              "against the screens; " + TESSERACT_HINT + ")")
+    elif exe and langs and "tur" not in langs.split("+") and not a.no_ocr:
+        print("(tesseract has no Turkish data, so Turkish words are misread - " + TESSERACT_HINT + ")")
     with open(a.output, "w", encoding="utf-8") as f:
         json.dump(ev, f, ensure_ascii=False, indent=1)
     print(f"→ {a.output}")
@@ -286,4 +309,7 @@ def main():
 
 
 if __name__ == "__main__":
+    for _stream in (sys.stdout, sys.stderr):  # Windows consoles and pipes default to a legacy code page
+        if hasattr(_stream, "reconfigure"):
+            _stream.reconfigure(encoding="utf-8", errors="replace")
     main()
