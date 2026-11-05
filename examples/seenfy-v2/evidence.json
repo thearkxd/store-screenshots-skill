@@ -1864,10 +1864,10 @@
    "sha256": "195fa8c0049ff31141a2d3099fb2bd26de5c9be9ddc153c83bb2f933a4f48c9b",
    "regions": {
     "continue-card": [
-     0.04,
-     0.208,
-     0.775,
-     0.435
+     0.0542,
+     0.2094,
+     0.7737,
+     0.4325
     ],
     "episode-badge": [
      0.575,
@@ -2369,7 +2369,10 @@
      "c": 45
     }
    ],
-   "text": "19:22 wl > ae Merhaba, ah alperzkan İzlemeye Devam Et a * House of the Dragon Sıradaki: S2E5 16% Tümünü Gor Begenilenler ? İÇİNDE VAR ~ A Çim KONUS BENİMLE 65 * 71 İçinde Kim Var? Konuş Benimle The Wc Listelerim Tümünü Gör En sevdiklerim İL O Ae"
+   "text": "19:22 wl > ae Merhaba, ah alperzkan İzlemeye Devam Et a * House of the Dragon Sıradaki: S2E5 16% Tümünü Gor Begenilenler ? İÇİNDE VAR ~ A Çim KONUS BENİMLE 65 * 71 İçinde Kim Var? Konuş Benimle The Wc Listelerim Tümünü Gör En sevdiklerim İL O Ae",
+   "region_radius": {
+    "continue-card": 30.7
+   }
   },
   "koleksiyonlar": {
    "path": "../seenfy/screens/06-koleksiyonlar.jpg",
@@ -2380,21 +2383,42 @@
    "sha256": "4666b35c09011c78be44ffafa412820f6bce571e078460e33f0f30901bf08513",
    "regions": {
     "moods": [
-     0.03,
+     0.0407,
      0.236,
-     0.955,
+     0.9593,
      0.886
     ],
     "plot-twist": [
-     0.03,
-     0.403,
-     0.955,
-     0.557
+     0.0407,
+     0.4037,
+     0.9593,
+     0.5544
+    ],
+    "beni-sasirt": [
+     0.0407,
+     0.24,
+     0.9593,
+     0.39
+    ],
+    "beyin-yakan": [
+     0.0407,
+     0.5681,
+     0.9593,
+     0.7188
+    ],
+    "korkunc": [
+     0.0407,
+     0.7325,
+     0.9593,
+     0.8831
     ]
    },
    "region_text": {
-    "moods": "© Beni Şaşırt . Alışkanlıklarının dışına çık. © Plot Twist Garantili. - ih Ters köşe yapacak filmler. a oe ia Beyin Yakan y Zihnini zorlayacak yapımlar. Gerçekten Korkunç . Gerginlik ve korku dolu yapimlar. d",
-    "plot-twist": "© Plot Twist Garantili. — _ N Ters köşe yapacak filmler. . at on"
+    "moods": "© Beni Şaşırt . Alışkanlıklarının dışına çık. © Plot Twist Garantili. - ENİ Ters köşe yapacak filmler. a “> ia Beyin Yakan y Zihnini zorlayacak yapımlar. Gerçekten Korkunç . Gerginlik ve korku dolu yapimlar. >",
+    "plot-twist": "© Plot Twist Garantili. — _ N Ters köşe yapacak filmler. . at tn",
+    "beni-sasirt": "© Beni Şaşırt . Alışkanlıklarının dışına çık.",
+    "beyin-yakan": "ia Beyin Yakan y Zihnini zorlayacak yapımlar.",
+    "korkunc": "Gerçekten Korkunç N Gerginlik ve korku dolu yapımlar."
    },
    "ocr": [
     {
@@ -2968,7 +2992,13 @@
      "c": 72
     }
    ],
-   "text": "Cm 19:23 eal e — f= Q Film, dizi, oyuncu veya kullanıcı... Film & Dizi Kullanıcılar Oyuncular ‘+ Keşfetmeye Değer Koleksiyonlar Beni Şaşırt Alışkanlıklarının dışına çık. Plot Twist Garantili... Ters köşe yapacak filmler. a | i Beyin Yakan Zihnini zorlayacak yapımlar. Gerçekten Korkunç Gerginlik ve korku dolu yapımlar Tümü» © Popüler Diziler e ype w N |"
+   "text": "Cm 19:23 eal e — f= Q Film, dizi, oyuncu veya kullanıcı... Film & Dizi Kullanıcılar Oyuncular ‘+ Keşfetmeye Değer Koleksiyonlar Beni Şaşırt Alışkanlıklarının dışına çık. Plot Twist Garantili... Ters köşe yapacak filmler. a | i Beyin Yakan Zihnini zorlayacak yapımlar. Gerçekten Korkunç Gerginlik ve korku dolu yapımlar Tümü» © Popüler Diziler e ype w N |",
+   "region_radius": {
+    "beni-sasirt": 44.4,
+    "plot-twist": 51.2,
+    "beyin-yakan": 51.2,
+    "korkunc": 44.4
+   }
   }
  },
  "assets": {}

@@ -111,6 +111,35 @@ def scene_warnings(scene, img, ctx):
                 out.append(f"text \"{snip(t['meta'])}\" touches the screen {sop['meta'].get('evidence')!r} - leave "
                            "at least 0.025u (anchor it with \"below\"/\"above\" and a \"gap\")")
                 break
+    # --- crops and lifts that look broken: words sliced by a crop edge, a lifted piece with no visible edge
+    for _, sop in screens:
+        m = sop["meta"]
+        crop = m.get("crop") or [0, 0, 1, 1]
+        item = ctx["evidence"]["screens"].get(m.get("evidence")) or {}
+        if tuple(crop) != (0.0, 0.0, 1.0, 1.0):
+            cut = crop_cuts(item, crop)
+            if cut:
+                out.append(f"the crop of {m.get('evidence')!r} slices through {', '.join(repr(w) for w in cut[:3])} - move its "
+                           "edge to a gap between components, so nothing reads half-cut")
+            elif not m.get("lift"):
+                through = edge_through_content(m.get("file"), crop)
+                if through:
+                    sides = ", ".join(f"{sd} ({sh:.0%} of it is UI)" for sd, sh in through)
+                    out.append(f"the crop of {m.get('evidence')!r} cuts through the UI at its {sides} - move the edge to a gap "
+                               "between components (or to the screen's own edge), so no component reads half-cut")
+        if m.get("lift"):
+            snapped = lift_margin(m.get("file"), crop)
+            if snapped:
+                out.append(f"the lifted piece of {m.get('evidence')!r} includes a margin around the component, so its own edge "
+                           f"shows inside the lifted one (a double edge) - cut it to the component: {snapped} "
+                           "(evidence.py name … --snap also keeps its corner radius)")
+        if m.get("lift") and img is not None:
+            sep = edge_separation(img, sop["box"], sop.get("radius", 0), U)
+            if sep is not None and sep < 12:
+                out.append(f"the lifted piece of {m.get('evidence')!r} has no visible edge (its background runs into what is "
+                           "behind it), so it reads as misaligned UI, not a raised card - lift a whole component cut to its "
+                           "own edges (evidence.py name … --snap keeps its corner radius), give it a keyline (\"frame\": "
+                           "plain), or mark the element instead")
     # --- UI look-alikes: small rounded boxes with text inside
     shapes = [op for op in ops if op["op"] == "rect" and op.get("meta", {}).get("role") != "background" and op["meta"].get("bbox")]
     texts = [op for op in ops if op["op"] == "text"]
@@ -245,6 +274,123 @@ def store_warnings(scene, ctx):
             if share > rs.PLAY_TEXT_SHARE:
                 out.append(f"caption covers {share:.0%} of the height - Google Play recommends taglines take up no more "
                            f"than 20% (shorter headline, no sub-line, or a smaller size in the android variant)")
+    return out
+
+
+def edge_separation(img, box, radius, U=1206):
+    """How visible the edge of a piece is: the colour step between a band just inside its edge and the ground
+    just outside, median over the straight parts of its four sides (a keyline inside the edge counts)."""
+    if img is None:
+        return None
+    px = img.convert("RGB").load()
+    W, H = img.size
+    x0, y0, x1, y1 = box
+    r = max(radius, 6)
+    depth = max(5, int(0.012 * U))  # a card edge or keyline just inside the cut still counts
+    steps = []
+
+    def at(x, y):
+        return px[min(W - 1, max(0, int(x))), min(H - 1, max(0, int(y)))]
+
+    def dist(a, b):
+        return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2) ** 0.5
+    sides = [((x0 + r, y0), (x1 - r, y0), (0, -1)), ((x0 + r, y1), (x1 - r, y1), (0, 1)),
+             ((x0, y0 + r), (x0, y1 - r), (-1, 0)), ((x1, y0 + r), (x1, y1 - r), (1, 0))]
+    for (ax, ay), (bx, by), (nx, ny) in sides:
+        n = max(2, int(max(abs(bx - ax), abs(by - ay)) / 10))
+        for i in range(n):
+            t = (i + 0.5) / n
+            x, y = ax + (bx - ax) * t, ay + (by - ay) * t
+            ox, oy = x + nx * 6, y + ny * 6
+            if not (0 <= ox < W and 0 <= oy < H):
+                continue  # an edge on the canvas border needs no separation
+            outside = at(ox, oy)
+            steps.append(max(dist(at(x - nx * k, y - ny * k), outside) for k in range(1, depth + 1, 2)))
+    if len(steps) < 6:
+        return None
+    steps.sort()
+    return steps[len(steps) // 2]
+
+
+_SNAP = {}
+
+
+def lift_margin(path, crop):
+    """If a lifted crop is a component plus a margin around it, the component's own box (else None)."""
+    if not path or tuple(crop) == (0.0, 0.0, 1.0, 1.0):
+        return None
+    key = (path, tuple(crop))
+    if key not in _SNAP:
+        import evidence
+        m = 0.012  # look a little outside the crop, so a crop cut exactly to its component snaps to itself
+        wide = [max(0.0, crop[0] - m), max(0.0, crop[1] - m), min(1.0, crop[2] + m), min(1.0, crop[3] + m)]
+        try:
+            box, _, kind = evidence.snap(path, wide, full=True)
+        except (OSError, ValueError):
+            box, kind = crop, None
+        loose = kind == "component" and max(box[0] - crop[0], box[1] - crop[1], crop[2] - box[2], crop[3] - box[3]) > 0.006
+        _SNAP[key] = [round(v, 4) for v in box] if loose else None
+    return _SNAP[key]
+
+
+_BG = {}
+
+
+def edge_through_content(path, crop):
+    """Crop edges (inside the screen) that run through UI instead of through a gap: for each such edge, the share
+    of its line that isn't the screen's background colour. -> [(side, share)]"""
+    from PIL import Image as _Image
+    if not path:
+        return []
+    if path not in _BG:
+        im = _Image.open(path).convert("RGB")
+        small = im.resize((max(1, im.width // 4), max(1, im.height // 4)))
+        cols = small.getcolors(small.width * small.height) or []
+        _BG[path] = (im, max(cols)[1] if cols else (0, 0, 0))
+    im, bg = _BG[path]
+    W, H = im.size
+    px = im.load()
+    out = []
+    x0, y0, x1, y1 = crop[0] * W, crop[1] * H, crop[2] * W, crop[3] * H
+    for side, inside, (a, b, fixed, step, horizontal) in (("top", crop[1] > 0.002, (x0, x1, y0, 1, True)),
+                                                          ("bottom", crop[3] < 0.998, (x0, x1, y1, -1, True)),
+                                                          ("left", crop[0] > 0.002, (y0, y1, x0, 1, False)),
+                                                          ("right", crop[2] < 0.998, (y0, y1, x1, -1, False))):
+        if not inside:
+            continue
+        lo, hi = a + (b - a) * 0.04, b - (b - a) * 0.04
+        n = max(8, int((hi - lo) / 3))
+
+        def share(offset):
+            hits = 0
+            for i in range(n):
+                t = lo + (hi - lo) * i / (n - 1)
+                x, y = (t, fixed + offset) if horizontal else (fixed + offset, t)
+                p = px[min(W - 1, max(0, int(x))), min(H - 1, max(0, int(y)))]
+                if max(abs(p[k] - bg[k]) for k in range(3)) > 18:
+                    hits += 1
+            return hits / n
+        # UI on both sides of the edge = a component cut in two; background just outside = cut on its border
+        inside_share, outside_share = share(2 * step), share(-3 * step)
+        if inside_share > 0.35 and outside_share > 0.35:
+            out.append((side, inside_share))
+    return out
+
+
+def crop_cuts(item, crop, min_conf=60):
+    """Words on the screen (OCR) that the crop's edge slices through."""
+    out = []
+    for w in item.get("ocr") or []:
+        t = w.get("t", "")
+        if w.get("c", 0) < min_conf or sum(ch.isalnum() for ch in t) < 2:
+            continue
+        b = w["b"]
+        a = area(b)
+        if a <= 0:
+            continue
+        f = area(inter(b, crop)) / a
+        if 0.12 < f < 0.88:
+            out.append(t)
     return out
 
 

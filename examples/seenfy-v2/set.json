@@ -143,10 +143,10 @@
      "id": "list",
      "evidence": "koleksiyonlar",
      "crop": [
-      0.03,
+      0.0407,
       0.236,
-      0.955,
-      0.557
+      0.9593,
+      0.5585
      ],
      "w": "88%",
      "cx": "50%",
@@ -365,34 +365,20 @@
      "type": "screen",
      "id": "main",
      "evidence": "kesfet",
-     "w": "66%",
+     "crop": [
+      0,
+      0.2,
+      1,
+      0.898
+     ],
+     "w": "92%",
      "cx": "50%",
      "below": {
       "default": "sub",
       "android": "head"
      },
-     "gap": 0.08,
-     "radius": 0.07,
-     "frame": {
-      "default": {
-       "style": "plain",
-       "border": 0.005,
-       "color": "$card",
-       "island": false
-      },
-      "android": null
-     }
-    },
-    {
-     "type": "screen",
-     "evidence": "kesfet",
-     "crop": "mark-row",
-     "lift": {
-      "from": "main",
-      "scale": 1.2
-     },
-     "radius": 0.03,
-     "shadow": "tight"
+     "gap": 0.1,
+     "radius": 0.05
     }
    ]
   }

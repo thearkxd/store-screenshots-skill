@@ -224,6 +224,11 @@ def design_tests(tmp):
     assert json.load(open(ev, encoding="utf-8"))["screens"]["home"]["regions"]["hero"] == [0.04, 0.15, 0.95, 0.57]
     run(s("evidence.py"), "name", ev, "home", "bad", "0.5,0.5,0.4,0.6", expect=1)
     run(s("evidence.py"), "show", ev, "home", "-o", os.path.join(d, "grid.png"))
+    # --snap: a rough box around a card tightens to the card and keeps its corner radius
+    run(s("evidence.py"), "name", ev, "friends", "post", "0.015,0.198,0.985,0.396", "--snap")
+    fe = json.load(open(ev, encoding="utf-8"))["screens"]["friends"]
+    assert all(abs(a - b) < 0.004 for a, b in zip(fe["regions"]["post"], [0.0448, 0.2105, 0.9552, 0.3902])), fe["regions"]["post"]
+    assert fe["region_radius"]["post"] > 20, fe["region_radius"]
     shipped = json.load(open(ev_path, encoding="utf-8"))
     if shutil.which("tesseract"):
         assert "312" in shipped["screens"]["stats"]["region_text"]["total"], shipped["screens"]["stats"]["region_text"]
@@ -342,13 +347,22 @@ def design_tests(tmp):
         shot("lookalike", [head, scr, {"type": "rect", "role": "decor", "motive": "test", "x": 0.1, "y": 0.45, "w": 0.4, "h": 0.08, "radius": 0.04, "fill": "$accent"},
                            {"type": "text", "role": "label", "style": "sub", "text": "Hemen izle", "x": 0.13, "y": 0.465, "w": 0.35, "color": "$ink"}]),
         shot("seam", [dict(head, text="Bir resim iki slot boyunca uzanıyor", w=1.8), dict(scr, cx="42%")], span=2),
+        shot("cut", [head, dict(scr, evidence="calendar", crop=[0, 0.02, 1, 0.66], y=0.5)], proof=[{"evidence": "calendar"}]),
+        shot("margin", [head, dict(scr, evidence="friends", id="f"),
+                        {"type": "screen", "evidence": "friends", "crop": [0.015, 0.198, 0.985, 0.396], "lift": {"from": "f", "scale": 1.1}}],
+             proof=[{"evidence": "friends"}]),
+        shot("noedge", [head, dict(scr, evidence="detail", id="dl"),
+                        {"type": "screen", "evidence": "detail", "crop": [0.03, 0.43, 0.97, 0.48], "lift": {"from": "dl", "scale": 1.12}}],
+             proof=[{"evidence": "detail"}]),
     ]
     p = bad_set("warn", cases, promise_words=["kitap"])
     out = run(s("compose.py"), "render", p, "--out", os.path.join(d, "warn"), both=True)
     for msg in ("covers", "number '999'", 'without a "motive"', "outside the campaign palette: #00FF00", "low contrast",
                 "too small for search results", "doesn't cover its place", "will look soft", "touches the screen",
-                "looks like app UI", "crosses the seam", "off-centre", "names what the app does"):
+                "looks like app UI", "crosses the seam", "off-centre", "names what the app does",
+                "includes a margin around the component", "has no visible edge"):
         assert msg in out, (msg, out)
+    assert "cuts through the UI" in out or "slices through 'Perşembe'" in out, out  # pixels, or the OCR words
     same = [shot(f"m{i}", [head, dict(scr, evidence=ev_id)]) for i, ev_id in enumerate(("stats", "home", "calendar"))]
     out = run(s("compose.py"), "render", bad_set("same", same), "--out", os.path.join(d, "same"), both=True)
     assert "share one composition" in out, out

@@ -682,6 +682,9 @@ class Scene:
             w, h = self.geometry_from_crop(L, piece.width, piece.height)
             x, y = c.place_x(L, w), c.place_y(L, h)
         radius = c.len_x(L.get("radius", 0)) if "radius" in L else 0
+        rr = (item.get("region_radius") or {}).get(L.get("crop")) if isinstance(L.get("crop"), str) else None
+        if "radius" not in L and rr:  # a snapped component keeps its own corner radius, at its new scale
+            radius = rr * w / piece.width
         frame = L.get("frame")
         fr = None
         if frame:
@@ -696,7 +699,7 @@ class Scene:
               "lossless": path.lower().endswith(".png")}
         self.common(L, op, outer)
         op["meta"].update(role=L.get("role", "proof" if kind == "screen" else "brand"), kind=kind,
-                          evidence=eid, sha256=item.get("sha256"), file=path, crop=r)
+                          evidence=eid, sha256=item.get("sha256"), file=path, crop=r, lift=bool(L.get("lift")))
         ops.append(op)
 
     def image(self, L, ops):

@@ -150,7 +150,6 @@
       "from": "list",
       "scale": 1.08
      },
-     "radius": 0.04,
      "shadow": "soft"
     },
     {
@@ -196,7 +195,7 @@
       0,
       0,
       1,
-      0.66
+      0.452
      ],
      "w": 0.88,
      "cx": "50%",
@@ -218,7 +217,6 @@
       "scale": 1.14,
       "dx": 0.035
      },
-     "radius": 0.045,
      "shadow": "soft"
     },
     {
@@ -228,8 +226,9 @@
      "style": "headline",
      "text": "Kaldığın bölüm\n*hep hazır*",
      "x": 0.08,
-     "bottom": 0.36,
-     "w": 0.86
+     "w": 0.86,
+     "below": "home",
+     "gap": 0.2
     },
     {
      "type": "text",

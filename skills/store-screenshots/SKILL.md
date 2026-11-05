@@ -130,7 +130,7 @@ Register the raw screens and measure the app's look. Don't start designing befor
 python3 scripts/prepare_screens.py screens/ --out prepared/ --status-bar 9:41   # read the report it prints
 python3 scripts/evidence.py build prepared/ --assets icon.png -o evidence.json   # ids, SHA-256, OCR words
 python3 scripts/evidence.py show evidence.json home -o home.grid.png             # read crop boxes off the grid
-python3 scripts/evidence.py name evidence.json home continue-card 0.04,0.21,0.78,0.44
+python3 scripts/evidence.py name evidence.json home continue-card 0.03,0.2,0.79,0.45 --snap   # cut to the card, radius kept
 python3 scripts/dna.py measure evidence.json --app "<name>" [--site <url>] -o dna.json
 python3 scripts/dna.py fonts evidence.json home --region <x0,y0,x1,y1> --text "<the words there>" -o font-match.jpg
 ```
@@ -215,7 +215,9 @@ Fix every warning, or know why it doesn't apply. Then check what no script can:
 - **One campaign:** cover the headlines - is it still one brand? Do neighbours look like different
   compositions, not the same layout?
 - **Every callout and zoom at 100 %:** enlarging also enlarges bugs - words broken mid-line, truncated text,
-  misaligned UI. A bug in the screen is fixed in the app and re-captured, never painted over.
+  misaligned UI. A bug in the screen is fixed in the app and re-captured, never painted over. Also look for
+  bugs of your own making: a crop that cuts a card or a word in half, a lift with a double edge (cut wider
+  than its card) or with no edge at all (a row with no background of its own).
 - **Is the data believable?** The same figure repeated, a "winner" resting on one sample, an item that tells a
   different story on two screens: re-seed one consistent demo account and re-capture.
 - **Does any shot look like a template or an AI render** (`references/anti-ai.md`)? Common signs: a gradient

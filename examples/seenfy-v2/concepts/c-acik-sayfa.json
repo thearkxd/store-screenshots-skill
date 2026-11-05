@@ -173,46 +173,28 @@
     {
      "type": "screen",
      "evidence": "koleksiyonlar",
-     "crop": [
-      0.03,
-      0.239,
-      0.955,
-      0.39
-     ],
+     "crop": "beni-sasirt",
      "w": 0.8,
      "x": 0.05,
      "y": 0.68,
-     "radius": 0.04,
      "shadow": "soft"
     },
     {
      "type": "screen",
      "evidence": "koleksiyonlar",
-     "crop": [
-      0.03,
-      0.569,
-      0.955,
-      0.72
-     ],
+     "crop": "beyin-yakan",
      "w": 0.8,
      "x": 0.05,
      "y": 1.34,
-     "radius": 0.04,
      "shadow": "soft"
     },
     {
      "type": "screen",
      "evidence": "koleksiyonlar",
-     "crop": [
-      0.03,
-      0.732,
-      0.955,
-      0.883
-     ],
+     "crop": "korkunc",
      "w": 0.8,
      "x": 0.15,
      "y": 1.67,
-     "radius": 0.04,
      "shadow": "soft"
     },
     {
@@ -222,7 +204,6 @@
      "w": 0.86,
      "x": 0.12,
      "y": 0.98,
-     "radius": 0.04,
      "shadow": "deep"
     },
     {
@@ -283,7 +264,6 @@
       "from": "home",
       "scale": 1.14
      },
-     "radius": 0.045,
      "shadow": "deep"
     },
     {

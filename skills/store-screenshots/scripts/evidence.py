@@ -4,6 +4,7 @@
   python3 evidence.py build screens/ --assets icon.png photo.jpg -o evidence.json   # register screens + assets
   python3 evidence.py show evidence.json discover -o discover.grid.png               # grid + OCR boxes, to read crops
   python3 evidence.py name evidence.json discover match-badge 0.06,0.18,0.5,0.24     # name a region (and read its text)
+  python3 evidence.py name evidence.json discover pick-card 0.02,0.2,0.98,0.6 --snap # ...tightened to the card inside, radius kept
 
 Every raw screen gets an id (from its file name), its size, a SHA-256 of the file (scenes are checked against
 it, so an edited screen is caught) and - when tesseract is installed - the words on it with their boxes, so
@@ -186,6 +187,55 @@ def show(a):
     print(out)
 
 
+def snap(path, box, tol=7, full=False):
+    """Tighten a rough box to the component inside it - the pixels that differ from the background around
+    it - and measure the component's corner radius. -> (box as fractions, radius in source px)."""
+    from PIL import ImageChops
+    im = Image.open(path).convert("RGB")
+    W, H = im.size
+    x0, y0, x1, y1 = (int(round(v)) for v in (box[0] * W, box[1] * H, box[2] * W, box[3] * H))
+    x1, y1 = min(W, max(x1, x0 + 2)), min(H, max(y1, y0 + 2))
+    border = ([im.getpixel((x, y0)) for x in range(x0, x1)] + [im.getpixel((x, y1 - 1)) for x in range(x0, x1)]
+              + [im.getpixel((x0, y)) for y in range(y0, y1)] + [im.getpixel((x1 - 1, y)) for y in range(y0, y1)])
+    bg = tuple(sorted(p[k] for p in border)[len(border) // 2] for k in range(3))
+    piece = im.crop((x0, y0, x1, y1))
+    r, g, b = ImageChops.difference(piece, Image.new("RGB", piece.size, bg)).split()
+    mask = ImageChops.lighter(r, ImageChops.lighter(g, b)).point(lambda v: 255 if v > tol else 0)
+    w, h = mask.size
+    px = mask.load()
+    def flat(im):
+        return list(im.get_flattened_data() if hasattr(im, "get_flattened_data") else im.getdata())
+    rows = [v / 255 * w for v in flat(mask.resize((1, h), Image.BOX))]
+    cols = [v / 255 * h for v in flat(mask.resize((w, 1), Image.BOX))]
+    # a component with its own background fills most of each row and column it spans; plain content (text,
+    # an icon) doesn't - then its ink is the component
+    kind = "component"
+    ys = [y for y, n in enumerate(rows) if n >= 0.25 * w]
+    xs = [x for x, n in enumerate(cols) if n >= 0.25 * h]
+    if not ys or not xs:
+        kind = "content"
+        ys = [y for y, n in enumerate(rows) if n >= max(3, 0.02 * w)]
+        xs = [x for x, n in enumerate(cols) if n >= max(3, 0.02 * h)]
+    if not ys or not xs:
+        return (box, 0.0, None) if full else (box, 0.0)
+    tx0, tx1, ty0, ty1 = xs[0], xs[-1] + 1, ys[0], ys[-1] + 1
+    radii = []
+    for cx, cy, sx, sy in ((tx0, ty0, 1, 1), (tx1 - 1, ty0, -1, 1), (tx0, ty1 - 1, 1, -1), (tx1 - 1, ty1 - 1, -1, -1)):
+        for k in range(0, min(tx1 - tx0, ty1 - ty0) // 2):
+            if px[cx + sx * k, cy + sy * k]:
+                radii.append(k / (1 - 2 ** -0.5))
+                break
+    radius = sorted(radii)[len(radii) // 2] if radii else 0.0
+    out = [round((x0 + tx0) / W, 4), round((y0 + ty0) / H, 4), round((x0 + tx1) / W, 4), round((y0 + ty1) / H, 4)]
+    radius = round(radius if radius >= 2 else 0.0, 1)
+    if kind == "component":  # a card is filled with its own background; bars and text inside a bigger card aren't
+        inner = mask.crop((tx0, ty0, tx1, ty1)).resize((1, 1), Image.BOX)
+        fill = (inner.get_flattened_data() if hasattr(inner, "get_flattened_data") else inner.getdata())[0] / 255
+        if fill < 0.8:
+            kind = "content"
+    return (out, radius, kind) if full else (out, radius)
+
+
 def name(a):
     ev = load(a.manifest)
     item = ev["screens"].get(a.id)
@@ -194,16 +244,22 @@ def name(a):
     box = [float(v) for v in a.box.split(",")]
     if len(box) != 4 or not (0 <= box[0] < box[2] <= 1 and 0 <= box[1] < box[3] <= 1):
         sys.exit("box: x0,y0,x1,y1 as fractions, x0 < x1, y0 < y1")
+    base = os.path.dirname(os.path.abspath(a.manifest))
+    path = item["path"] if os.path.isabs(item["path"]) else os.path.join(base, item["path"])
+    radius = None
+    if a.snap:
+        box, radius = snap(path, box)
     item.setdefault("regions", {})[a.name] = box
+    if radius is not None:
+        item.setdefault("region_radius", {})[a.name] = radius
     exe, langs = tesseract()
     text = ""
     if exe and langs:
-        base = os.path.dirname(os.path.abspath(a.manifest))
-        text = region_ocr(item["path"] if os.path.isabs(item["path"]) else os.path.join(base, item["path"]), box, exe, langs)
+        text = region_ocr(path, box, exe, langs)
         item.setdefault("region_text", {})[a.name] = text
     with open(a.manifest, "w", encoding="utf-8") as f:
         json.dump(ev, f, ensure_ascii=False, indent=1)
-    print(f"{a.id}#{a.name} = {box}" + (f"  reads: {text!r}" if text else ""))
+    print(f"{a.id}#{a.name} = {box}" + (f"  corner radius {radius:g}px" if radius else "") + (f"  reads: {text!r}" if text else ""))
 
 
 def main():
@@ -223,6 +279,8 @@ def main():
     n.add_argument("id")
     n.add_argument("name")
     n.add_argument("box")
+    n.add_argument("--snap", action="store_true", help="tighten the box to the component inside it and record its corner "
+                   "radius - for anything you'll lift or show as a card")
     a = p.parse_args()
     {"build": build, "show": show, "name": name}[a.cmd](a)
 

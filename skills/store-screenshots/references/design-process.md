@@ -69,6 +69,12 @@ python3 scripts/evidence.py name evidence.json home continue-card 0.04,0.21,0.78
 - **Name every region you'll crop:** the name documents the crop. It also reads the text of the region up close
   (small UI text like a badge or a chip is often missed on the whole screen), so a claim like "%88" can be
   checked.
+- **Cut components, not slices.**
+  - A crop's edges go through gaps between components, or along the screen's own edge.
+  - Anything you lift, or show as a card, is named with `--snap`. It is then cut exactly to its own edges and
+    keeps its own corner radius.
+  - A lift with a margin around the card shows two edges. A lifted row with no background of its own shows
+    none. Either reads as a rendering bug, and the renderer warns about both.
 - Assets are brand images that aren't UI: icon, logo, a product photo. They can't stand in for UI.
 
 ## 3. Visual DNA

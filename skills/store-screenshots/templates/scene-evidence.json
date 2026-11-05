@@ -1323,9 +1323,9 @@
    "regions": {
     "tonight": [
      0.0448,
-     0.2735,
+     0.2731,
      0.9552,
-     0.4199
+     0.4203
     ],
     "week": [
      0.03,
@@ -1337,6 +1337,9 @@
    "region_text": {
     "tonight": "21:00 - 1sa 19 dk sonra —_ Gece Vardiyası A Açık GECE, 52 :B/ : \"Kırmızı Işık” VARDIYASI",
     "week": "Pzt Car Per Cum Cmt Paz 3 5 6 7 8 9 BU AKŞAM 21:00 :1sa 19 dk sonra —_ Gece Vardiyası O Açık GECE, 52 :B/ : \"Kırmızı Işık” VARDIYASI"
+   },
+   "region_radius": {
+    "tonight": 64.9
    }
   },
   "stats": {
@@ -2940,14 +2943,17 @@
    "text": "21:41 TT | Arkadaslar Su an 3 arkadasin izliyor Oneriler c&> Ortak listeler Mert : 4 dk o Gece Vardiyası'nda S2 - B6'yı _ bitirdi VARDIYASI GECE. “O son sahne... kimse bana spoiler vermesin.\" ? 12 Yanıtla Zeynep - 38 dk Mahalle'yi 5 üzerinden 5 ile puanladı ¥ 838 Yanıtla Can : o Ada'yı listesine ekledi Senin listende de var - birlikte başlayın 3 Yanıtla Deniz : 2 sa Son Durak'ın 2. sezonunu SON bekliyor DURAK Cuma 20:00 - hatırlatıcı açık ? 5 Yanıtla G) O Ana sayfa Takvim İstatistik Arkadaşlar",
    "regions": {
     "first-post": [
-     0.03,
-     0.225,
-     0.97,
-     0.405
+     0.0448,
+     0.2105,
+     0.9552,
+     0.3902
     ]
    },
    "region_text": {
-    "first-post": "yo Mert - 4 dk Gece Vardiyası'nda S2 - B6'yı > li bitirdi VARDİYASI “O son sahne... kimse bana spoiler vermesin.\" ? 12 Yanıtla"
+    "first-post": "4 Mert - 4 dk Gece Vardiyası'nda S2 :B6'yı st bitirdi Sivası “O son sahne... kimse bana spoiler vermesin.\" ? 12 Yanıtla"
+   },
+   "region_radius": {
+    "first-post": 64.9
    }
   },
   "detail": {

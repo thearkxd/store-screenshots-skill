@@ -143,6 +143,13 @@ Screen options:
   lifted piece must cover its place, or the UI shows twice (warned).
 - Name crops once: `evidence.py name evidence.json home continue-card 0.04,0.21,0.78,0.44`. Then
   `"crop": "continue-card"`; the name also reads the region's text up close for the claim check.
+- **Anything you lift or show as a card: name it with `--snap`.** Draw the box a little larger than the
+  component. `--snap` tightens it to the component's own edges and records its corner radius. A layer with
+  that crop then keeps the component's radius at its new size, unless you give `"radius"`. A lift cut wider
+  than its component shows two edges; a lift of a row with no background of its own has no edge at all.
+  Both read as broken UI, and both are warned.
+- **Crops end in gaps:** put a crop's edges between components, or at the screen's own edge, never through a
+  card, a row or a word.
 
 ## 6. Sizes, stores and locales
 
@@ -176,6 +183,11 @@ screens captured on that device, given per size.
 - no `proof`;
 - a number that isn't in the text read from the screens the shot shows;
 - a lifted piece that doesn't cover its place.
+
+*Crops and lifts that look broken:*
+- a crop edge that slices through words (OCR) or through a component - UI on both sides of the edge;
+- a lifted piece cut wider than its component (a double edge);
+- a lifted piece with no visible edge (its background runs into what is behind it).
 
 *Legibility:*
 - headline under 0.06u, sub-line under 0.03u;
