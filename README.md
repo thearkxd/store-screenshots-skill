@@ -7,6 +7,117 @@ as AI-generated.
 
 ![Seenfy App Store screenshots made with this skill, Turkish](docs/images/seenfy-tr.jpg)
 
+- Finds the app's promise and angle and writes headlines (TR + EN) that pass the swap test.
+- Builds every shot from the app's real screens and renders pixel-exact PNGs for every store size: iPhone (two
+  sizes), iPhone Duo, iPad, Google Play and its feature graphic.
+- Seven design directions with a concept checkpoint, so the look is a choice, not a template.
+- A library of 1,718 real top-chart screenshots with verdicts, store and copy checks, and a peer test.
+
+Jump to: [Install](#install) · [Use](#use) · [What it does](#what-it-does) · [Examples](#examples)
+
+## Install
+
+The skill is the folder `skills/store-screenshots` - the one with `SKILL.md` in it. Wherever it goes, that
+folder must end up as `<skills folder>/store-screenshots/SKILL.md`: not one level deeper, and not under
+another name.
+
+**Claude Code - plugin marketplace** (also works while the repository is private)
+```
+/plugin marketplace add thearkxd/store-screenshots-skill
+/plugin install store-screenshots@store-screenshots-skill
+```
+- **Private repository:** Claude Code clones with the git credentials already on your machine. Run
+  `gh auth login` and then `gh auth setup-git` once.
+- **A branch:** add `#<branch>`, for example `thearkxd/store-screenshots-skill#v2-design-driven`.
+- **Updates:** run `/plugin marketplace update store-screenshots-skill`, or turn on auto-update under `/plugin` →
+  Marketplaces. A new copy arrives when the version in `.claude-plugin/plugin.json` changes.
+
+**Claude Code - clone once, update with `git pull`** (the easiest way to follow a branch)
+
+macOS / Linux:
+```bash
+git clone https://github.com/thearkxd/store-screenshots-skill.git ~/code/store-screenshots-skill
+mkdir -p ~/.claude/skills
+ln -s ~/code/store-screenshots-skill/skills/store-screenshots ~/.claude/skills/store-screenshots
+```
+Windows (PowerShell). Write `$HOME`, not `~`: Windows PowerShell passes `~` to `git` unexpanded, and git then creates a
+folder literally named `~`.
+```powershell
+git clone https://github.com/thearkxd/store-screenshots-skill.git "$HOME\code\store-screenshots-skill"
+New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
+New-Item -ItemType Junction -Path "$HOME\.claude\skills\store-screenshots" -Target "$HOME\code\store-screenshots-skill\skills\store-screenshots"
+```
+- A junction needs no admin rights. `ln` doesn't exist in PowerShell.
+- If you use another config folder (`CLAUDE_CONFIG_DIR`, for example `.claude-second`), put that name in place
+  of `.claude`.
+- If a copied `store-screenshots` folder is already in `skills`, delete it first.
+- To update, run `git pull` in the clone. To switch branches, run `git checkout <branch>`. The next session
+  loads the new files.
+
+**Claude Code - from the release zip:** `store-screenshots.zip` holds one folder, `store-screenshots/`. Extract
+it straight into your skills folder (`~/.claude/skills/`). Windows' "Extract All" adds a folder named after the
+zip (`store-screenshots\store-screenshots\SKILL.md`), which is one level too deep. Pick the skills folder
+itself as the target, or move the inner folder up.
+
+**claude.ai / Claude desktop** - download `store-screenshots-lite.zip` from Releases and upload the zip as it
+is, without extracting it, in the Skills section of your settings (custom skills need code execution enabled).
+
+**ChatGPT** - Skills → Create → Upload from your computer, and pick `store-screenshots-lite.zip`. (Skills
+availability depends on your ChatGPT plan and workspace settings.)
+
+**Codex CLI, Gemini CLI, Cursor and others** - copy or link `skills/store-screenshots` into your agent's skills
+folder (for example `~/.codex/skills/`, `~/.gemini/skills/` or `~/.agents/skills/`), the same way as above.
+
+**A branch that isn't released yet:** branches don't publish releases. Open the branch's run under Actions →
+"Build & release" and download the artifact `store-screenshots-<commit>`. That zip holds both packages,
+`store-screenshots-lite.zip` and `store-screenshots.zip`: extract it once and use the inner zip as above.
+Artifacts are kept for 14 days.
+
+Skills don't sync between products - install in each one you use. After installing, run the checklist in
+[`docs/testing.md`](docs/testing.md) once to make sure the skill triggers and the scripts run there.
+
+## Full vs lite
+
+| Package | Contents | Size | Use for |
+|---|---|---|---|
+| `store-screenshots.zip` | everything, all 1,619 library images | ~46 MB | Claude Code, Codex, Cursor, Gemini CLI, cloning the repo |
+| `store-screenshots-lite.zip` | full text catalog + 661 images at 420 px (every shot of the exemplary apps, the first shot of every app, shots 1–3 of instructive bad ones) | ~16 MB (18 MB unpacked) | claude.ai and ChatGPT uploads |
+
+Both work the same way; the scripts only offer images that are on disk. Build them with
+`python3 tools/package_skill.py` (writes `dist/`).
+
+## Use
+
+The skill starts by asking whether the app is already live. **Live:** send the App Store / Google Play
+link(s) - it reads the listing (description, what's new, category, rating, current screenshots, competitors),
+drafts the brief, scores the current set, and then asks for exactly the raw screens the new storyboard needs.
+**Not live:** it asks a short form instead (what it does, for whom, what it does better, brand).
+
+Just ask, in any language:
+- "Şu uygulama için yeni mağaza görselleri yap: https://apps.apple.com/tr/app/…/id6764370964"
+- "Henüz yayında olmayan bir bütçe uygulaması için mağaza görselleri hazırla."
+- "Critique our Play Store screenshots and tell me the three biggest fixes."
+- "What do the best finance apps put in their first screenshot?"
+- "Bu İngilizce başlıkları Türkçe'ye uyarla."
+
+Or run the tools yourself:
+```bash
+S=skills/store-screenshots/scripts
+python3 $S/search_library.py --category weather --summary
+python3 $S/search_library.py --quality exemplary --position 1 --verified --format headlines
+python3 $S/fetch_listing.py https://apps.apple.com/tr/app/id6764370964 --search "film dizi takip"
+python3 $S/prepare_screens.py examples/seenfy/screens --out prepared --status-bar 9:41
+python3 $S/crop_helper.py check examples/seenfy/set.json -o crops.jpg
+python3 $S/concepts.py examples/seenfy/set.json -o concepts.jpg        # 3 directions for the category
+python3 $S/concepts.py --list                                          # all seven directions
+python3 $S/render_set.py examples/seenfy/set.json --out out/
+python3 $S/check_set.py out/tr/ios --store ios --lang tr
+python3 $S/check_set.py out/tr/android --store android --lang tr
+python3 $S/peer_test.py out/tr/ios --category entertainment -o peer.jpg
+```
+
+## What it does
+
 - **Process & craft** - brief, category research, story order, the first three shots, headline patterns,
   banned/tired phrases (EN + TR), layouts, type, colour, emphasis devices, localisation, critique scorecard,
   and up-to-date store specs (checked 2026-11-04).
@@ -33,6 +144,10 @@ as AI-generated.
   for each, Google Play feature graphic, bundled OFL fonts, emphasis words, zoom cards,
   callouts, posters, Turkish-safe capitals), check it against store and copy rules with a search-result
   preview, and peer-test it next to exemplary sets.
+
+## Examples
+
+- [Real example: Seenfy](#real-example-seenfy)
 
 ## Real example: Seenfy
 
@@ -119,107 +234,6 @@ Screens, crops and anything else can differ per size (`{"default": …, "duo-inn
 to one store (`"stores": ["ios"]`), and wider canvases (Duo, iPad) get type and spacing scaled to their shape.
 
 ![iPhone Duo outer (left three) and inner (right three) displays, demo app](docs/images/duo-example.jpg)
-
-## Full vs lite
-
-| Package | Contents | Size | Use for |
-|---|---|---|---|
-| `store-screenshots.zip` | everything, all 1,619 library images | ~46 MB | Claude Code, Codex, Cursor, Gemini CLI, cloning the repo |
-| `store-screenshots-lite.zip` | full text catalog + 661 images at 420 px (every shot of the exemplary apps, the first shot of every app, shots 1–3 of instructive bad ones) | ~16 MB (18 MB unpacked) | claude.ai and ChatGPT uploads |
-
-Both work the same way; the scripts only offer images that are on disk. Build them with
-`python3 tools/package_skill.py` (writes `dist/`).
-
-## Install
-
-The skill is the folder `skills/store-screenshots` - the one with `SKILL.md` in it. Wherever it goes, that
-folder must end up as `<skills folder>/store-screenshots/SKILL.md`: not one level deeper, and not under
-another name.
-
-**Claude Code - plugin marketplace** (also works while the repository is private)
-```
-/plugin marketplace add thearkxd/store-screenshots-skill
-/plugin install store-screenshots@store-screenshots-skill
-```
-- **Private repository:** Claude Code clones with the git credentials already on your machine. Run
-  `gh auth login` and then `gh auth setup-git` once.
-- **A branch:** add `#<branch>`, for example `thearkxd/store-screenshots-skill#v2-design-driven`.
-- **Updates:** run `/plugin marketplace update store-screenshots-skill`, or turn on auto-update under `/plugin` →
-  Marketplaces. A new copy arrives when the version in `.claude-plugin/plugin.json` changes.
-
-**Claude Code - clone once, update with `git pull`** (the easiest way to follow a branch)
-
-macOS / Linux:
-```bash
-git clone https://github.com/thearkxd/store-screenshots-skill.git ~/code/store-screenshots-skill
-mkdir -p ~/.claude/skills
-ln -s ~/code/store-screenshots-skill/skills/store-screenshots ~/.claude/skills/store-screenshots
-```
-Windows (PowerShell). Write `$HOME`, not `~`: Windows PowerShell passes `~` to `git` unexpanded, and git then creates a
-folder literally named `~`.
-```powershell
-git clone https://github.com/thearkxd/store-screenshots-skill.git "$HOME\code\store-screenshots-skill"
-New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
-New-Item -ItemType Junction -Path "$HOME\.claude\skills\store-screenshots" -Target "$HOME\code\store-screenshots-skill\skills\store-screenshots"
-```
-- A junction needs no admin rights. `ln` doesn't exist in PowerShell.
-- If you use another config folder (`CLAUDE_CONFIG_DIR`, for example `.claude-second`), put that name in place
-  of `.claude`.
-- If a copied `store-screenshots` folder is already in `skills`, delete it first.
-- To update, run `git pull` in the clone. To switch branches, run `git checkout <branch>`. The next session
-  loads the new files.
-
-**Claude Code - from the release zip:** `store-screenshots.zip` holds one folder, `store-screenshots/`. Extract
-it straight into your skills folder (`~/.claude/skills/`). Windows' "Extract All" adds a folder named after the
-zip (`store-screenshots\store-screenshots\SKILL.md`), which is one level too deep. Pick the skills folder
-itself as the target, or move the inner folder up.
-
-**claude.ai / Claude desktop** - download `store-screenshots-lite.zip` from Releases and upload the zip as it
-is, without extracting it, in the Skills section of your settings (custom skills need code execution enabled).
-
-**ChatGPT** - Skills → Create → Upload from your computer, and pick `store-screenshots-lite.zip`. (Skills
-availability depends on your ChatGPT plan and workspace settings.)
-
-**Codex CLI, Gemini CLI, Cursor and others** - copy or link `skills/store-screenshots` into your agent's skills
-folder (for example `~/.codex/skills/`, `~/.gemini/skills/` or `~/.agents/skills/`), the same way as above.
-
-**A branch that isn't released yet:** branches don't publish releases. Open the branch's run under Actions →
-"Build & release" and download the artifact `store-screenshots-<commit>`. That zip holds both packages,
-`store-screenshots-lite.zip` and `store-screenshots.zip`: extract it once and use the inner zip as above.
-Artifacts are kept for 14 days.
-
-Skills don't sync between products - install in each one you use. After installing, run the checklist in
-[`docs/testing.md`](docs/testing.md) once to make sure the skill triggers and the scripts run there.
-
-## Use
-
-The skill starts by asking whether the app is already live. **Live:** send the App Store / Google Play
-link(s) - it reads the listing (description, what's new, category, rating, current screenshots, competitors),
-drafts the brief, scores the current set, and then asks for exactly the raw screens the new storyboard needs.
-**Not live:** it asks a short form instead (what it does, for whom, what it does better, brand).
-
-Just ask, in any language:
-- "Şu uygulama için yeni mağaza görselleri yap: https://apps.apple.com/tr/app/…/id6764370964"
-- "Henüz yayında olmayan bir bütçe uygulaması için mağaza görselleri hazırla."
-- "Critique our Play Store screenshots and tell me the three biggest fixes."
-- "What do the best finance apps put in their first screenshot?"
-- "Bu İngilizce başlıkları Türkçe'ye uyarla."
-
-Or run the tools yourself:
-```bash
-S=skills/store-screenshots/scripts
-python3 $S/search_library.py --category weather --summary
-python3 $S/search_library.py --quality exemplary --position 1 --verified --format headlines
-python3 $S/fetch_listing.py https://apps.apple.com/tr/app/id6764370964 --search "film dizi takip"
-python3 $S/prepare_screens.py examples/seenfy/screens --out prepared --status-bar 9:41
-python3 $S/crop_helper.py check examples/seenfy/set.json -o crops.jpg
-python3 $S/concepts.py examples/seenfy/set.json -o concepts.jpg        # 3 directions for the category
-python3 $S/concepts.py --list                                          # all seven directions
-python3 $S/render_set.py examples/seenfy/set.json --out out/
-python3 $S/check_set.py out/tr/ios --store ios --lang tr
-python3 $S/check_set.py out/tr/android --store android --lang tr
-python3 $S/peer_test.py out/tr/ios --category entertainment -o peer.jpg
-```
 
 ## What's inside
 
