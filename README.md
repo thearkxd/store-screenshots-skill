@@ -99,7 +99,7 @@ python3 $S/compose.py render examples/seenfy-v2/set.json --out out/       # ios,
 - The renderer warns when the far side stops reading, when a device floats with no shadow, when the lenses
   differ, and when turned phones appear in most shots.
 
-![3D devices: two phones facing each other, a flat shot, one laid back, a flat shot, and a 100 % detail](docs/images/device3d-example.jpg)
+![3D devices: two phones facing each other, a flat shot, one laid back, a flat shot](docs/images/device3d-example.jpg)
 
 <details><summary>The bundled scene example (fictional app, <code>templates/scene.example.json</code>, concept "Tek Turuncu")</summary>
 
