@@ -1,5 +1,7 @@
 # Store Screenshots Skill for Claude, ChatGPT & AI agents
 
+[![skills.sh](https://skills.sh/b/thearkxd/store-screenshots-skill)](https://skills.sh/thearkxd/store-screenshots-skill)
+
 A skill that turns Claude, ChatGPT or any agent that supports **Agent Skills** (`SKILL.md`) into an app-marketing
 designer for **App Store and Google Play screenshots**: from the app's promise to headline copy, an
 app-specific design and pixel-exact PNGs (plus editable SVGs). Everything is built from the app's real screens
@@ -22,24 +24,39 @@ Jump to: [Install](#install) · [Use](#use) · [What it does](#what-it-does) · 
 
 ## Install
 
-The skill is the folder `skills/store-screenshots` - the one with `SKILL.md` in it. Wherever it goes, that
-folder must end up as `<skills folder>/store-screenshots/SKILL.md`: not one level deeper, and not under
-another name.
+**Any agent, one command** ([skills.sh](https://skills.sh/thearkxd/store-screenshots-skill)): Claude Code,
+Codex, Cursor, Gemini CLI and the other agents the `skills` CLI knows.
+```bash
+npx skills add thearkxd/store-screenshots-skill        # asks which agents, and project or user level
+npx skills add thearkxd/store-screenshots-skill -g     # user level: every project gets it
+npx skills update                                      # later: pull the newest version
+```
+Python 3 with Pillow runs the scripts (`pip install pillow`). `pip install resvg-py` adds the SVG renderer.
+tesseract adds the checks that read the screens (Windows `winget install --id tesseract-ocr.tesseract` plus
+`tur.traineddata`; macOS `brew install tesseract tesseract-lang`; Linux `apt install tesseract-ocr tesseract-ocr-tur`).
 
-**Claude Code - plugin marketplace** (also works while the repository is private)
+**Claude Code - plugin marketplace**
 ```
 /plugin marketplace add thearkxd/store-screenshots-skill
 /plugin install store-screenshots@store-screenshots-skill
 ```
-- **Private repository:** Claude Code clones with the git credentials already on your machine. Run
-  `gh auth login` and then `gh auth setup-git` once.
-- **A branch:** add `#<branch>`, for example `thearkxd/store-screenshots-skill#v2-design-driven`.
-- **Updates:** run `/plugin marketplace update store-screenshots-skill`, or turn on auto-update under `/plugin` →
-  Marketplaces. A new copy arrives when the version in `.claude-plugin/plugin.json` changes.
+Updates: run `/plugin marketplace update store-screenshots-skill`, or turn on auto-update under `/plugin` →
+Marketplaces. A new copy arrives with every release.
 
-**Claude Code - clone once, update with `git pull`** (the easiest way to follow a branch)
+**claude.ai / Claude desktop** - download `store-screenshots-lite.zip` from
+[Releases](https://github.com/thearkxd/store-screenshots-skill/releases/latest) and upload the zip as it is,
+without extracting it, in the Skills section of your settings (custom skills need code execution enabled).
 
-macOS / Linux:
+**ChatGPT** - Skills → Create → Upload from your computer, and pick `store-screenshots-lite.zip`. (Skills
+availability depends on your ChatGPT plan and workspace settings.)
+
+<details><summary>By hand: clone, release zip, a branch</summary>
+
+The skill is the folder `skills/store-screenshots` - the one with `SKILL.md` in it. Wherever it goes, that
+folder must end up as `<skills folder>/store-screenshots/SKILL.md`: not one level deeper, and not under
+another name.
+
+**Clone once, update with `git pull`.** macOS / Linux:
 ```bash
 git clone https://github.com/thearkxd/store-screenshots-skill.git ~/code/store-screenshots-skill
 mkdir -p ~/.claude/skills
@@ -56,27 +73,18 @@ New-Item -ItemType Junction -Path "$HOME\.claude\skills\store-screenshots" -Targ
 - If you use another config folder (`CLAUDE_CONFIG_DIR`, for example `.claude-second`), put that name in place
   of `.claude`.
 - If a copied `store-screenshots` folder is already in `skills`, delete it first.
-- To update, run `git pull` in the clone. To switch branches, run `git checkout <branch>`. The next session
-  loads the new files.
+- For Codex CLI, Gemini CLI, Cursor and others, link the same folder into that agent's skills folder (for
+  example `~/.codex/skills/`, `~/.gemini/skills/` or `~/.agents/skills/`).
 
-**Claude Code - from the release zip:** `store-screenshots.zip` holds one folder, `store-screenshots/`. Extract
-it straight into your skills folder (`~/.claude/skills/`). Windows' "Extract All" adds a folder named after the
-zip (`store-screenshots\store-screenshots\SKILL.md`), which is one level too deep. Pick the skills folder
-itself as the target, or move the inner folder up.
+**From the release zip:** `store-screenshots.zip` holds one folder, `store-screenshots/`. Extract it straight
+into your skills folder (`~/.claude/skills/`). Windows' "Extract All" adds a folder named after the zip
+(`store-screenshots\store-screenshots\SKILL.md`), which is one level too deep. Pick the skills folder itself as
+the target, or move the inner folder up.
 
-**claude.ai / Claude desktop** - download `store-screenshots-lite.zip` from Releases and upload the zip as it
-is, without extracting it, in the Skills section of your settings (custom skills need code execution enabled).
-
-**ChatGPT** - Skills → Create → Upload from your computer, and pick `store-screenshots-lite.zip`. (Skills
-availability depends on your ChatGPT plan and workspace settings.)
-
-**Codex CLI, Gemini CLI, Cursor and others** - copy or link `skills/store-screenshots` into your agent's skills
-folder (for example `~/.codex/skills/`, `~/.gemini/skills/` or `~/.agents/skills/`), the same way as above.
-
-**A branch that isn't released yet:** branches don't publish releases. Open the branch's run under Actions →
-"Build & release" and download the artifact `store-screenshots-<commit>`. That zip holds both packages,
-`store-screenshots-lite.zip` and `store-screenshots.zip`: extract it once and use the inner zip as above.
-Artifacts are kept for 14 days.
+**A branch:** the plugin takes `#<branch>` (`thearkxd/store-screenshots-skill#<branch>`), a clone takes
+`git checkout <branch>`. Branches don't publish releases: their packages are under Actions → "Build &
+release" → the run's artifact `store-screenshots-<commit>` (kept for 14 days).
+</details>
 
 Skills don't sync between products - install in each one you use. After installing, run the checklist in
 [`docs/testing.md`](docs/testing.md) once to make sure the skill triggers and the scripts run there.
@@ -86,7 +94,7 @@ Skills don't sync between products - install in each one you use. After installi
 | Package | Contents | Size | Use for |
 |---|---|---|---|
 | `store-screenshots.zip` | everything, all 1,619 library images | ~46 MB | Claude Code, Codex, Cursor, Gemini CLI, cloning the repo |
-| `store-screenshots-lite.zip` | full text catalog + 661 images at 420 px (every shot of the exemplary apps, the first shot of every app, shots 1–3 of instructive bad ones) | ~16 MB (18 MB unpacked) | claude.ai and ChatGPT uploads |
+| `store-screenshots-lite.zip` | full text catalog + 661 images at 420 px (every shot of the exemplary apps, the first shot of every app, shots 1–3 of instructive bad ones) | ~16 MB (19 MB unpacked) | claude.ai and ChatGPT uploads |
 
 Both work the same way; the scripts only offer images that are on disk. Build them with
 `python3 tools/package_skill.py` (writes `dist/`).
@@ -420,6 +428,14 @@ DNA'sını çıkarır: renk rolleri, font, şekil dili, yalnızca bu uygulamada 
 tek zemin ailesi, tek font eşleşmesi, tek vurgu, tek motif. Gerçek ekranlar esnetilemez, renklendirilemez, üstü
 boyanamaz; ekranda olmayan bir sayı başlığa yazılırsa uyarı verir. Çıktı: her mağaza ölçüsünde PNG ve Figma'da
 düzenlenebilir SVG. Pilot: `examples/seenfy-v2/`. Yedi hazır yön artık hızlı yol ve yedek.
+
+**Hiçbir efekt varsayılan değil:** cam, glow, gradient, eğik ya da 3D telefon ancak uygulamanın DNA'sından, konseptten
+ya da karenin mesajından bir gerekçeyle kullanılır; gerekçesiz efekt uyarı verir. Skill kendi alışkanlıklarını da
+izler, böylece yaptığı setler birbirine benzemez. İşe başlarken bir kez sorar: birlikte mi seçelim, yoksa doğrudan
+sonucu mu üreteyim? Google Play kuralları zorunluluk, öneri ve promosyon uygunluğu olarak ayrı etiketlenir.
+
+**Kurulum:** `npx skills add thearkxd/store-screenshots-skill` (Claude Code, Codex, Cursor, Gemini CLI…); claude.ai
+ve ChatGPT için Releases'taki `store-screenshots-lite.zip`.
 
 Gerçek örnek: yukarıdaki Seenfy seti skill ile baştan sona üretildi (mağaza sayfası okundu, eski set 13/20
 aldı, storyboard çıkarıldı, 6 ham ekranla render edildi). Türkçe ve İngilizce spec'ler `examples/seenfy/`
