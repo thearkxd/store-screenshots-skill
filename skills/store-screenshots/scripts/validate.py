@@ -181,6 +181,9 @@ def scene_warnings(scene, img, ctx):
             out.append(f"headline at {m['size'] / U:.3f}u is too small for search results (≥ 0.06u)")
         if role == "sub" and m["size"] < 0.03 * U:
             out.append(f"sub-line at {m['size'] / U:.3f}u is too small (≥ 0.03u)")
+        if role == "footnote" and not 0.02 * U <= m["size"] <= 0.03 * U:
+            out.append(f"footnote at {m['size'] / U:.3f}u - a footnote is small but readable at full size (0.02-0.03u); "
+                       "anything bigger competes with the sub-line")
         b = m["bbox"]
         pad = 0.03 * U
         if b[0] < pad or b[2] > c.W - pad or b[1] < pad or b[3] > c.H - pad:
@@ -268,7 +271,7 @@ def store_warnings(scene, ctx):
             out.append("device frame in a Google Play set - Play advises against device imagery; show the bare screen "
                        "(radius, no \"frame\") in the android variant")
         for slot in range(scene.span):
-            hs = [op["meta"].get("ink", op["meta"]["bbox"]) for op in ops if op["op"] == "text" and op["meta"].get("role") not in ("label", "annotation")
+            hs = [op["meta"].get("ink", op["meta"]["bbox"]) for op in ops if op["op"] == "text" and op["meta"].get("role") not in ("label", "annotation", "footnote")
                   and slot_of(scene, op["meta"]["bbox"]) == slot]  # a giant number is tagline text too
             share = sum(b[3] - b[1] for b in hs) / c.H
             if share > rs.PLAY_TEXT_SHARE:
@@ -452,6 +455,71 @@ def set_warnings(fps):
     for g in groups:
         out.append(f"shots {', '.join(fps[k][0] for k in g)} share one composition (headline and main visual in the same place, "
                    "same scale) - vary scale, crop or placement; let the campaign system, not a layout, hold the set together")
+    return out
+
+
+def norm_word(t):
+    return "".join(ch for ch in rs.tr_lower(t) if ch.isalnum())
+
+
+def visible_words(scene, ctx, slot):
+    """The app's words (OCR of the evidence) that one slot actually shows: inside each screen's crop and inside
+    the canvas, lifted copies left out. -> (words, evidence ids)"""
+    c = scene.c
+    x_lo, x_hi = (slot * c.slot_w, (slot + 1) * c.slot_w) if scene.span == 2 else (0, c.W)
+    words, evs = set(), set()
+    for op in walk(scene.ops):
+        m = op.get("meta", {})
+        if op["op"] not in ("image", "device3d") or m.get("kind") != "screen" or m.get("lift"):
+            continue
+        item = ctx["evidence"]["screens"].get(m.get("evidence")) or {}
+        crop = m.get("crop") or [0, 0, 1, 1]
+        bx0, by0, bx1, by1 = op["box"] if op["op"] == "image" else m.get("screen_bbox", m["bbox"])
+        if bx1 <= bx0 or by1 <= by0:
+            continue
+
+        def fx(x):
+            return crop[0] + (x - bx0) / (bx1 - bx0) * (crop[2] - crop[0])
+
+        def fy(y):
+            return crop[1] + (y - by0) / (by1 - by0) * (crop[3] - crop[1])
+        vis = (fx(max(bx0, x_lo)), fy(max(by0, 0)), fx(min(bx1, x_hi)), fy(min(by1, c.H)))
+        if vis[2] <= vis[0] or vis[3] <= vis[1]:
+            continue
+        evs.add(m.get("evidence"))
+        for w in item.get("ocr") or []:
+            t = norm_word(w.get("t", ""))
+            if w.get("c", 0) < 60 or len(t) < 4:
+                continue
+            cx, cy = (w["b"][0] + w["b"][2]) / 2, (w["b"][1] + w["b"][3]) / 2
+            if vis[0] <= cx <= vis[2] and vis[1] <= cy <= vis[3]:
+                words.add(t)
+    return words, evs
+
+
+def content_repeats(contents, evidence, min_shared=6, share=0.2):
+    """contents: [(slot label, words, evidence ids)]. Two slots that show the same items through different
+    screens (the same posts on the calendar and on the home screen) prove one thing twice. Words on most
+    screens (tab bars, the app's own labels) don't count."""
+    screens = evidence.get("screens", {})
+    n = len(screens)
+    df = {}
+    for item in screens.values():
+        for t in {norm_word(w.get("t", "")) for w in item.get("ocr") or [] if w.get("c", 0) >= 60}:
+            df[t] = df.get(t, 0) + 1
+    chrome = {t for t, k in df.items() if n >= 3 and k / n >= 0.5}
+    out = []
+    for i in range(len(contents)):
+        for j in range(i + 1, len(contents)):
+            (la, wa, ea), (lb, wb, eb) = contents[i], contents[j]
+            if ea & eb:
+                continue  # the same screen twice is the crop check's job
+            a, b = wa - chrome, wb - chrome
+            shared = a & b
+            if a and b and len(shared) >= min_shared and (len(shared) / min(len(a), len(b)) >= share or len(shared) >= 10):
+                out.append(f"shots {la} and {lb} show the same content on different screens ({', '.join(sorted(shared)[:5])}, …) - "
+                           "each shot should prove something new; one item carried through the set is fine, the same list "
+                           "twice isn't")
     return out
 
 

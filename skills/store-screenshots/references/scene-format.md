@@ -117,8 +117,8 @@ The campaign is what holds the set together while every composition differs (`de
 Common keys:
 - `type`;
 - `id` (to anchor, lift or mark later layers);
-- `role`: `headline`, `sub`, `display` (big type that isn't the headline), `label`, `proof`, `decor`, `brand`,
-  `annotation`;
+- `role`: `headline`, `sub`, `display` (big type that isn't the headline), `footnote` (a small disclosure such as
+  "Örnek veriler", at the bottom margin), `label`, `proof`, `decor`, `brand`, `annotation`;
 - `motive` - required for `decor`: where the shape comes from;
 - placement (§1), `rotate`, `opacity`.
 
@@ -190,7 +190,7 @@ screens captured on that device, given per size.
 - a lifted piece with no visible edge (its background runs into what is behind it).
 
 *Legibility:*
-- headline under 0.06u, sub-line under 0.03u;
+- headline under 0.06u, sub-line under 0.03u, a footnote outside 0.02-0.03u;
 - text within 0.03u of an edge;
 - contrast under 3:1 for large text or 4.5:1 for small, measured on the rendered pixels;
 - text or a hand mark across the seam of a span;
@@ -210,6 +210,8 @@ screens captured on that device, given per size.
 - three or more shots with the same composition (headline and main visual in the same place and scale);
 - none of the first three headlines uses a promise word;
 - the same screen with the same crop in two shots;
+- the same content in two shots through different screens (the same posts on the calendar and on the home
+  screen), read from the screens' text;
 - only one iPhone size.
 
 *Google Play:*

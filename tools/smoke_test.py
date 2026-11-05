@@ -363,6 +363,27 @@ def design_tests(tmp):
                 "includes a margin around the component", "has no visible edge"):
         assert msg in out, (msg, out)
     assert "cuts through the UI" in out or "slices through 'Perşembe'" in out, out  # pixels, or the OCR words
+    # the same items on two different screens (the same posts on the calendar and on the home screen)
+    ev_dup = json.load(open(ev_path, encoding="utf-8"))
+    for sid in ev_dup["screens"]:
+        ev_dup["screens"][sid]["path"] = os.path.join(os.path.dirname(ev_path), ev_dup["screens"][sid]["path"])
+    items = ["Sabahlamayı", "bıraktım", "Toplantılar", "kaybolan", "saatleri", "Finaller", "haftası", "alışkanlıkla"]
+    for sid in ("stats", "friends"):
+        ev_dup["screens"][sid]["ocr"] = (ev_dup["screens"][sid].get("ocr") or []) + [
+            {"t": t, "b": [0.1, 0.4 + k * 0.03, 0.4, 0.42 + k * 0.03], "c": 95} for k, t in enumerate(items)]
+    ev_dup_path = os.path.join(d, "ev-dup.json")
+    json.dump(ev_dup, open(ev_dup_path, "w", encoding="utf-8"), ensure_ascii=False)
+    p = bad_set("dup", [shot("d1", [head, dict(scr, evidence="stats")]), shot("d2", [head, dict(scr, evidence="friends", y=0.5)],
+                                                                            proof=[{"evidence": "friends"}])])
+    j = json.load(open(p, encoding="utf-8"))
+    j["evidence"] = ev_dup_path
+    json.dump(j, open(p, "w", encoding="utf-8"), ensure_ascii=False)
+    out = run(s("compose.py"), "render", p, "--out", os.path.join(d, "dup"), both=True)
+    assert "show the same content on different screens" in out, out
+    # a footnote is small but readable, and not part of the caption
+    p = bad_set("foot", [shot("f1", [head, scr, {"type": "text", "role": "footnote", "style": "sub", "text": "Örnek veriler",
+                                                  "x": 0.08, "bottom": 0.05, "size": 0.045}])])
+    assert "footnote at 0.045u" in run(s("compose.py"), "render", p, "--out", os.path.join(d, "foot"), both=True)
     same = [shot(f"m{i}", [head, dict(scr, evidence=ev_id)]) for i, ev_id in enumerate(("stats", "home", "calendar"))]
     out = run(s("compose.py"), "render", bad_set("same", same), "--out", os.path.join(d, "same"), both=True)
     assert "share one composition" in out, out
