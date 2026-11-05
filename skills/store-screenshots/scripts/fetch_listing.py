@@ -36,6 +36,26 @@ class Blocked(Exception):
     pass
 
 
+def find_tesseract():
+    """tesseract on PATH, or where the Windows installer puts it (then PATH is extended for this process)."""
+    import shutil
+    exe = shutil.which("tesseract")
+    if exe or os.name != "nt":
+        return exe
+    for base in (os.environ.get("ProgramFiles", r"C:\Program Files"), os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"),
+                 os.path.join(os.environ.get("LOCALAPPDATA", ""), "Programs")):
+        cand = os.path.join(base, "Tesseract-OCR", "tesseract.exe")
+        if os.path.exists(cand):
+            os.environ["PATH"] = os.path.dirname(cand) + os.pathsep + os.environ.get("PATH", "")
+            return cand
+    return None
+
+
+TESSERACT_HINT = ("install tesseract with Turkish: Windows - winget install --id tesseract-ocr.tesseract, then tur.traineddata "
+                  "from github.com/tesseract-ocr/tessdata into C:\\Program Files\\Tesseract-OCR\\tessdata; "
+                  "macOS - brew install tesseract tesseract-lang; Linux - apt install tesseract-ocr tesseract-ocr-tur")
+
+
 def get(url, timeout=30, retries=3):
     """Fetch bytes. A proxy/firewall refusal raises Blocked; Apple's own 403/429 (rate limiting) is retried."""
     import time
@@ -278,7 +298,7 @@ def icon_colours(folder):
 def current_headlines(files):
     """OCR the caption of each current screenshot (best effort, needs tesseract + Pillow)."""
     import shutil
-    if not shutil.which("tesseract"):
+    if not find_tesseract():
         return []
     try:
         import importlib.util
@@ -404,4 +424,7 @@ def main():
 
 
 if __name__ == "__main__":
+    for _stream in (sys.stdout, sys.stderr):  # Windows consoles and pipes default to a legacy code page
+        if hasattr(_stream, "reconfigure"):
+            _stream.reconfigure(encoding="utf-8", errors="replace")
     main()

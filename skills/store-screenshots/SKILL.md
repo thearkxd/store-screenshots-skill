@@ -40,7 +40,10 @@ replaces most other questions. Otherwise state assumptions and go; iterate after
 
 All scripts are Python 3 and live in `scripts/` next to this file (in Claude Code that is
 `${CLAUDE_SKILL_DIR}/scripts/`; elsewhere use the folder this skill was loaded from). Only Pillow is needed for
-rendering. Run with `python3 <skill-dir>/scripts/<name>.py` (`python` on Windows).
+rendering. Run with `python3 <skill-dir>/scripts/<name>.py` (`python` on Windows). The scripts set their own
+UTF-8 output, so Windows consoles need no `PYTHONUTF8`. tesseract with Turkish data adds the checks that read
+screens (repeated figures, current headlines). To install it: Windows `winget install --id tesseract-ocr.tesseract`
+plus `tur.traineddata`; macOS `brew install tesseract tesseract-lang`; Linux `apt install tesseract-ocr tesseract-ocr-tur`.
 
 | Script | Use it to |
 |---|---|
