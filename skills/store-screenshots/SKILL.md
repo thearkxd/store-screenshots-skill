@@ -113,7 +113,8 @@ to App Store categories; see `references/library-guide.md` for the list and the 
   shot shows that output big - not as a thumbnail in a list. A span pair suits a wide output (a carousel's
   slides, a photo series).
 - **One proof per shot, never twice:** two shots on the same screen, or the same element (a failed post, a
-  card) in two shots, waste a slot. The renderer flags the same screen shown the same way.
+  card) in two shots, waste a slot - also when it shows up on two different screens (the same posts on the
+  calendar and on the home screen). The renderer flags both.
 - Draft **2–3 headline options per shot** in the user's language, 3–6 words each, verb-led or spoken,
   with one concrete detail (a number, a real moment, a named pain). Shot 1 states the angle; use the
   audience's insider words in at least two. The headline adds what the screen can't say - it doesn't repeat

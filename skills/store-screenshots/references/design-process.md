@@ -194,6 +194,12 @@ Let the message decide the composition:
 - Start from the brief and place layers in u. Use `%` widths when they should fill any device.
 - Anchor text to text (`"below": "head"`), so wrapping never causes collisions.
 - Use the text's own size bands. A headline is at least 0.06u, so it reads in search results.
+- A disclosure ("Örnek veriler", "Temsili görüntüdür") goes in a `footnote` at the bottom margin (0.02-0.03u),
+  never in the sub-line slot under the headline, where it weakens the claim. A footnote doesn't count towards
+  Google Play's 20 % caption limit.
+- One proof per shot, across screens too. The same posts on the calendar and on the home screen are one proof
+  shown twice, even though the screens differ. One item carried through the set as a story (the same draft
+  suggested, approved, then queued) is fine.
 - **Every decoration needs a `motive`** naming where it comes from in the DNA or the concept ("the app's progress
   bar track"). Without a motive it's AI decoration - delete it. At most a few per shot.
 - **Gradients** only when the app has them, or they come from the app's own colours (`"sample"`), never the

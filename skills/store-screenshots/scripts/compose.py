@@ -137,7 +137,7 @@ def cmd_render(a):
             os.makedirs(out_dir, exist_ok=True)
             report = {"preset": name, "size": [W, H], "lang": lang, "locale": loc, "device": rs.device_class(name, W, H),
                       "store": rs.store_of(name, W, H), "renderer": "compose", "shots": [], "set_warnings": []}
-            slot, fps, scenes, pseudo, units = 0, [], [], [], []
+            slot, fps, scenes, pseudo, units, contents = 0, [], [], [], [], []
             for i, shot in enumerate(shots, start=1):
                 span = shot.get("span", 1)
                 label = f"{slot + 1:02d}" + (f"-{slot + span:02d}" if span > 1 else "")
@@ -168,6 +168,9 @@ def cmd_render(a):
                     report["shots"].append(entry)
                 for s_, ev_, crop_ in proof_units(shot, scene):
                     units.append((f"{slot - span + 1 + s_:02d}", ev_, crop_))
+                for j in range(span):
+                    words, evs = va.visible_words(scene, ctx, j)
+                    contents.append((f"{slot - span + 1 + j:02d}", words, evs))
                 for w in warnings:
                     print(f"! {loc or ''} {name} {label}: {w}")
             set_rules = []
@@ -176,6 +179,7 @@ def cmd_render(a):
                 set_rules += va.device3d_set_warnings(scenes)
                 set_rules += rs.promise_warnings(pseudo, spec.get("promise_words"), lang)
                 set_rules += repeat_units(units)
+                set_rules += va.content_repeats(contents, ctx["evidence"])
                 if report["device"] == "iphone" and not a.size:
                     set_rules += rs.iphone_size_warnings(sizes)
             for w in set_rules:
