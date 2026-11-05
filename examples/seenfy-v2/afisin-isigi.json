@@ -1,5 +1,5 @@
 {
- "_doc": "Seenfy, concept D 'Afişin Işığı' - made with store-screenshots 2.2 in direct mode from the same evidence and DNA as the pilot (set.json). Every ground is blurred from the poster on its own screen; the indigo appears only on the word that decides. Materials are listed with their sources; render with: python3 skills/store-screenshots/scripts/compose.py render examples/seenfy-v2/afisin-isigi.json --out out/",
+ "_doc": "Seenfy, concept D 'Afişin Işığı' - made with store-screenshots 2.2 in direct mode from the same evidence and DNA as the pilot (set.json). It uses most of what the scene engine can do, each effect with its source in the campaign's materials: 3D phones with one camera, a rim light and a bezel sheen, a context phone, a span pair, a frosted glass pane, glow, a callout, an SVG motif, a hand mark. App Store sizes get the 3D phones; Google Play gets flat screens (Play advises against device imagery). Render: python3 skills/store-screenshots/scripts/compose.py render examples/seenfy-v2/afisin-isigi.json --out out/",
  "version": 2,
  "app": "Seenfy",
  "evidence": "evidence.json",
@@ -17,7 +17,7 @@
  ],
  "concept": {
   "name": "Afişin Işığı",
-  "idea": "Seenfy akşam açılır, karar bir afişe bakarak verilir. Her görselin zemini o ekrandaki afişin kendisinden gelir - Exhuma'nın grisi, Minyonlar'ın turuncusu, Yıldızlararası'nın buzu - ve ekran odadaki tek ışıktır. Uygulamanın çividi yalnızca kararı veren kelimede yanar."
+  "idea": "Seenfy akşam, karanlık bir odada açılır; karar bir afişe bakarak verilir. Her görselin zemini o ekrandaki afişten gelir, telefon da o odada duran bir nesnedir: arkadan uygulamanın çividiyle aydınlanır. Çivit yalnızca kararı veren kelimede ve ışıkta yanar."
  },
  "campaign": {
   "tokens": {
@@ -33,9 +33,24 @@
    "text": "fonts/Poppins_400Regular.ttf"
   },
   "materials": {
-   "flat": "dna: flat cards on #121212, no shadows - the screens are shown without depth",
+   "flat": "dna: flat cards on #121212, no shadows - flat screens stay flat",
    "photo": "dna: posters are the content - every ground is blurred from the poster on its own screen",
-   "glow": "concept: Afişin Işığı - the screen is the only light in the room, a soft light behind it"
+   "glow": "concept: Afişin Işığı - the only light in the room is the app's indigo, behind the phone and on its rim",
+   "3d": "concept: the phone as an object in that dark room - in the opening shot, and in the pair where two screens answer each other",
+   "glass": "concept: words over a loud poster sit on a frosted pane, so the poster stays visible behind them",
+   "illustration": "concept: the continue-watching progress bar, drawn once across the pair"
+  },
+  "camera": {
+   "fov": 22,
+   "light": [
+    -0.45,
+    -0.75,
+    -0.5
+   ],
+   "rim": {
+    "color": "$accent",
+    "strength": 0.7
+   }
   },
   "type": {
    "headline": {
@@ -74,7 +89,7 @@
   {
    "id": "promise",
    "message": "Picks you'll love, not the charts - every pick carries a match score",
-   "alt": "Seenfy öneri ekranı: Exhuma filmi, %88 Sana Uygun rozetiyle; zemin afişin renklerinden",
+   "alt": "Seenfy öneri ekranı bir telefonda: Exhuma, %88 Sana Uygun rozetiyle; arkada keşfet ekranı",
    "proof": [
     {
      "evidence": "sana-uygun",
@@ -92,17 +107,17 @@
      ],
      "blur": 0.1,
      "darken": [
-      0.62,
-      0.88
+      0.64,
+      0.9
      ],
      "tint": "$ground"
     },
     "light": {
-     "x": "50%",
-     "y": "62%",
-     "r": 0.8,
-     "opacity": 0.16,
-     "color": "$ink"
+     "x": "58%",
+     "y": "66%",
+     "r": 0.85,
+     "opacity": 0.26,
+     "color": "$accent"
     }
    },
    "layers": [
@@ -130,13 +145,222 @@
      "android": null
     },
     {
-     "type": "screen",
-     "evidence": "sana-uygun",
-     "crop": "hero-card",
-     "w": "90%",
-     "cx": "50%",
-     "cy": "60%",
-     "radius": 0.05
+     "default": {
+      "type": "device3d",
+      "id": "behind",
+      "role": "context",
+      "evidence": "kesfet",
+      "w": 0.6,
+      "right": -0.2,
+      "y": 0.62,
+      "rotate3d": {
+       "yaw": -46,
+       "pitch": 12
+      },
+      "body": {
+       "color": "graphite",
+       "sheen": 0.2
+      }
+     },
+     "android": null
+    },
+    {
+     "default": {
+      "type": "device3d",
+      "id": "phone",
+      "evidence": "sana-uygun",
+      "w": 0.7,
+      "x": 0.05,
+      "y": 0.58,
+      "rotate3d": {
+       "yaw": 18,
+       "pitch": 4
+      },
+      "body": {
+       "color": "graphite",
+       "sheen": 0.25
+      }
+     },
+     "android": {
+      "type": "screen",
+      "id": "phone",
+      "evidence": "sana-uygun",
+      "crop": "hero-card",
+      "w": "90%",
+      "cx": "50%",
+      "cy": "60%",
+      "radius": 0.05,
+      "glow": {
+       "color": "$accent",
+       "blur": 0.12,
+       "opacity": 0.45
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "pair",
+   "span": 2,
+   "message": "The episode you left and the next film, side by side - one tap to either",
+   "alt": [
+    "Seenfy ana sayfası bir telefonda: House of the Dragon, sıradaki bölüm S2E5",
+    "Seenfy detay ekranı bir telefonda: Yıldızlararası, 2s 49dk, IMDb 8.5"
+   ],
+   "proof": [
+    {
+     "evidence": "anasayfa",
+     "region": "continue-card"
+    },
+    {
+     "evidence": "detay",
+     "region": "facts"
+    }
+   ],
+   "background": {
+    "sample": {
+     "evidence": "anasayfa",
+     "crop": [
+      0.06,
+      0.21,
+      0.77,
+      0.43
+     ],
+     "blur": 0.1,
+     "darken": [
+      0.6,
+      0.88
+     ],
+     "tint": "$ground"
+    },
+    "light": {
+     "x": "50%",
+     "y": "62%",
+     "r": 1.0,
+     "opacity": 0.24,
+     "color": "$accent"
+    }
+   },
+   "layers": [
+    {
+     "type": "text",
+     "id": "head1",
+     "role": "headline",
+     "style": "headline",
+     "text": "Dizide kaldığın yer\n*tek dokunuş* uzakta",
+     "x": "4%",
+     "y": 0.13,
+     "w": 0.86
+    },
+    {
+     "default": {
+      "type": "text",
+      "role": "sub",
+      "style": "sub",
+      "text": "Sıradaki bölüm ana sayfanda seni bekler.",
+      "x": "4%",
+      "below": "head1",
+      "gap": 0.035,
+      "w": 0.8
+     },
+     "android": null
+    },
+    {
+     "type": "text",
+     "id": "head2",
+     "role": "headline",
+     "style": "headline",
+     "text": "Puan, süre, tür:\n*açmadan önce* bil",
+     "x": "54%",
+     "y": 0.13,
+     "w": 0.86
+    },
+    {
+     "default": {
+      "type": "text",
+      "role": "sub",
+      "style": "sub",
+      "text": "Film ya da dizi, kararını verecek her şey tek ekranda.",
+      "x": "54%",
+      "below": "head2",
+      "gap": 0.035,
+      "w": 0.8
+     },
+     "android": null
+    },
+    {
+     "default": {
+      "type": "svg",
+      "role": "illustration",
+      "motive": "the continue-watching progress bar (16% on the home screen), drawn once across the pair",
+      "x": 0.14,
+      "y": 2.02,
+      "markup": "<rect width='1.72' height='0.014' rx='0.007' fill='$card'/><rect width='0.62' height='0.014' rx='0.007' fill='$accent'/>"
+     },
+     "android": null
+    },
+    {
+     "default": {
+      "type": "device3d",
+      "id": "home",
+      "evidence": "anasayfa",
+      "w": 0.68,
+      "cx": "29%",
+      "y": 0.56,
+      "rotate3d": {
+       "yaw": 20,
+       "pitch": 4
+      },
+      "body": {
+       "color": "graphite",
+       "sheen": 0.25
+      }
+     },
+     "android": {
+      "type": "screen",
+      "id": "home",
+      "evidence": "anasayfa",
+      "h": 1.72,
+      "cx": "25%",
+      "y": 0.62,
+      "radius": 0.07
+     }
+    },
+    {
+     "type": "mark",
+     "kind": "circle",
+     "on": "home",
+     "region": "episode-badge",
+     "color": "$accent",
+     "width": 0.008,
+     "pad": 0.02
+    },
+    {
+     "default": {
+      "type": "device3d",
+      "id": "detail",
+      "evidence": "detay",
+      "w": 0.68,
+      "cx": "71%",
+      "y": 0.56,
+      "rotate3d": {
+       "yaw": -20,
+       "pitch": 4
+      },
+      "body": {
+       "color": "graphite",
+       "sheen": 0.25
+      }
+     },
+     "android": {
+      "type": "screen",
+      "id": "detail",
+      "evidence": "detay",
+      "h": 1.72,
+      "cx": "75%",
+      "y": 0.5,
+      "radius": 0.07
+     }
     }
    ]
   },
@@ -159,10 +383,10 @@
       0.96,
       0.56
      ],
-     "blur": 0.12,
+     "blur": 0.1,
      "darken": [
-      0.7,
-      0.86
+      0.66,
+      0.84
      ],
      "tint": "$ground"
     }
@@ -181,7 +405,6 @@
     {
      "default": {
       "type": "text",
-      "id": "sub",
       "role": "sub",
       "style": "sub",
       "text": "Beni Şaşırt'tan Gerçekten Korkunç'a, ruh haline göre film koleksiyonları.",
@@ -197,190 +420,44 @@
      "id": "c1",
      "evidence": "koleksiyonlar",
      "crop": "beni-sasirt",
-     "w": 0.8,
-     "y": 0.7,
-     "cx": "47%"
+     "w": 0.82,
+     "cx": "45%",
+     "y": 0.68
     },
     {
      "type": "screen",
      "id": "c2",
      "evidence": "koleksiyonlar",
      "crop": "plot-twist",
-     "w": 0.8,
+     "w": 0.92,
+     "cx": "53%",
      "below": "c1",
-     "gap": 0.04,
-     "cx": "53%"
+     "gap": 0.045,
+     "glow": {
+      "color": "$accent",
+      "blur": 0.09,
+      "opacity": 0.55
+     }
     },
     {
      "type": "screen",
      "id": "c3",
      "evidence": "koleksiyonlar",
      "crop": "beyin-yakan",
-     "w": 0.8,
+     "w": 0.82,
+     "cx": "45%",
      "below": "c2",
-     "gap": 0.04,
-     "cx": "47%"
+     "gap": 0.045
     },
     {
      "type": "screen",
      "id": "c4",
      "evidence": "koleksiyonlar",
      "crop": "korkunc",
-     "w": 0.8,
+     "w": 0.82,
+     "cx": "53%",
      "below": "c3",
-     "gap": 0.04,
-     "cx": "53%"
-    }
-   ]
-  },
-  {
-   "id": "continue",
-   "message": "The next episode waits on the home screen - one tap and you're back",
-   "alt": "Seenfy ana sayfası: House of the Dragon, sıradaki bölüm S2E5, izleme ilerlemesiyle",
-   "proof": [
-    {
-     "evidence": "anasayfa",
-     "region": "continue-card"
-    }
-   ],
-   "background": {
-    "sample": {
-     "evidence": "anasayfa",
-     "crop": [
-      0.06,
-      0.21,
-      0.77,
-      0.43
-     ],
-     "blur": 0.1,
-     "darken": [
-      0.58,
-      0.84
-     ],
-     "tint": "$ground"
-    },
-    "light": {
-     "x": "50%",
-     "y": "20%",
-     "r": 0.75,
-     "opacity": 0.14,
-     "color": "$ink"
-    }
-   },
-   "layers": [
-    {
-     "type": "screen",
-     "id": "home",
-     "evidence": "anasayfa",
-     "h": 1.7,
-     "cx": "50%",
-     "y": -0.25,
-     "radius": 0.07
-    },
-    {
-     "type": "mark",
-     "kind": "circle",
-     "on": "home",
-     "region": "episode-badge",
-     "color": "$accent",
-     "width": 0.008,
-     "pad": 0.025
-    },
-    {
-     "type": "text",
-     "id": "head",
-     "role": "headline",
-     "style": "headline",
-     "text": "Dizide kaldığın yer\n*tek dokunuş* uzakta",
-     "x": 0.08,
-     "y": 1.62,
-     "w": 0.86
-    },
-    {
-     "default": {
-      "type": "text",
-      "role": "sub",
-      "style": "sub",
-      "text": "Sıradaki bölüm ana sayfanda seni bekler.",
-      "x": 0.08,
-      "below": "head",
-      "gap": 0.035,
-      "w": 0.8
-     },
-     "android": null
-    }
-   ]
-  },
-  {
-   "id": "facts",
-   "message": "Rating, runtime and genre before you press play",
-   "alt": "Seenfy detay ekranı: Yıldızlararası, 2s 49dk, IMDb 8.5, 2014, Macera Dram Bilim-Kurgu",
-   "proof": [
-    {
-     "evidence": "detay",
-     "region": "facts"
-    }
-   ],
-   "background": {
-    "sample": {
-     "evidence": "detay",
-     "crop": [
-      0.1,
-      0.06,
-      0.9,
-      0.5
-     ],
-     "blur": 0.1,
-     "darken": [
-      0.55,
-      0.72
-     ],
-     "tint": "$ink"
-    }
-   },
-   "layers": [
-    {
-     "type": "text",
-     "id": "head",
-     "role": "headline",
-     "style": "headline",
-     "text": "Puan, süre, tür:\n*açmadan önce* bil",
-     "x": 0.08,
-     "y": 0.13,
-     "w": 0.86,
-     "color": "$ground"
-    },
-    {
-     "default": {
-      "type": "text",
-      "role": "sub",
-      "style": "sub",
-      "text": "Film ya da dizi, kararını verecek her şey tek ekranda.",
-      "x": 0.08,
-      "below": "head",
-      "gap": 0.035,
-      "w": 0.8,
-      "color": "$neutral"
-     },
-     "android": null
-    },
-    {
-     "type": "screen",
-     "id": "detail",
-     "evidence": "detay",
-     "right": 0.0,
-     "y": 0.66,
-     "radius": 0.06,
-     "h": 1.52
-    },
-    {
-     "type": "screen",
-     "evidence": "detay",
-     "crop": "facts",
-     "lift": {
-      "from": "detail",
-      "scale": 1.16
-     }
+     "gap": 0.045
     }
    ]
   },
@@ -403,24 +480,43 @@
       0.88,
       0.62
      ],
-     "blur": 0.09,
+     "blur": 0.05,
      "darken": [
-      0.3,
-      0.62
+      0.22,
+      0.5
      ],
      "tint": "$ground"
     }
    },
    "layers": [
     {
+     "type": "rect",
+     "id": "pane",
+     "role": "decor",
+     "x": 0.05,
+     "y": 0.08,
+     "w": 0.9,
+     "h": 0.33,
+     "radius": 0.05,
+     "fill": null,
+     "glass": {
+      "blur": 0.045,
+      "tint": "$ground",
+      "opacity": 0.42,
+      "edge": "$ink",
+      "edge_opacity": 0.2
+     },
+     "motive": "the concept's frosted pane: words over the loud poster"
+    },
+    {
      "type": "text",
      "id": "head",
      "role": "headline",
      "style": "headline",
      "text": "İzledin mi?\n*İşaretle*, gerisi gelsin",
-     "x": 0.08,
-     "y": 0.13,
-     "w": 0.86
+     "x": 0.1,
+     "y": 0.14,
+     "w": 0.82
     },
     {
      "type": "screen",
@@ -432,9 +528,9 @@
       1,
       0.905
      ],
-     "h": 1.35,
+     "h": 1.33,
      "cx": "50%",
-     "y": 0.54,
+     "y": 0.53,
      "radius": 0.05
     },
     {
@@ -442,7 +538,7 @@
      "id": "pill",
      "role": "callout",
      "cx": "50%",
-     "y": 1.95,
+     "y": 1.93,
      "w": 0.64,
      "h": 0.09,
      "radius": 0.045,
@@ -454,7 +550,7 @@
      "style": "callout",
      "text": "Öneriler buna göre değişir",
      "cx": "50%",
-     "cy": 1.995,
+     "cy": 1.975,
      "w": 0.6,
      "align": "center"
     }

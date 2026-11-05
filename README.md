@@ -188,23 +188,29 @@ python3 $S/peer_test.py out/tr/ios --category entertainment -o peer.jpg
 
 ## Seenfy with 2.2: "Afişin Işığı"
 
-Made in direct mode from the same five raw screens, evidence and DNA as the pilot below, with a new concept
-([`examples/seenfy-v2/afisin-isigi.json`](examples/seenfy-v2/afisin-isigi.json)).
+This set was made in direct mode. It uses the same five raw screens, evidence and DNA as the pilot below, with a
+new concept ([`examples/seenfy-v2/afisin-isigi.json`](examples/seenfy-v2/afisin-isigi.json)). It uses
+most of what the scene engine can do, and every set check passes.
 
-- **The idea:** Seenfy is opened in the evening, and the choice is made by looking at a poster. Every ground is
-  blurred from the poster on its own screen: Exhuma's grey, the Minions' orange, Interstellar's ice. The
-  app's indigo appears only on the word that decides.
-- **Materials, each with its source:** flat and photo come from the DNA. A soft light behind the screen comes
-  from the concept ("the screen is the only light in the room"), in three of the five shots, not all of them.
-- **One system, five compositions:**
-  1. the match-score card;
-  2. four real mood cards in a staircase;
-  3. the home screen bleeding off the top, with the S2E5 badge circled;
-  4. the facts card lifted out of a light detail shot;
-  5. the discover screen, with one callout in the campaign's own pill.
-- **Checks:** clean on every size, iPhone medium and large and Google Play. The Play set has no frames and
-  keeps taglines under 20 %. The feature graphic sits on indigo rather than white, black or dark gray, and
-  every shot has alt text.
+- **The idea:** Seenfy is opened in the evening, in a dark room, and the choice is made by looking at a poster.
+  - Every ground is blurred from the poster on its own screen.
+  - The phone is an object in that room, lit from behind by the app's indigo.
+  - Indigo appears only on the word that decides and in the light.
+- **What it uses, each with its source in the campaign's `materials`:**
+  - 3D phones sharing one camera, with an indigo rim light and a bezel sheen;
+  - a context phone turned away behind the proof;
+  - a span pair of two phones answering each other, the home screen and the detail screen;
+  - the continue-watching progress bar drawn once across the pair as an SVG motif;
+  - a hand-drawn circle on the S2E5 badge that follows the phone's perspective;
+  - glow on the one mood that matters;
+  - a frosted glass pane for words over a loud poster;
+  - a callout in the campaign's own pill.
+- **What the rules shaped:**
+  - Turned phones appear in two shots, the opening shot and the pair, never in all.
+  - The pair sits in slots 2-3, so search results never cut it in half.
+  - Google Play gets the same set with flat screens, since Play advises against device imagery, and taglines
+    under 20 %.
+  - The feature graphic sits on indigo rather than white, black or dark gray, and every shot has alt text.
 
 ![Seenfy, concept "Afişin Işığı": App Store set](docs/images/afisin-isigi-set.jpg)
 
