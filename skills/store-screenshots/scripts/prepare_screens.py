@@ -38,6 +38,28 @@ from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONT = os.path.normpath(os.path.join(HERE, "..", "assets", "fonts", "InterDisplay-SemiBold.otf"))
+
+
+def find_tesseract():
+    """tesseract on PATH, or where the Windows installer puts it (then PATH is extended for this process)."""
+    import shutil
+    exe = shutil.which("tesseract")
+    if exe or os.name != "nt":
+        return exe
+    for base in (os.environ.get("ProgramFiles", r"C:\Program Files"), os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"),
+                 os.path.join(os.environ.get("LOCALAPPDATA", ""), "Programs")):
+        cand = os.path.join(base, "Tesseract-OCR", "tesseract.exe")
+        if os.path.exists(cand):
+            os.environ["PATH"] = os.path.dirname(cand) + os.pathsep + os.environ.get("PATH", "")
+            return cand
+    return None
+
+
+TESSERACT_HINT = ("install tesseract with Turkish: Windows - winget install --id tesseract-ocr.tesseract, then tur.traineddata "
+                  "from github.com/tesseract-ocr/tessdata into C:\\Program Files\\Tesseract-OCR\\tessdata; "
+                  "macOS - brew install tesseract tesseract-lang; Linux - apt install tesseract-ocr tesseract-ocr-tur")
+
+
 def pixels(im):
     return list(im.get_flattened_data() if hasattr(im, "get_flattened_data") else im.getdata())
 
@@ -115,11 +137,11 @@ FIGURE = re.compile(r"(?<![\d:./,])(\d{1,3}(?:[.,]\d{1,2})?\s?(?:B|K|M|Mn|bin|mi
 
 
 def ocr_langs():
-    exe = shutil.which("tesseract")
+    exe = find_tesseract()
     if not exe:
         return None, None
     try:
-        out = subprocess.run([exe, "--list-langs"], capture_output=True, text=True, timeout=20).stdout.split()
+        out = subprocess.run([exe, "--list-langs"], capture_output=True, encoding="utf-8", errors="replace", timeout=20).stdout.split()
     except (OSError, subprocess.SubprocessError):
         return None, None
     langs = "+".join(l for l in ("eng", "tur") if l in out) or None
@@ -135,7 +157,7 @@ def repeated_figures(im, exe, langs, times=3):
         path = os.path.join(tmp, "s.png")
         g.save(path)
         try:
-            text = subprocess.run([exe, path, "-", "-l", langs, "--psm", "11"], capture_output=True, text=True,
+            text = subprocess.run([exe, path, "-", "-l", langs, "--psm", "11"], capture_output=True, encoding="utf-8", errors="replace",
                                   timeout=120).stdout
         except (OSError, subprocess.SubprocessError):
             return []
@@ -204,6 +226,8 @@ def main():
         diffs.append(sum(abs(x - y) for x, y in zip(a_px, b_px)) / len(a_px))
     print(f"{len(files)} screens → {a.out}" + ("" if exe and langs or a.no_ocr else
                                                  "   (no tesseract: demo-data check skipped)"))
+    if not (exe and langs) and not a.no_ocr:
+        print("   " + TESSERACT_HINT)
     for r_ in report:
         print(f"- {r_['file']}: {r_['size'][0]}x{r_['size'][1]} (ratio {r_['ratio']})")
         for n in r_["notes"]:
@@ -217,4 +241,7 @@ def main():
 
 
 if __name__ == "__main__":
+    for _stream in (sys.stdout, sys.stderr):  # Windows consoles and pipes default to a legacy code page
+        if hasattr(_stream, "reconfigure"):
+            _stream.reconfigure(encoding="utf-8", errors="replace")
     main()

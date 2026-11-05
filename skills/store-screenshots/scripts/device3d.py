@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python3
 """3D devices: a real screen on a phone body turned in space.
 
@@ -380,4 +381,7 @@ def shadow_for(rgba, spec, pad):
 
 
 if __name__ == "__main__":
+    for _stream in (sys.stdout, sys.stderr):  # Windows consoles and pipes default to a legacy code page
+        if hasattr(_stream, "reconfigure"):
+            _stream.reconfigure(encoding="utf-8", errors="replace")
     print(__doc__)

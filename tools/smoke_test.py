@@ -607,6 +607,24 @@ def device3d_tests(tmp):
         assert "WARN" not in out and "ERROR" not in out, out
 
 
+def console_tests(tmp):
+    """Windows consoles and pipes default to a legacy code page (cp1254 / cp857 in Turkey): the scripts must
+    print arrows, ≥ and Turkish letters there without crashing, with no PYTHONUTF8 needed."""
+    env = dict(os.environ, PYTHONIOENCODING="cp1254")
+    env.pop("PYTHONUTF8", None)
+    out_dir = os.path.join(tmp, "console")
+    calls = [[s("search_library.py"), "--category", "weather", "--summary"],
+             [s("render_set.py"), os.path.join(SKILL, "templates", "set.example.json"), "--out", out_dir, "--size", "ios"],
+             [s("check_set.py"), os.path.join(out_dir, "ios"), "--store", "ios", "--lang", "tr", "--headlines", "Kaldığın bölüm → hazır"]]
+    if os.path.exists(s("compose.py")):
+        calls += [[s("evidence.py"), "build", DEMO, "-o", os.path.join(tmp, "console-ev.json"), "--no-ocr"],
+                  [s("compose.py"), "render", os.path.join(SKILL, "templates", "scene.example.json"), "--out",
+                   os.path.join(tmp, "console-scene"), "--size", "ios"]]
+    for args in calls:
+        p = subprocess.run([PY, *args], capture_output=True, env=env)  # no -I: it would ignore PYTHONIOENCODING
+        assert p.returncode == 0, (args[0], p.stderr.decode("utf-8", "replace")[-1500:])
+
+
 def quality_tests(tmp):
     """The checks that catch a set that looks fine but doesn't sell: no promise in shots 1-3, the same proof
     twice, thin demo data."""
@@ -715,6 +733,7 @@ def main():
         span_tests(tmp)
         size_tests(tmp)
         quality_tests(tmp)
+        console_tests(tmp)
         design_tests(tmp)
         device3d_tests(tmp)
         # every bundled font covers Turkish

@@ -65,7 +65,11 @@ All scripts are Python 3 and live in `scripts/` next to this file (in Claude Cod
 | `find_challengers.py`, `build_catalog.py` | Maintainers: pick well-rated small/mid-size apps per category; rebuild the library catalog |
 
 Rendering needs Pillow; `pip install resvg-py` adds the SVG renderer `compose.py` prefers (and `svg` layers
-need). tesseract (with Turkish) makes the claim checks possible.
+need). tesseract with Turkish data makes the checks that read the screens possible: numbers in the copy,
+repeated content, words sliced by a crop. Without it, say that those checks didn't run. To install it:
+Windows `winget install --id tesseract-ocr.tesseract` plus `tur.traineddata`; macOS
+`brew install tesseract tesseract-lang`; Linux `apt install tesseract-ocr tesseract-ocr-tur`. The scripts set
+their own UTF-8 output, so Windows consoles need no `PYTHONUTF8`.
 
 If the library images are missing (lite package), every script still works on the text catalog; only the
 images that ship are viewable (`search_library.py` marks them `img`).

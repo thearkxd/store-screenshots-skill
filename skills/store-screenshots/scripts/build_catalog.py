@@ -44,7 +44,7 @@ def ocr_words(img, tmpdir):
     path = os.path.join(tmpdir, f"ocr-{os.getpid()}.png")
     img.save(path)
     out = subprocess.run(["tesseract", path, "stdout", "-l", "eng+tur", "--psm", "11", "tsv"],
-                         capture_output=True, text=True, timeout=120).stdout
+                         capture_output=True, encoding="utf-8", errors="replace", timeout=120).stdout
     words = []
     for line in out.splitlines()[1:]:
         p = line.split("\t")
@@ -337,4 +337,7 @@ def main():
 
 
 if __name__ == "__main__":
+    for _stream in (sys.stdout, sys.stderr):  # Windows consoles and pipes default to a legacy code page
+        if hasattr(_stream, "reconfigure"):
+            _stream.reconfigure(encoding="utf-8", errors="replace")
     sys.exit(main())
