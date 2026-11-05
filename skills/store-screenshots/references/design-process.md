@@ -83,6 +83,7 @@ python3 scripts/evidence.py name evidence.json home continue-card 0.04,0.21,0.78
 python3 scripts/dna.py measure evidence.json --app "Seenfy" -o dna.json          # + --site https://… if there is one
 python3 scripts/dna.py fonts evidence.json home --region 0.05,0.08,0.6,0.12 --text "İzlemeye Devam Et" -o font-match.jpg
 python3 scripts/dna.py board dna.json -o dna-board.jpg
+python3 scripts/dna.py reference liked.png --dna dna.json -o reference.jpg      # a set the user likes: principles only
 ```
 
 **`measure`** finds what a script can find:
@@ -98,6 +99,11 @@ python3 scripts/dna.py board dna.json -o dna-board.jpg
   (OFL) match on the font-match sheet. Tell the user which one you used and why.
 - **palette**: the roles you'll actually use, with the app's hex values.
 - **shape**: corner radius, elevation (flat or shadowed), density, icon style.
+- **materials** - what the screens are made of, each with where it shows. The vocabulary is flat, elevated,
+  glass, glow, gradient, texture, paper, 3d, tilt, illustration and photo. Seenfy:
+  `{"flat": "cards and lists are flat fills (anasayfa, kutuphane)", "photo": "posters are the content"}`. List
+  only what the screens show. The board prints the rest as "not in the app", and a campaign may use those
+  only with the concept as its reason (§7).
 - **signatures** - 2-4 elements only this app has, each with its evidence and crop. Seenfy: the indigo "%88 Sana
   Uygun" pill, the continue-watching card with "S2E5", the mood collections. Signatures are what concepts are
   made of.
@@ -107,6 +113,18 @@ python3 scripts/dna.py board dna.json -o dna-board.jpg
 
 Render the board and show it with the concepts (§4). If you're unsure about the DNA - no brand material, a
 font you can't identify - show the board first and confirm it.
+
+**References the user likes.** When the user sends a set they admire, `dna.py reference` adds it to the
+DNA. It records the reference's palette, and you write the principles to take from it:
+- `hierarchy` - what reads first;
+- `density` - how many elements a shot holds;
+- `rhythm` - how shots differ from each other;
+- `type_and_screen` - how type and UI share the canvas;
+- `why_it_works`.
+
+Its palette, fonts, illustrations, 3D objects and layouts stay its own. A great reference is great because it
+comes from its own app, so copying its look produces the template this skill exists to avoid. With
+`"dna": "dna.json"` in the set, the renderer warns when campaign colours match the reference but not the app.
 
 ## 4. Concepts: three ideas, not three colour schemes
 
@@ -139,9 +157,14 @@ Put all three in version-2 set files that share the same copy and evidence, then
 python3 scripts/compose.py concepts a.json b.json c.json --board dna-board.jpg -o concepts.jpg
 ```
 
-Show it with one line per concept on why it fits the angle, and your pick. Mixing is allowed ("B's numbers on
-C's light page") - make a new set file for the mix. Skip the checkpoint only if the user said "just deliver"
-or the brand already has a screenshot system. Then name the concept you chose and why.
+Together pace (`intake.md` §1): show it with one line per concept on why it fits the angle, and your pick.
+Mixing is allowed ("B's numbers on C's light page") - make a new set file for the mix. Direct pace: open the
+sheet yourself, choose, and name the concept and why in the delivery. If the brand already has a screenshot
+system, follow it and skip the concepts.
+
+**The examples are not concepts.** `templates/scene.example.json` and the Seenfy pilot show how a set file is
+written. Their placements, palette and devices belong to Dizilog and Seenfy. A shot that repeats an example's
+numbers for its main visual and type is warned.
 
 ## 5. The campaign system: what stays, what changes
 
@@ -153,7 +176,9 @@ A professional campaign varies the composition and keeps the system.
 - one emphasis device;
 - one motif or ownable detail, used with restraint;
 - the margins (about 0.08u from the edges) and the corner radius from the DNA;
-- the role of colour: the accent means the same thing everywhere.
+- the role of colour: the accent means the same thing everywhere;
+- the **materials** (`"materials"` in the campaign), each with its reason. An effect the campaign doesn't list
+  needs a `"motive"` on its layer.
 
 **Changes from shot to shot (the variables):**
 - where the headline sits: top, bottom, beside, over open ground;
@@ -200,9 +225,26 @@ Let the message decide the composition:
   suggested, approved, then queued) is fine.
 - **Every decoration needs a `motive`** naming where it comes from in the DNA or the concept ("the app's progress
   bar track"). Without a motive it's AI decoration - delete it. At most a few per shot.
-- **Gradients** only when the app has them, or they come from the app's own colours (`"sample"`), never the
-  default purple-to-blue.
-- **Free vector work** (a motif, a pattern, a drawn shape) goes in an `svg` layer, written in u. For something
+- **Effects are materials, and nothing is a default.** Gradients, glow, glass, grain, tilted or 3D phones and
+  illustrations are each allowed when they have a source, and only then:
+  - the app's DNA ("the tab bar is frosted glass");
+  - the concept ("the accent is the only light in the set");
+  - the shot's message ("a stack of cards, so depth");
+  - the brand guide.
+
+  Write the source in the campaign's `"materials"`: `{"glass": "dna: tab bar and sheets"}`. For a one-off,
+  use the layer's `"motive"`. The renderer warns about any effect without a source, and about an effect on
+  every shot that doesn't come from the DNA. The default purple-to-blue gradient has no source for any app.
+- **Glass** (`"glass"` on a rect) is a frosted panel: what's behind it, blurred and tinted, with a hairline
+  edge. Use it behind text that floats over a photo or a busy ground, the way the app's own sheets do. Never
+  put it over a screen, which is painting over the UI.
+- **Glow** (`"glow"` on a screen, rect or ellipse) is a coloured halo with no offset, so it reads as light, not as
+  a shadow. One light source per shot, and only in the colour that carries the message.
+- **Callouts** (`"role": "callout"`, `scene-format.md` §5) point at a part of the UI: "Spoiler gizli", "3
+  hatırlatma". They use the campaign's `callout` style, so they never read as the app's own buttons or badges.
+  They may reach over a screen's edge, but cover at most 8 % of it, and a shot has at most four.
+- **Free vector work** (a motif, a pattern, a drawn shape, a spot illustration) goes in an `svg` layer, written
+  in u (recipes: `scene-format.md` §5). For something
   no layer can do - perspective, complex illustration - use the HTML route (`layouts.md` §6). The truth rules
   still apply: screens are `<img>` tags of the evidence files, never redrawn, and the result is checked with
   `check_set.py`.
@@ -225,6 +267,8 @@ wrong. Then judge what no check can:
 - Is anything decorative competing with the product?
 - Do shots 1-3 alone say what the app does?
 - Does it look like this app's own marketing, or like an AI render of a category (`anti-ai.md`)?
+- Does it look like this skill's last set? A dark ground, a lifted card, a mark, a phone at the bottom: each is
+  right for some shot, never by habit (`anti-ai.md`, "The skill's own habits").
 
 Do at least one round of fixes. Usually the fix is: larger UI, less type, fewer colours, a stronger focal point.
 
@@ -232,12 +276,17 @@ Do at least one round of fixes. Usually the fix is: larger UI, less type, fewer 
 
 - One set file renders every size. `%` widths and anchored text adapt by themselves; override per size where
   needed (`scene-format.md` §6).
-- **Google Play:**
-  - no device frame;
-  - all words on the canvas within 20 % of its height, including big type - shrink it in the android variant
-    or drop a sub-line there;
-  - no prices, promos, calls to action or rankings;
-  - a feature graphic, 1024×500.
+- **Google Play** (`store-specs.md`, Google Play, keeps requirements, recommendations and promotion rules apart):
+  - required: at least 2 screenshots (at most 8 per device type) within the size limits, and a 1024×500 feature
+    graphic without alpha;
+  - recommended:
+    - no device frame;
+    - all words on the canvas within 20 % of its height, including big type - shrink it in the android
+      variant or drop a sub-line there;
+    - no prices, promos, calls to action, rankings or testimonials;
+    - alt text for every shot (`"alt"`, ≤ 140 characters);
+    - a feature graphic with a coloured ground, its key elements away from the edges;
+  - for promotion formats: 4+ screenshots at ≥ 1080 px, 9:16 or 16:9.
 - **iPhone Duo / iPad:** use screens captured on that device, given per size, and re-check every composition -
   the canvas is wider.
 

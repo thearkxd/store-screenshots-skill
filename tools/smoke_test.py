@@ -193,7 +193,8 @@ def size_tests(tmp):
               "Hemen indir, şimdi dene", "“Harika bir uygulama” ★★★★★", "Yeni özellik: takvim", "1M+ downloads",
               "Yeni bölüm çıkınca ilk sen bil")
     assert out.count("call to action") == 1 and "user testimonial" in out, out
-    assert '"Yeni özellik: takvim": Google Play disallows' in out and '"1M+ downloads": Google Play disallows' in out, out
+    assert '"Yeni özellik: takvim": [Play recommendation] ranking' in out and '"1M+ downloads": [Play recommendation] ranking' in out, out
+    assert "[Play requirement]: the listing can be removed" in out, out  # the legend says what each label costs
     assert '05 "Yeni bölüm' not in out, out
     # concept sheets at other sizes
     run(s("concepts.py"), fx, "--size", "duo-inner", "--directions", "editorial", "cinematic", "-o", os.path.join(tmp, "duo-concepts.jpg"))
@@ -408,6 +409,152 @@ def design_tests(tmp):
             assert px[0] > 200 and px[1] < 140, (backend, px, out)
 
 
+def guardrail_tests(tmp):
+    """Nothing is a default: effects need a source, the skill's own habits and the bundled examples are caught,
+    callouts stay the campaign's, references lend principles not colours, Google Play's three kinds of rule are
+    labelled apart - and glass and glow draw the same on both backends."""
+    import json
+    from PIL import Image, ImageChops, ImageStat
+    sys.path.insert(0, SCRIPTS)
+    import scene as sc
+    tdir = os.path.join(SKILL, "templates")
+    ex = os.path.join(tdir, "scene.example.json")
+    ev_path = os.path.join(tdir, "scene-evidence.json")
+    d = os.path.join(tmp, "guard")
+    os.makedirs(d)
+    base = json.load(open(ex, encoding="utf-8"))
+
+    def write(name, shots, campaign=None, **extra):
+        p = os.path.join(d, name, "set.json")
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        camp = dict(base["campaign"], **(campaign or {}))
+        bare = {k: v for k, v in base.items() if k != "feature_graphic"}
+        spec = dict(bare, evidence=ev_path, sizes=["ios"], shots=shots, campaign=camp, app=extra.pop("app", "Test " + name), **extra)
+        json.dump(spec, open(p, "w", encoding="utf-8"), ensure_ascii=False)
+        return p
+
+    def render(p, *args, expect=0, out="out"):
+        return run(s("compose.py"), "render", p, "--out", os.path.join(os.path.dirname(p), out), *args, expect=expect, both=True)
+    head = {"type": "text", "id": "head", "role": "headline", "style": "headline", "text": "Kaldığın *bölüm* hazır", "x": 0.08, "y": 0.12, "w": 0.84}
+    shot = lambda i, layers, **kw: dict({"id": i, "alt": "Test görseli", "proof": [{"evidence": "stats"}], "background": {"fill": "$ground"},
+                                         "layers": layers}, **kw)
+    scr = {"type": "screen", "id": "s", "evidence": "stats", "w": 0.7, "x": 0.15, "y": 0.5, "radius": 0.06}
+    blob = {"type": "ellipse", "role": "decor", "motive": "the accent as the one light", "x": 0.05, "y": 1.6, "w": 0.5, "fill": "$accent"}
+    panel = {"type": "rect", "role": "decor", "motive": "the app's frosted sheet", "x": 0.1, "y": 1.75, "w": 0.6, "h": 0.2, "radius": 0.04,
+             "fill": None, "glass": {"blur": 0.03, "opacity": 0.14}}
+    glow_scr = dict(scr, glow={"color": "$accent", "blur": 0.1, "opacity": 0.6})
+
+    # --- glass and glow draw, and both backends agree
+    if sc.have_resvg():
+        p = write("fx", [shot("fx", [head, blob, glow_scr, panel])])
+        render(p)
+        render(p, "--backend", "pillow", out="pil")
+        a = Image.open(os.path.join(d, "fx", "out", "ios", "01.png")).convert("RGB")
+        b = Image.open(os.path.join(d, "fx", "pil", "ios", "01.png")).convert("RGB")
+        diff = sum(ImageStat.Stat(ImageChops.difference(a, b)).mean) / 3
+        assert diff < 6, f"glass/glow: backends differ by {diff:.1f}"
+        U = 1206
+        halo = a.getpixel((int(0.15 * U) - 12, int(0.9 * U)))  # just left of the screen: lit by the accent glow
+        ground = a.getpixel((int(0.02 * U), int(0.3 * U)))
+        assert halo[0] > ground[0] + 25, (halo, ground)
+        # the glass panel blurs the edge of the accent ellipse behind it: a soft ramp, not a hard step
+        y = int(1.85 * U)
+        row = [a.getpixel((x, y))[0] for x in range(int(0.45 * U), int(0.62 * U))]
+        steps = max(abs(row[i + 1] - row[i]) for i in range(len(row) - 1))
+        assert steps < 40, steps
+    # --- effects without a source are warned; with one, they're a choice
+    p = write("nosrc", [shot("n", [head, dict(blob, motive=None), dict(glow_scr), dict(panel, motive=None)])])
+    out = render(p)
+    assert "glass on rect has no source" in out and "glow on image s has no source" in out, out
+    p = write("src", [shot("n", [head, dict(blob, motive=None), glow_scr, dict(panel, motive=None)])],
+              campaign={"materials": {"glass": "concept: the sheets of the app, frosted", "glow": "concept: the accent is the only light"}})
+    out = render(p)
+    assert "has no source" not in out, out
+    p = write("noreason", [shot("n", [head, scr])], campaign={"materials": {"gradient": "", "sparkle": "x"}})
+    out = render(p)
+    assert "'gradient' has no reason" in out and "'sparkle' isn't one of" in out, out
+    dna = {"materials": {"flat": "flat cards"}, "measured": {"ui": "light", "palette": [{"hex": "#FF5A3C"}]},
+           "references": [{"file": "liked.png", "palette": ["#2B6CFF", "#19C37D", "#0E0E10"]}]}
+    json.dump(dna, open(os.path.join(d, "dna.json"), "w", encoding="utf-8"))
+    p = write("dnasrc", [shot("n", [head, scr, dict(panel, motive=None)])], dna=os.path.join(d, "dna.json"),
+              campaign={"materials": {"glass": "dna: frosted tab bar"},
+                        "tokens": dict(base["campaign"]["tokens"], blue="#2B6CFF", green="#19C37D")})
+    out = render(p)
+    assert "says it comes from the DNA" in out and "come from the reference" in out, out
+    for name, layer, msg in (("glassgroup", {"type": "group", "layers": [panel]}, "top-level layers only"),
+                             ("glassellipse", dict(blob, glass={}), "works on a rect")):
+        assert msg in render(write(name, [shot("g", [head, scr, layer])]), expect=1), name
+    # --- callouts: the campaign's own style is not app UI; anything else is
+    box = {"type": "rect", "role": "callout", "x": 0.55, "y": 0.42, "w": 0.4, "h": 0.08, "radius": 0.04, "fill": "$accent"}
+    label = {"type": "text", "role": "callout", "style": "callout", "text": "Spoiler gizli", "x": 0.58, "y": 0.44, "w": 0.35}
+    callout_style = {"type": dict(base["campaign"]["type"], callout={"font": "display", "size": 0.034, "color": "$ground"})}
+    out = render(write("callout", [shot("c", [head, scr, box, label])], campaign=callout_style))
+    assert "looks like app UI" not in out and "callout style" not in out and "covers" not in out, out
+    out = render(write("callout-nostyle", [shot("c", [head, scr, box, dict(label, style="sub")])]))
+    assert "doesn't use a campaign callout style" in out and "looks like app UI" in out, out
+    many = [head, scr] + [dict(label, y=0.3 + 0.1 * k, x=0.08, w=0.3) for k in range(5)]
+    assert "5 callouts in one shot" in render(write("callouts", [shot("c", many)], campaign=callout_style))
+    # --- the skill's own habits, across a set
+    lifted = [shot(f"h{k}", [head, dict(scr, evidence=e, id="m", y=0.7 + 0.05 * k),
+                             {"type": "screen", "evidence": e, "crop": r, "lift": {"from": "m", "scale": 1.08}}],
+                   proof=[{"evidence": e}])
+              for k, (e, r) in enumerate((("stats", "tiles"), ("home", "resume"), ("calendar", "tonight"), ("friends", "first-post")))]
+    out = render(write("habits", lifted, campaign={"materials": {"glow": "concept: one light"}}))
+    assert "a lifted card in 4 of 4 shots" in out and "every shot crops its main screen" in out, out
+    glowing = [shot(f"g{k}", [head, dict(glow_scr, evidence=e, y=0.5 + 0.1 * k)], proof=[{"evidence": e}])
+               for k, e in enumerate(("stats", "home", "calendar", "friends"))]
+    out = render(write("glowing", glowing, campaign={"materials": {"glow": "concept: one light"}}, dna=os.path.join(d, "dna.json")))
+    assert "glow in every shot" in out and "the app's UI is light but every shot is on a dark ground" in out, out
+    out = render(write("glowing-dna", glowing, campaign={"materials": {"glow": "dna: the app's neon accent"}}))
+    assert "glow in every shot" not in out, out
+    # --- the bundled example is the format, not a look
+    out = render(write("copy", base["shots"]))
+    assert "repeats the layout of the bundled example 'templates/resume'" in out, out
+    # --- opt-in history: a set that looks like the last one for another app
+    os.environ["STORE_SCREENSHOTS_HOME"] = os.path.join(d, "home")
+    try:
+        render(write("hist-a", base["shots"][:3], app="App A"), "--history")
+        out = render(write("hist-b", base["shots"][:3], app="App B"), "--history")
+        assert "looks like your 'App A' set" in out, out
+        out = run(s("compose.py"), "history")
+        assert "App A" in out and "App B" in out and "2 sets" in out, out
+        run(s("compose.py"), "history", "--clear")
+        assert "no history yet" in run(s("compose.py"), "history")
+    finally:
+        os.environ.pop("STORE_SCREENSHOTS_HOME", None)
+    # --- Google Play: requirement, recommendation, promotion eligibility - and alt text
+    p = write("play", [shot("p1", [head, scr]), shot("p2", [head, dict(scr, evidence="home")], alt="x" * 150, proof=[{"evidence": "home"}]),
+                       shot("p3", [head, dict(scr, evidence="calendar")], alt=None, proof=[{"evidence": "calendar"}])],
+              feature_graphic={"background": {"fill": "$ground"}, "layers": [dict(head, x=0.02, y=0.2, w=2.0)]})
+    j = json.load(open(p, encoding="utf-8"))
+    j["sizes"] = ["android"]
+    json.dump(j, open(p, "w", encoding="utf-8"), ensure_ascii=False)
+    render(p)
+    rep = json.load(open(os.path.join(d, "play", "out", "android", "_render.json"), encoding="utf-8"))
+    assert rep["shots"][0]["alt"] == "Test görseli", rep["shots"][0]
+    out = run(s("check_set.py"), os.path.join(d, "play", "out", "android"), "--store", "android", "--lang", "tr")
+    for msg in ("[Play promotion eligibility] fewer than 4 screenshots", "[Play recommendation] 1 of 3 screenshots have no alt text",
+                "02.png: alt text is 150 characters", "[Play recommendation] feature graphic ground is",
+                "the headline reaches into the cutoff zone", "feature graphic has no alt text", "[Play requirement]: the listing"):
+        assert msg in out, (msg, out)
+    assert "ERROR" not in out, out
+    # --- dna: materials on the board, a reference recorded with its palette
+    ev = json.load(open(ev_path, encoding="utf-8"))
+    dna_path = os.path.join(d, "dna-m.json")
+    run(s("dna.py"), "measure", ev_path, "--app", "Dizilog", "-o", dna_path)
+    m = json.load(open(dna_path, encoding="utf-8"))
+    assert "_doc" in m["materials"] and m["references"] == [], m
+    m["materials"]["flat"] = "flat cards"
+    json.dump(m, open(dna_path, "w", encoding="utf-8"))
+    run(s("dna.py"), "board", dna_path, "-o", os.path.join(d, "board.jpg"))
+    ref = os.path.join(d, "liked.png")
+    Image.new("RGB", (400, 800), (43, 108, 255)).save(ref)
+    run(s("dna.py"), "reference", ref, "--dna", dna_path, "-o", os.path.join(d, "reference.jpg"))
+    m = json.load(open(dna_path, encoding="utf-8"))
+    assert m["references"][0]["palette"][0].upper().startswith("#2"), m["references"]
+    assert ev  # the shipped evidence was readable
+
+
 def console_tests(tmp):
     """Windows consoles and pipes default to a legacy code page (cp1254 / cp857 in Turkey): the scripts must
     print arrows, ≥ and Turkish letters there without crashing, with no PYTHONUTF8 needed."""
@@ -511,7 +658,7 @@ def main():
             from PIL import Image
             assert Image.open(os.path.join(ex, loc, "feature-graphic.png")).size == (1024, 500)
             out = run(s("check_set.py"), os.path.join(ex, loc, "android"), "--store", "android")
-            assert "Google Play disallows" not in out, out  # "Popüler olanı değil" / "Not what's popular" are negated
+            assert "ranking, award, price" not in out, out  # "Popüler olanı değil" / "Not what's popular" are negated
         # screen preparation and crop helpers
         prep = os.path.join(tmp, "prep")
         run(s("prepare_screens.py"), os.path.join(ROOT, "examples", "seenfy", "screens"), "--out", prep, "--status-bar", "9:41",
@@ -536,6 +683,7 @@ def main():
         quality_tests(tmp)
         console_tests(tmp)
         design_tests(tmp)
+        guardrail_tests(tmp)
         # every bundled font covers Turkish
         sys.path.insert(0, SCRIPTS)
         import render_set
@@ -547,7 +695,7 @@ def main():
         # copy checks must catch an obviously bad headline
         out = run(s("check_set.py"), os.path.join(tmp, "android"), "--store", "android", "--lang", "tr",
                   "--headlines", "Kusursuz Dizi Deneyimi", "#1 dizi uygulaması!", "a", "b", "c")
-        assert "kusursuz" in out and "Google Play" in out, out
+        assert "kusursuz" in out and "[Play recommendation] ranking" in out, out
     print("smoke test passed")
 
 

@@ -3,13 +3,15 @@
 A version-2 set describes every screenshot as a **scene**: a canvas and an ordered list of layers you place
 freely. There is no built-in layout. The process that decides what goes in a scene is in
 `design-process.md`; this file is the reference for writing one. A complete worked set is
-`templates/scene.example.json` (Seenfy, concept "Ekrandaki Sayı").
+`templates/scene.example.json` (the fictional Dizilog, concept "Tek Turuncu"). It shows the format, not a
+look to reuse.
 
 ```bash
 python3 scripts/compose.py render set.json --out out/                  # every locale × size: PNG + SVG + _render.json
 python3 scripts/compose.py render set.json --out out/ --shots detail    # re-render one shot (numbering and report kept)
 python3 scripts/compose.py xray set.json --shot promise -o x.png        # boxes, roles, margins, seam, thumbnail inset
 python3 scripts/compose.py concepts a.json b.json c.json --board dna-board.jpg -o concepts.jpg
+python3 scripts/compose.py render set.json --out out/ --history         # opt-in: compare with earlier sets, then log it
 ```
 
 Drawn with resvg (`pip install resvg-py`) when it's installed, otherwise with Pillow (`--backend pillow`);
@@ -53,6 +55,7 @@ text (fonts referenced by family name) and the screens embedded.
  "sizes": ["ios", "ios-large", "android"],               // presets: references/store-specs.md
  "promise_words": ["izle", "film", "dizi"],              // one must appear in the first three headlines
  "concept": {"name": "Ekrandaki Sayı", "idea": "..."},   // shown on the concept sheet
+ "dna": "dna.json",                                      // optional: materials, UI mode and references to check against
  "campaign": { ... } | "campaign.json",
  "shots": [ ... ],
  "feature_graphic": {"background": ..., "layers": [...]}}  // Google Play, 1024×500 (2.174u tall, 4.45u wide)
@@ -66,17 +69,32 @@ The campaign is what holds the set together while every composition differs (`de
 "campaign": {
  "tokens": {"ground": "#121212", "ink": "#EAF6F6", "muted": "#A9ADB5", "accent": "#5460F0"},
  "fonts": {"display": "fonts/Poppins-SemiBold.ttf", "text": "fonts/Poppins-Regular.ttf"},
+ "materials": {"flat": "dna: flat dark cards", "photo": "dna: posters are the content"},
  "type": {
   "headline": {"font": "display", "size": 0.088, "min_size": 0.066, "line_height": 1.1, "tracking": -0.018,
                "color": "$ink", "max_lines": 3, "emphasis": {"style": "color", "color": "$accent"}},
   "datum":    {"font": "display", "size": 0.42, "line_height": 0.92, "tracking": -0.05, "color": "$accent"},
-  "sub":      {"font": "text", "size": 0.036, "line_height": 1.35, "color": "$muted"}}}
+  "sub":      {"font": "text", "size": 0.036, "line_height": 1.35, "color": "$muted"},
+  "callout":  {"font": "display", "size": 0.034, "color": "$ground"}}}
 ```
 
 - **tokens** - every colour the set uses, named by role, taken from the DNA. Write `"$name"` anywhere a colour
   goes. The validator flags colours that aren't tokens (white and black are always allowed).
 - **fonts** - paths (relative to the file that holds the campaign) or bundled aliases (`assets/fonts/FONTS.md`).
   Text layers use these names; the validator flags any other font.
+- **materials** - what the set is made of, each with where it comes from. The names are flat, elevated, glass,
+  glow, gradient, texture, paper, 3d, tilt, illustration and photo. The reason starts with its source:
+  `"dna: …"` (the app shows it; with `"dna"` linked, the DNA must list it too), `"concept: …"` or
+  `"brand guide: …"`. An effect in a shot needs its material here or a `"motive"` on the layer, or it is
+  warned. The renderer finds:
+  - glass: `glass` on a rect;
+  - glow: `glow` on a layer, or a background `light`;
+  - gradient: a gradient fill;
+  - texture: grain;
+  - tilt: a rotated screen;
+  - 3d: a device3d layer;
+  - illustration: an `svg` layer;
+  - photo: a photo background.
 - **type** - named text styles. A text layer takes `"style": "headline"` and may override any key.
   - `size`, `min_size` (u): the text shrinks towards `min_size` until it fits its `w` (and `h`, if given).
   - `line_height`, `tracking` (fraction of the size), `align` left/center/right, `case` none/upper/lower
@@ -96,6 +114,7 @@ The campaign is what holds the set together while every composition differs (`de
 ```jsonc
 {"id": "promise",
  "message": "Picks you'll love, not the charts - the match score proves it",   // the composition brief's message
+ "alt": "Seenfy keşfet ekranı: %88 Sana Uygun rozetiyle önerilen bir film",       // ≤ 140 characters (Google Play)
  "proof": [{"evidence": "sana-uygun", "region": "match-badge"}],              // what proves the headline
  "span": 1, "stores": ["ios"],                                                 // optional
  "background": {"fill": "$ground", "grain": 0.03},
@@ -118,16 +137,17 @@ Common keys:
 - `type`;
 - `id` (to anchor, lift or mark later layers);
 - `role`: `headline`, `sub`, `display` (big type that isn't the headline), `footnote` (a small disclosure such as
-  "Örnek veriler", at the bottom margin), `label`, `proof`, `decor`, `brand`, `annotation`;
+  "Örnek veriler", at the bottom margin), `callout` (a label pointing at the UI, below), `label`, `proof`,
+  `decor`, `brand`, `annotation`;
 - `motive` - required for `decor`: where the shape comes from;
 - placement (§1), `rotate`, `opacity`.
 
 | type | keys |
 |---|---|
 | `text` | `text` (with `*emphasis*` and `\n`), `style`, `w` (default 86 %), optional `h`, any type-style key (§3) |
-| `screen` | `evidence` (screen id), `crop` `[x0, y0, x1, y1]` fractions or a region name, **`w` or `h` - never both**, `radius`, `frame`, `shadow`, `lift` |
+| `screen` | `evidence` (screen id), `crop` `[x0, y0, x1, y1]` fractions or a region name, **`w` or `h` - never both**, `radius`, `frame`, `shadow`, `glow`, `lift` |
 | `image` | `asset` (a registered brand image: icon, logo, photo), same sizing as `screen`; `opacity` allowed |
-| `rect` / `ellipse` | `w`, `h`, `radius` (rect), `fill` (colour or gradient), `stroke`, `stroke_width`, `shadow` |
+| `rect` / `ellipse` | `w`, `h`, `radius` (rect), `fill` (colour or gradient), `stroke`, `stroke_width`, `shadow`, `glow`, `glass` (rect) |
 | `path` | `d` in u (M L H V C S Q T Z, absolute and relative; no arcs), offset `x`/`y`, `fill`, `stroke`, `stroke_width`, `cap` |
 | `svg` | `markup` (SVG elements) or `file`, drawn in u at offset `x`/`y`; `$tokens` allowed; no `<text>`/`<image>` |
 | `group` | `layers`, and `rotate`/`opacity` for all of them together |
@@ -138,6 +158,8 @@ Screen options:
   `"plain"` (a keyline, no island: `{"style": "plain", "border": 0.005, "color": "$edge", "island": false}`).
   No frame on Google Play.
 - `shadow`: `soft`, `deep`, `tight` or `{"blur", "dy", "dx", "opacity", "color"}` (u).
+- `glow`: `{"color": "$accent", "blur": 0.08, "opacity": 0.45, "spread": 0}` (u) - a coloured halo with no
+  offset. It also works on rects and ellipses. It is the `glow` material.
 - `lift`: `{"from": "main", "scale": 1.15, "dx": 0, "dy": 0}`. The same region, cut from the same screen, drawn
   over its own place in the `from` layer and enlarged: the element the headline talks about comes forward. The
   lifted piece must cover its place, or the UI shows twice (warned).
@@ -150,6 +172,42 @@ Screen options:
   Both read as broken UI, and both are warned.
 - **Crops end in gaps:** put a crop's edges between components, or at the screen's own edge, never through a
   card, a row or a word.
+
+**Glass.** Use it on a top-level rect:
+`{"type": "rect", "w": 0.6, "h": 0.16, "radius": 0.04, "fill": null, "glass": {"blur": 0.03, "tint": "#FFFFFF",
+"opacity": 0.12, "edge": "#FFFFFF", "edge_opacity": 0.28}}`.
+- The panel blurs whatever is drawn below it in the shot, tints it, and gives it a hairline edge.
+- Text goes in a layer above it.
+- Keep it off screens: glass over the UI is painting over it, and is warned.
+
+**Callouts.** A callout is a short label that points at one part of the UI ("Spoiler gizli", "3 hatırlatma").
+The campaign needs a text style whose name starts with `callout`. Draw it as a text layer
+`{"role": "callout", "style": "callout", …}` over a rect `{"role": "callout", "fill": "$accent", "radius": …}`.
+- In the campaign's style, it reads as the campaign talking. So it is exempt from the "looks like app UI"
+  check, which a callout in any other style still gets.
+- It may reach over a screen's edge, but covers at most 8 % of the screen.
+- At least 0.03u, at most four per shot. Add a `mark` arrow if it needs to point.
+
+**SVG recipes.** Each one uses `$tokens`, is drawn in u, and needs a `"motive"` saying what in the app it comes
+from:
+```jsonc
+// the app's own progress bar as a motif - motive: "the episode progress bar"
+{"type": "svg", "role": "decor", "motive": "the episode progress bar", "x": 0.08, "y": 1.9,
+ "markup": "<rect width='0.84' height='0.012' rx='0.006' fill='$edge'/><rect width='0.52' height='0.012' rx='0.006' fill='$accent'/>"}
+// a spot illustration in the app's icon style: outline, the icons' stroke weight, round caps
+{"type": "svg", "role": "illustration", "motive": "the calendar tab icon, drawn large", "x": 0.62, "y": 0.2,
+ "markup": "<g fill='none' stroke='$accent' stroke-width='0.012' stroke-linecap='round' stroke-linejoin='round'><rect x='0' y='0.03' width='0.26' height='0.24' rx='0.04'/><path d='M0 0.1H0.26M0.07 0V0.06M0.19 0V0.06'/><circle cx='0.13' cy='0.18' r='0.025' fill='$accent'/></g>"}
+// a pattern from the card radius: the app's cards, as a quiet ground texture
+{"type": "svg", "role": "decor", "motive": "the poster cards' 0.04u radius", "opacity": 0.25, "x": 0, "y": 1.4,
+ "markup": "<g fill='$card'><rect x='0.06' y='0' width='0.26' height='0.38' rx='0.04'/><rect x='0.37' y='0.06' width='0.26' height='0.38' rx='0.04'/><rect x='0.68' y='0.12' width='0.26' height='0.38' rx='0.04'/></g>"}
+// confetti from the app's own shapes - only over a result the screen shows (a streak, a goal reached)
+{"type": "svg", "role": "decor", "motive": "the app's check and dot shapes, for the finished goal", "x": 0.1, "y": 0.9,
+ "markup": "<g fill='$accent'><circle cx='0.05' cy='0.04' r='0.012'/><circle cx='0.7' cy='0.1' r='0.009'/></g><path d='M0.3 0.02l0.02 0.02 0.04-0.04' stroke='$accent' stroke-width='0.008' fill='none' stroke-linecap='round'/>"}
+```
+- Draw with the app's own vocabulary: its stroke weight, its corner radius, its fills.
+- An illustration the app doesn't use anywhere needs the concept as its reason (`"illustration"` in the
+  campaign's materials).
+- Stock blobs, sparkles and generic confetti have no motive for any app.
 
 ## 6. Sizes, stores and locales
 
@@ -173,7 +231,8 @@ screens captured on that device, given per size.
 - a screen file that changed since the manifest was built (SHA-256);
 - `w` and `h` together on a screen (it would stretch);
 - `filter`, `blur`, `tint`, `recolor`, `saturation`, `brightness` or `opacity` on a screen;
-- `<text>` or `<image>` inside an `svg` layer.
+- `<text>` or `<image>` inside an `svg` layer;
+- `glass` on anything but a top-level rect.
 
 **Warned** (printed, stored in `_render.json`, reprinted by `check_set.py`):
 
@@ -202,6 +261,11 @@ screens captured on that device, given per size.
 
 *Campaign:*
 - decoration without a `motive`, or more than 5 decorative layers;
+- an effect (glass, glow, gradient, grain, tilt, 3D, illustration) with no source in the campaign's
+  `materials` or the layer's `motive`;
+- a campaign material without a reason, or a `dna:` reason the DNA doesn't list;
+- campaign colours taken from a reference (`dna.py reference`) rather than the app;
+- a callout outside the campaign's callout style, under 0.03u, covering more than 8 % of a screen, or more than four in a shot;
 - colours that aren't tokens;
 - fonts outside the campaign;
 - more than one headline font in the set.
@@ -212,8 +276,15 @@ screens captured on that device, given per size.
 - the same screen with the same crop in two shots;
 - the same content in two shots through different screens (the same posts on the calendar and on the home
   screen), read from the screens' text;
-- only one iPhone size.
+- only one iPhone size;
+- the skill's own habits on most shots (`anti-ai.md`):
+  - a lift or a mark in most shots;
+  - every shot's phone cropped at the bottom edge;
+  - one effect on every shot without a `dna:` reason;
+  - a light app shown only on dark grounds;
+- a shot that repeats a bundled example's placements number for number;
+- with `--history`: a set that shares most of its look with one made earlier for another app.
 
-*Google Play:*
+*Google Play* (labelled `[Play recommendation]`; `check_set.py` adds the requirements and promotion rules):
 - a device frame;
 - captions over 20 % of the height.

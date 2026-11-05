@@ -470,6 +470,31 @@ def rot_point(p, angle, centre):
     return (cx + (x - cx) * math.cos(a) - (y - cy) * math.sin(a), cy + (x - cx) * math.sin(a) + (y - cy) * math.cos(a))
 
 
+def glow_spec(g, U, tokens):
+    """A coloured halo behind a layer (no offset): {"color": "$accent", "blur": 0.08, "opacity": 0.45, "spread": 0}."""
+    if not g:
+        return None
+    if not isinstance(g, dict) or not g.get("color"):
+        raise SceneError('glow: {"color": "$token", "blur": 0.08, "opacity": 0.45, "spread": 0.0} (u)')
+    return {"blur": float(g.get("blur", 0.08)) * U, "dx": 0.0, "dy": 0.0, "opacity": float(g.get("opacity", 0.45)),
+            "color": color(g["color"], tokens), "spread": float(g.get("spread", 0.0)) * U}
+
+
+def glass_spec(g, U, tokens):
+    """Frosted glass: what is behind the panel, blurred and tinted, with a hairline edge.
+    {"blur": 0.03, "tint": "#FFFFFF", "opacity": 0.12, "edge": "#FFFFFF", "edge_opacity": 0.28}; {} or true = defaults"""
+    if g is None or g is False:
+        return None
+    g = {} if g is True else dict(g)
+    return {"blur": float(g.get("blur", 0.03)) * U, "tint": color(g.get("tint", "#FFFFFF"), tokens),
+            "opacity": float(g.get("opacity", 0.12)), "edge": color(g.get("edge", "#FFFFFF"), tokens),
+            "edge_opacity": float(g.get("edge_opacity", 0.28)), "edge_w": max(1.0, float(g.get("edge_width", 0.0025)) * U)}
+
+
+def grown(box, d):
+    return (box[0] - d, box[1] - d, box[2] + d, box[3] + d)
+
+
 def shadow_spec(s, U):
     if not s:
         return None
@@ -495,6 +520,7 @@ class Scene:
         self.ctx = ctx  # fonts, lang, tokens, campaign, evidence, spec_dir
         self.ops, self.meta, self.warnings = [], [], []
         self.by_id = {}
+        self._depth = 0
 
     # -- loading
     def evidence_image(self, eid, kind="screen"):
@@ -629,7 +655,7 @@ class Scene:
         self.warnings += res["warnings"]
         op = {"op": "text", "runs": res["runs"], "rects": res["rects"], "marks": res["marks"]}
         self.common(L, op, res["bbox"])
-        op["meta"].update(role=L.get("role", "text"), text=res["text"], size=res["size"], lines=res["lines"],
+        op["meta"].update(role=L.get("role", "text"), text=res["text"], size=res["size"], lines=res["lines"], style=L.get("style"),
                           color=tl.s["color"], text_bbox=res["bbox"], ink=rot_bbox(res["ink"], op["rotate"], op["centre"]))
         ops.append(op)
 
@@ -696,6 +722,7 @@ class Scene:
                  x + w + (fr["border"] if fr else 0), y + h + (fr["border"] if fr else 0))
         op = {"op": "image", "img": piece, "box": (x, y, x + w, y + h), "src_box": (x, y, x + w, y + h), "crop": r,
               "radius": radius, "frame": fr, "shadow": shadow_spec(L.get("shadow"), c.U), "src_path": path,
+              "glow": glow_spec(L.get("glow"), c.U, self.ctx["tokens"]),
               "lossless": path.lower().endswith(".png")}
         self.common(L, op, outer)
         op["meta"].update(role=L.get("role", "proof" if kind == "screen" else "brand"), kind=kind,
@@ -711,7 +738,13 @@ class Scene:
         x, y = c.place_x(L, w), c.place_y(L, h)
         op = {"op": L["type"], "box": (x, y, x + w, y + h), "radius": c.len_x(L.get("radius", 0)) if L["type"] == "rect" else 0,
               "fill": resolve_fill(L.get("fill"), self.ctx["tokens"]), "stroke": color(L.get("stroke"), self.ctx["tokens"]),
-              "stroke_w": c.len_x(L.get("stroke_width", 0.006)), "shadow": shadow_spec(L.get("shadow"), c.U)}
+              "stroke_w": c.len_x(L.get("stroke_width", 0.006)), "shadow": shadow_spec(L.get("shadow"), c.U),
+              "glow": glow_spec(L.get("glow"), c.U, self.ctx["tokens"]),
+              "glass": glass_spec(L.get("glass"), c.U, self.ctx["tokens"]) if L["type"] == "rect" else None}
+        if L.get("glass") not in (None, False) and L["type"] != "rect":
+            raise SceneError('"glass" works on a rect (the panel behind floating content)')
+        if op["glass"] and self._depth:
+            raise SceneError('"glass" works on top-level layers only (not inside a group)')
         self.common(L, op, op["box"])
         op["meta"]["colors"] = fill_colors(op["fill"]) + ([op["stroke"]] if op["stroke"] else [])
         ops.append(op)
@@ -774,9 +807,13 @@ class Scene:
 
     def group(self, L, ops):
         sub = []
-        for child in L.get("layers") or []:
-            if child is not None:
-                self.layer(child, sub)
+        self._depth += 1
+        try:
+            for child in L.get("layers") or []:
+                if child is not None:
+                    self.layer(child, sub)
+        finally:
+            self._depth -= 1
         if not sub:
             return
         boxes = [o["meta"]["bbox"] for o in sub]
@@ -889,7 +926,12 @@ def pil_op(canvas, op, fonts):
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0)) if needs_layer else None
     tgt = layer
     if o == "rect" or o == "ellipse":
-        draw_shadow(tgt, op["box"], op.get("radius", 0) if o == "rect" else (op["box"][2] - op["box"][0]) / 2, op.get("shadow"))
+        rr = op.get("radius", 0) if o == "rect" else (op["box"][2] - op["box"][0]) / 2
+        if op.get("glow"):
+            draw_shadow(tgt, grown(op["box"], op["glow"]["spread"]), rr + op["glow"]["spread"], op["glow"])
+        draw_shadow(tgt, op["box"], rr, op.get("shadow"))
+        if op.get("glass_img") is not None:
+            tgt.alpha_composite(op["glass_img"], dest=tuple(int(v) for v in op["glass_at"]))
         if op["fill"]:
             x0, y0, x1, y1 = [int(round(v)) for v in op["box"]]
             g = gradient_image(op["fill"], (max(1, x1 - x0), max(1, y1 - y0)))
@@ -918,6 +960,8 @@ def pil_op(canvas, op, fonts):
         fr = op.get("frame")
         b = fr["border"] if fr else 0
         outer = (x0 - b, y0 - b, x1 + b, y1 + b)
+        if op.get("glow"):
+            draw_shadow(tgt, grown(outer, op["glow"]["spread"]), op["radius"] + b + op["glow"]["spread"], op["glow"])
         draw_shadow(tgt, outer, op["radius"] + b, op.get("shadow"))
         d = ImageDraw.Draw(tgt)
         if fr:
@@ -1051,7 +1095,13 @@ class SVGWriter:
         if o in ("rect", "ellipse"):
             x0, y0, x1, y1 = op["box"]
             if o == "rect":
+                if op.get("glow"):
+                    self.shadow(grown(op["box"], op["glow"]["spread"]), op.get("radius", 0) + op["glow"]["spread"], op["glow"], inner)
                 self.shadow(op["box"], op.get("radius", 0), op.get("shadow"), inner)
+                if op.get("glass_img") is not None:
+                    gx, gy = op["glass_at"]
+                    inner.append(f'<image x="{gx}" y="{gy}" width="{op["glass_img"].width}" height="{op["glass_img"].height}" '
+                                 f'xlink:href="{_img_href(op["glass_img"], True)}"/>')
                 stroke = f' stroke="{op["stroke"][:7]}" stroke-width="{op["stroke_w"]:.1f}"' if op.get("stroke") else ""
                 inner.append(f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{x1 - x0:.1f}" height="{y1 - y0:.1f}" rx="{op.get("radius", 0):.1f}" '
                              f'{self.fill_attr(op["fill"], op["box"])}{stroke}/>')
@@ -1076,6 +1126,9 @@ class SVGWriter:
             x0, y0, x1, y1 = op["box"]
             fr = op.get("frame")
             b = fr["border"] if fr else 0
+            if op.get("glow"):
+                gb = grown((x0 - b, y0 - b, x1 + b, y1 + b), op["glow"]["spread"])
+                self.shadow(gb, op["radius"] + b + op["glow"]["spread"], op["glow"], inner)
             self.shadow((x0 - b, y0 - b, x1 + b, y1 + b), op["radius"] + b, op.get("shadow"), inner)
             if fr:
                 inner.append(f'<rect x="{x0 - b:.1f}" y="{y0 - b:.1f}" width="{x1 - x0 + 2 * b:.1f}" height="{y1 - y0 + 2 * b:.1f}" '
@@ -1167,8 +1220,45 @@ def rasterize(svg, font_files):
     return Image.open(io.BytesIO(png)).convert("RGBA")
 
 
+def prepare_glass(scene, fonts):
+    """Frosted-glass panels need what is drawn behind them: render the layers below each panel, blur and tint
+    that patch inside the panel's shape, add the hairline edge - one raster that both backends paste."""
+    c = scene.c
+    for i, op in enumerate(scene.ops):
+        g = op.get("glass")
+        if not g:
+            continue
+        below = Image.new("RGBA", (int(c.W), int(c.H)), (255, 255, 255, 255))
+        for prev in scene.ops[:i]:
+            below = pil_op(below, prev, fonts)
+        x0, y0, x1, y1 = [int(round(v)) for v in op["box"]]
+        x0, y0, x1, y1 = max(0, x0), max(0, y0), min(int(c.W), x1), min(int(c.H), y1)
+        if x1 - x0 < 2 or y1 - y0 < 2:
+            continue
+        m = int(g["blur"] * 2) + 2
+        patch = below.crop((max(0, x0 - m), max(0, y0 - m), min(int(c.W), x1 + m), min(int(c.H), y1 + m)))
+        patch = patch.filter(ImageFilter.GaussianBlur(max(1, g["blur"] / 2)))
+        patch = patch.crop((x0 - max(0, x0 - m), y0 - max(0, y0 - m), x0 - max(0, x0 - m) + (x1 - x0), y0 - max(0, y0 - m) + (y1 - y0)))
+        tint = Image.new("RGBA", patch.size, rgba(g["tint"], g["opacity"]))
+        patch = Image.alpha_composite(patch.convert("RGBA"), tint)
+        k = 3  # anti-aliased shape and edge
+        r = int(op.get("radius", 0) * k)
+        big = Image.new("L", (patch.width * k, patch.height * k), 0)
+        ImageDraw.Draw(big).rounded_rectangle([0, 0, big.width - 1, big.height - 1], radius=r, fill=255)
+        mask = big.resize(patch.size, Image.LANCZOS)
+        edge = Image.new("L", big.size, 0)
+        ew = max(1, int(g["edge_w"] * k))
+        ImageDraw.Draw(edge).rounded_rectangle([0, 0, big.width - 1, big.height - 1], radius=r, outline=255, width=ew)
+        edge = edge.resize(patch.size, Image.LANCZOS).point(lambda v: int(v * g["edge_opacity"]))
+        patch.putalpha(mask)
+        patch.alpha_composite(Image.composite(Image.new("RGBA", patch.size, rgba(g["edge"])), Image.new("RGBA", patch.size, (0, 0, 0, 0)), edge))
+        op["glass_img"], op["glass_at"] = patch, (x0, y0)
+
+
 def render(scene, fonts, backend="auto"):
     """-> (RGB image, svg text, backend used)"""
+    if any(op.get("glass") for op in scene.ops):
+        prepare_glass(scene, fonts)
     svg, font_files = to_svg(scene)
     use = backend
     if backend == "auto":

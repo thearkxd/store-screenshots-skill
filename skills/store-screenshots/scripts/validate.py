@@ -7,6 +7,7 @@ from pixels: what covers the app's UI, which number a headline uses and whether 
 three shots share one composition, which colours are off the campaign palette.
 """
 import hashlib
+import json
 import os
 import re
 import sys
@@ -96,6 +97,8 @@ def scene_warnings(scene, img, ctx):
             if op["op"] in ("image", "lines", "group") or role in ("annotation", "label", "background"):
                 continue
             ov = area(inter(sb, m.get("bbox", (0, 0, 0, 0))))
+            if role == "callout" and ov <= CALLOUT_OVERLAP * area(sb):
+                continue  # a callout may reach over the screen's edge to point at something
             if ov > 0.02 * area(sb):
                 what = "text" if op["op"] == "text" else op["op"]
                 out.append(f"{what} ({role}{' ' + m['id'] if m.get('id') else ''}) covers {ov / area(sb):.0%} of the "
@@ -143,6 +146,7 @@ def scene_warnings(scene, img, ctx):
     # --- UI look-alikes: small rounded boxes with text inside
     shapes = [op for op in ops if op["op"] == "rect" and op.get("meta", {}).get("role") != "background" and op["meta"].get("bbox")]
     texts = [op for op in ops if op["op"] == "text"]
+    callout_styles = {k for k in (campaign.get("type") or {}) if k.startswith("callout")}
     for r in shapes:
         b = r["meta"]["bbox"]
         if (b[3] - b[1]) > 0.14 * U:
@@ -151,9 +155,23 @@ def scene_warnings(scene, img, ctx):
             tb = t["meta"]["bbox"]
             if t["meta"].get("role") in ("headline", "sub") or area(tb) == 0:
                 continue
+            if t["meta"].get("role") == "callout" and t["meta"].get("style") in callout_styles and r["meta"].get("role") == "callout":
+                continue  # the campaign's own callout: it looks like the campaign, not like the app
             if area(inter(tb, b)) > 0.8 * area(tb):
                 out.append(f"\"{snip(t['meta'])}\" on a small rounded box looks like app UI - if the app shows it, "
                            "crop it from a screen; a marketing sticker must not look like a real button or badge")
+    # --- callouts: labels that point at the UI - they must look like the campaign, not like the app
+    callouts = [t for t in texts if t["meta"].get("role") == "callout"]
+    for t in callouts:
+        if t["meta"].get("style") not in callout_styles:
+            out.append(f"callout \"{snip(t['meta'])}\" doesn't use a campaign callout style - add \"callout\" to the campaign's "
+                       "\"type\" (and a callout shape style), so a callout reads as the campaign pointing at the app, never as "
+                       "the app's own UI")
+    for slot in range(scene.span):
+        n = sum(1 for t in callouts if slot_of(scene, t["meta"]["bbox"]) == slot)
+        if n > CALLOUT_MAX:
+            out.append(f"{n} callouts in one shot - more than {CALLOUT_MAX} turns the shot into a manual; keep the ones "
+                       "the headline needs")
     # --- claims: proof and numbers
     heads = [t for t in texts if t["meta"].get("role") == "headline"]
     if heads and not shot.get("proof"):
@@ -181,6 +199,8 @@ def scene_warnings(scene, img, ctx):
             out.append(f"headline at {m['size'] / U:.3f}u is too small for search results (≥ 0.06u)")
         if role == "sub" and m["size"] < 0.03 * U:
             out.append(f"sub-line at {m['size'] / U:.3f}u is too small (≥ 0.03u)")
+        if role == "callout" and m["size"] < 0.03 * U:
+            out.append(f"callout at {m['size'] / U:.3f}u is too small to read in the store (≥ 0.03u)")
         if role == "footnote" and not 0.02 * U <= m["size"] <= 0.03 * U:
             out.append(f"footnote at {m['size'] / U:.3f}u - a footnote is small but readable at full size (0.02-0.03u); "
                        "anything bigger competes with the sub-line")
@@ -190,7 +210,7 @@ def scene_warnings(scene, img, ctx):
             out.append(f"text \"{snip(m)}\" runs into the edge (keep ≥ 0.03u)")
         if scene.span == 2 and b[0] < c.slot_w - 0.012 * U and b[2] > c.slot_w + 0.012 * U:
             out.append(f"text \"{snip(m)}\" crosses the seam - the store's gap will cut it")
-        if img is not None and role in ("headline", "sub", "label"):
+        if img is not None and role in ("headline", "sub", "label", "callout"):
             ratio = text_contrast(img, t)
             need = 3.0 if m["size"] >= 0.075 * U else 4.5
             if ratio is not None and ratio < need:
@@ -236,6 +256,119 @@ def scene_warnings(scene, img, ctx):
         stray = sorted(os.path.basename(p) for p in used - allowed)
         if stray:
             out.append(f"fonts outside the campaign: {', '.join(stray)}")
+    out += material_warnings(scene, ctx)
+    return out
+
+
+CALLOUT_OVERLAP = 0.08
+CALLOUT_MAX = 4
+# The words for what a set is made of. An effect is never a default: each one used needs a source - the app's DNA,
+# the concept, or the shot's message - written in the campaign's "materials" or on the layer as a "motive".
+MATERIALS = ("flat", "elevated", "glass", "glow", "gradient", "texture", "paper", "3d", "tilt", "illustration", "photo")
+
+
+def materials_used(scene):
+    """-> [(material, what, motive)] for every effect the scene uses."""
+    found = []
+
+    def visit(ops, rot=0.0):
+        for op in ops:
+            m = op.get("meta", {})
+            what = f"{op['op']}{' ' + m['id'] if m.get('id') else ''}"
+            motive = m.get("motive")
+            r = rot + (op.get("rotate") or 0)
+            if op.get("glass"):
+                found.append(("glass", what, motive))
+            if op.get("glow"):
+                found.append(("glow", what, motive))
+            if m.get("kind") == "light":
+                found.append(("glow", "background light", None))
+            if op["op"] == "grain":
+                found.append(("texture", "background grain", None))
+            if isinstance(op.get("fill"), dict) and (op["fill"].get("linear") or op["fill"].get("radial")):
+                found.append(("gradient", "background" if m.get("role") == "background" else what, motive))
+            if m.get("kind") == "photo":
+                found.append(("photo", "background photo", None))
+            if op["op"] == "svg" and m.get("role") in ("decor", "illustration"):
+                found.append(("illustration", what, motive))
+            if m.get("kind") == "screen" and abs(r) > 0.5:
+                found.append(("tilt", f"screen {m.get('evidence')}", motive))
+            if op["op"] == "device3d":
+                found.append(("3d", f"device {m.get('evidence')}", motive))
+            if op["op"] == "group":
+                visit(op["ops"], r)
+    visit(scene.ops)
+    return found
+
+
+def campaign_materials(ctx):
+    mats = (ctx.get("campaign") or {}).get("materials") or {}
+    if isinstance(mats, list):  # ["glass", ...] without reasons
+        return {m: "" for m in mats}
+    return {k: v for k, v in mats.items() if not k.startswith("_")}
+
+
+def dna_materials(ctx):
+    mats = ((ctx.get("dna") or {}).get("materials")) or {}
+    if isinstance(mats, list):
+        return set(mats)
+    return {k for k, v in mats.items() if not k.startswith("_") and v}
+
+
+def campaign_material_warnings(ctx):
+    """Once per set: every material the campaign lists says where it comes from."""
+    out = []
+    camp = campaign_materials(ctx)
+    for name, why in camp.items():
+        if name not in MATERIALS:
+            out.append(f"campaign material {name!r} isn't one of {', '.join(MATERIALS)}")
+        elif not str(why).strip():
+            out.append(f"campaign material {name!r} has no reason - write where it comes from: \"dna: the tab bar is "
+                       "frosted glass\", \"concept: …\" or \"brand guide: …\"")
+        elif ctx.get("dna") and str(why).strip().lower().startswith("dna") and name not in dna_materials(ctx):
+            out.append(f"campaign material {name!r} says it comes from the DNA, but the DNA's \"materials\" don't list it - "
+                       "add it there with where the app shows it, or give the concept as the reason")
+    return out + reference_copy_warnings(ctx)
+
+
+def material_warnings(scene, ctx):
+    out = []
+    camp = campaign_materials(ctx)
+    seen = set()
+    for name, what, motive in materials_used(scene):
+        if name in camp and str(camp[name]).strip():
+            continue
+        if motive and str(motive).strip():
+            continue
+        if (name, what) in seen:
+            continue
+        seen.add((name, what))
+        out.append(f"{name} on {what} has no source - effects are never a default: list {name!r} in the campaign's "
+                   "\"materials\" with where it comes from (the app's DNA, the concept, the shot's message), or give the layer "
+                   "a \"motive\"; an effect without a source is what makes a set look like a template")
+    return out
+
+
+def reference_copy_warnings(ctx, tol=22):
+    """A reference the user liked is for principles; its palette must not become the campaign's."""
+    dna = ctx.get("dna") or {}
+    refs = dna.get("references") or []
+    if not refs:
+        return []
+    app = [hexrgb(v) for v in (dna.get("palette") or {}).values() if isinstance(v, str) and v.startswith("#")]
+    app += [hexrgb(p["hex"]) for p in ((dna.get("measured") or {}).get("palette") or [])]
+    toks = [hexrgb(v) for v in (ctx.get("tokens") or {}).values() if isinstance(v, str) and v.startswith("#")]
+
+    def near(a, pool):
+        return any(sum((x - y) ** 2 for x, y in zip(a, p)) <= tol ** 2 for p in pool)
+    out = []
+    for ref in refs:
+        pal = [hexrgb(h) for h in ref.get("palette") or []]
+        copied = [t for t in toks if near(t, pal) and not near(t, app) and max(t) - min(t) > 18]  # greys are everyone's
+        if len(copied) >= 2:
+            out.append(f"{len(copied)} campaign colours come from the reference {os.path.basename(ref.get('file', ''))!r}, not from "
+                       "the app - take the reference's principles (hierarchy, density, rhythm), never its palette, fonts or "
+                       "illustrations")
     return out
 
 
@@ -266,16 +399,18 @@ def store_warnings(scene, ctx):
                 out.append(f"screen {op['meta'].get('evidence')!r} ({op['img'].width}x{op['img'].height}) isn't {rs.CLASS_NAMES[dev]} "
                            f"screen - capture it on that device and give it per size (\"layers\": {{\"default\": …, "
                            f"\"{ctx.get('preset')}\": …}})")
+    if scene.shot.get("id") == "feature-graphic" and any(op.get("frame") and op["frame"]["style"] in ("phone", "android") for op in screens):
+        out.append(f"{rs.PLAY_REC} device frame in the feature graphic - Play advises against device imagery")
     if ctx.get("store") == "android" and scene.shot.get("id") != "feature-graphic":
         if any(op.get("frame") and op["frame"]["style"] in ("phone", "android") for op in screens):
-            out.append("device frame in a Google Play set - Play advises against device imagery; show the bare screen "
-                       "(radius, no \"frame\") in the android variant")
+            out.append(f"{rs.PLAY_REC} device frame in a Google Play set - Play advises against device imagery (it dates "
+                       "quickly); show the bare screen (radius, no \"frame\") in the android variant")
         for slot in range(scene.span):
             hs = [op["meta"].get("ink", op["meta"]["bbox"]) for op in ops if op["op"] == "text" and op["meta"].get("role") not in ("label", "annotation", "footnote")
                   and slot_of(scene, op["meta"]["bbox"]) == slot]  # a giant number is tagline text too
             share = sum(b[3] - b[1] for b in hs) / c.H
             if share > rs.PLAY_TEXT_SHARE:
-                out.append(f"caption covers {share:.0%} of the height - Google Play recommends taglines take up no more "
+                out.append(f"{rs.PLAY_REC} caption covers {share:.0%} of the height - Google Play recommends taglines take up no more "
                            f"than 20% (shorter headline, no sub-line, or a smaller size in the android variant)")
     return out
 
@@ -520,6 +655,107 @@ def content_repeats(contents, evidence, min_shared=6, share=0.2):
                 out.append(f"shots {la} and {lb} show the same content on different screens ({', '.join(sorted(shared)[:5])}, …) - "
                            "each shot should prove something new; one item carried through the set is fine, the same list "
                            "twice isn't")
+    return out
+
+
+def habit_warnings(scenes, ctx):
+    """The looks this skill itself falls into (references/anti-ai.md, "The skill's own habits"). Each is fine once;
+    on every shot of every set they make all sets look alike."""
+    n = len(scenes)
+    if n < 3:
+        return []
+    out = []
+    camp = campaign_materials(ctx)
+    lifts = marks = bleeds = darks = 0
+    mats = {}
+    for sc_ in scenes:
+        ops = list(walk(sc_.ops))
+        lifts += any(op.get("meta", {}).get("lift") for op in ops)
+        marks += any(op["op"] == "lines" for op in ops)
+        screens = [op for op in ops if op.get("meta", {}).get("kind") == "screen" and not op["meta"].get("lift")]
+        if screens:
+            main = max(screens, key=lambda o: area(o["meta"]["bbox"]))
+            bleeds += main["meta"]["bbox"][3] > sc_.c.H + 0.01 * sc_.c.U
+        bg = next((op for op in sc_.ops if op.get("meta", {}).get("role") == "background"), None)
+        if bg is not None:
+            cols = bg["meta"].get("colors") or []
+            dark = bool(cols) and all(rs.luminance(rs.hexrgb(col)) < 0.06 for col in cols)
+            darks += dark or bg["meta"].get("kind") == "sample"
+        for name in {m for m, _, _ in materials_used(sc_)}:
+            mats[name] = mats.get(name, 0) + 1
+    most = max(3, (n * 2 + 2) // 3)
+    if lifts >= most:
+        out.append(f"a lifted card in {lifts} of {n} shots - a lift is the move for the shot whose message is that one element, "
+                   "not a house style")
+    if marks >= most:
+        out.append(f"hand-drawn marks in {marks} of {n} shots - mark the one detail a shot is about, where the headline needs it")
+    if bleeds == n and n >= 4:
+        out.append("every shot crops its main screen at the bottom edge - vary it: a whole screen, a detail, a pair, "
+                   "a screen that sits inside the canvas")
+    for name, k in sorted(mats.items()):
+        why = str(camp.get(name, "")).strip().lower()
+        if k == n and n >= 4 and name not in ("flat",) and not why.startswith(("dna", "brand")):
+            out.append(f"{name} in every shot - unless the app itself is made of it (a \"dna: …\" reason), an effect on "
+                       "every shot is a template; keep it where a message needs it")
+    ui = ((ctx.get("dna") or {}).get("measured") or {}).get("ui")
+    if ui == "light" and darks == n:
+        out.append("the app's UI is light but every shot is on a dark ground - a dark set is a choice the concept has to "
+                   "make for a reason, not the default")
+    return out
+
+
+def example_copies(shots, spec_dir, here=None):
+    """Shots whose layers repeat a bundled example's placement number for number: the examples show the format,
+    not a look to reuse."""
+    here = here or os.path.dirname(os.path.abspath(__file__))
+    root = os.path.dirname(here)
+    files = [os.path.join(root, "templates", "scene.example.json")]
+    ex = os.path.join(os.path.dirname(os.path.dirname(root)), "examples")  # the repo's examples (not in the lite zip)
+    if os.path.isdir(ex):
+        for d in sorted(os.listdir(ex)):
+            for sub in ("", "concepts"):
+                folder = os.path.join(ex, d, sub)
+                if os.path.isdir(folder):
+                    files += [os.path.join(folder, fn) for fn in sorted(os.listdir(folder)) if fn.endswith(".json")]
+    mine = os.path.abspath(spec_dir)
+    if mine == os.path.join(root, "templates") or mine.startswith(ex + os.sep):
+        return []  # a bundled example itself
+
+    def related(p):  # the example's own folder (a set and its concepts) isn't copying itself
+        d = os.path.abspath(os.path.dirname(p))
+        return mine in (d, os.path.dirname(d)) or d == os.path.dirname(mine)
+    files = [p for p in files if not related(p)]
+
+    def sig(sh):
+        keys = []
+        for L in sh.get("layers") or []:
+            if not isinstance(L, dict) or L.get("type") not in ("text", "screen", "device3d"):
+                continue
+            pos = tuple(json.dumps(L.get(k), sort_keys=True) for k in ("x", "y", "cx", "cy", "w", "h", "right", "bottom", "crop", "rotate"))
+            keys.append((L["type"], L.get("role"), pos))
+        return keys
+    known = {}
+    for p in files:
+        try:
+            with open(p, encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, ValueError):
+            continue
+        for sh in data.get("shots") or []:
+            for k in sig(sh):
+                known.setdefault(k, f"{os.path.basename(os.path.dirname(p))}/{sh.get('id')}")
+    out = []
+    for sh in shots:
+        hits, screens = {}, {}
+        for k in sig(sh):
+            if k in known and sum(v != "null" for v in k[2]) >= 2:
+                hits[known[k]] = hits.get(known[k], 0) + 1
+                if k[0] != "text":
+                    screens[known[k]] = True
+        best = max(((ex_, n) for ex_, n in hits.items() if screens.get(ex_)), key=lambda kv: kv[1], default=None)
+        if best and best[1] >= 2:  # the main visual and the type placed exactly as in the example
+            out.append(f"shot {sh.get('id')!r} repeats the layout of the bundled example {best[0]!r} number for number - the "
+                       "examples show the format, not a look; compose this shot from its own message and the app's DNA")
     return out
 
 

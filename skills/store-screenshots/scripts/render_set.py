@@ -705,6 +705,13 @@ def render_shot(shot, style, W, H, fonts, spec_dir, lang, base=None, info=None, 
 
 
 PLAY_TEXT_SHARE = 0.20  # Google Play: "Taglines should not take up more than 20% of the image"
+# Google keeps three kinds of rule apart (support.google.com/googleplay/android-developer/answer/9866151), and so do
+# the checks: a requirement can get the listing removed or suspended; a "highly recommended" item doesn't affect
+# the listing page but may change how the assets appear or limit promotion; the promotion rules are required only
+# to appear in Play's screenshot-based recommendation formats.
+PLAY_REQ = "[Play requirement]"
+PLAY_REC = "[Play recommendation]"
+PLAY_PROMO = "[Play promotion eligibility]"
 
 
 def play_warnings(s, info, shot):
@@ -713,13 +720,13 @@ def play_warnings(s, info, shot):
         return []
     out = []
     if info.get("poster"):
-        out.append("type-only poster in a Google Play set: Play wants screenshots that show the in-app experience "
+        out.append(f"{PLAY_REC} type-only poster in a Google Play set: Play recommends screenshots that show the in-app experience "
                    "and taglines under 20% of the image - add \"stores\": [\"ios\"] to keep it in the App Store set only")
     elif info.get("text_ratio", 0) > PLAY_TEXT_SHARE:
-        out.append(f"caption covers {info['text_ratio']:.0%} of the height - Google Play recommends taglines take up "
+        out.append(f"{PLAY_REC} caption covers {info['text_ratio']:.0%} of the height - Google Play recommends taglines take up "
                    f"no more than 20% (shorter headline, no sub-line, or a smaller headline_size)")
     if shot.get("screen") and s["device"].get("style") in ("phone", "android"):
-        out.append("device frame in a Google Play set - Play advises against device imagery; leave \"android_style\" "
+        out.append(f"{PLAY_REC} device frame in a Google Play set - Play advises against device imagery; leave \"android_style\" "
                    "at \"none\" (the bare rounded screen)")
     return out
 
@@ -1006,7 +1013,7 @@ def render_span(shot, style, W, H, fonts, spec_dir, lang, keep=None):
         dv = s["device"]
         dev_top = int((max(bottoms) if bottoms else W * s.get("_k", 1.0) * 0.12) + W * dv["gap"] + H * dv.get("dy", 0))
         if s.get("_class") == "android" and dv.get("style") in ("phone", "android"):
-            warnings.append("device frame in a Google Play set - Play advises against device imagery")
+            warnings.append(f"{PLAY_REC} device frame in a Google Play set - Play advises against device imagery")
         x = (shot.get("device") or {}).get("x", 1.0)  # default: centred on the seam, half the phone in each slot
         canvas, xf = draw_device(canvas, screen, s, W, H, dev_top, cx=W * x, even=(x == 1.0))
         if keep is not None:
@@ -1337,7 +1344,7 @@ def render_feature_graphic(fg, style, fonts, spec_dir, lang, out_path):
             screen = crop_frac(screen, fg["crop"])
         dv = merge(s["device"], {"width": fg.get("device_width", 0.3), "style": s["device"].get("android_style") or s["device"]["style"]})
         if dv["style"] in ("phone", "android"):
-            warnings.append("device frame in the feature graphic - Google Play advises against device imagery")
+            warnings.append(f"{PLAY_REC} device frame in the feature graphic - Google Play advises against device imagery")
         canvas, _ = draw_device(canvas, screen, dict(s, device=dv), W, H, int(H * fg.get("device_top", 0.12)),
                                 cx=W * fg.get("device_x", 0.76))
     cap = Caption(fonts, s, W, lang)

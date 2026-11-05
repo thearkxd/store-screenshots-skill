@@ -11,7 +11,9 @@ and its own visual DNA, with copy that passes the "swap test" and doesn't read a
   shot composed freely, not a template filled in. Output: PNG and editable SVG for every store size.
 - The real UI is never stretched, recoloured or painted over. Every number is checked against the screens, and
   crops or lifts that look broken are flagged.
-- Finds the app's promise and angle and writes headlines (TR + EN) that pass the swap test.
+- Finds the app's promise and angle and writes headlines (TR + EN). The promise has to pass the swap test.
+- Nothing is a default: glass, glow, gradients, tilted or 3D phones are allowed only with a source in the
+  app's DNA or the concept. The skill also watches its own habits, so its sets don't all look alike.
 - A library of 1,718 real top-chart screenshots with verdicts, store and copy checks, and a peer test.
 
 Jump to: [Install](#install) · [Use](#use) · [What it does](#what-it-does) · [Examples](#examples)
@@ -93,6 +95,8 @@ The skill starts by asking whether the app is already live. **Live:** send the A
 link(s) - it reads the listing (description, what's new, category, rating, current screenshots, competitors),
 drafts the brief, scores the current set, and then asks for exactly the raw screens the new storyboard needs.
 **Not live:** it asks a short form instead (what it does, for whom, what it does better, brand).
+In the same message it asks for the pace: **choose together** (it shows the brief, the storyboard and three
+concepts) or **straight to the result** (it states its assumptions and delivers).
 
 Just ask, in any language:
 - "Şu uygulama için yeni mağaza görselleri yap: https://apps.apple.com/tr/app/…/id6764370964"
@@ -140,7 +144,14 @@ python3 $S/peer_test.py out/tr/ios --category entertainment -o peer.jpg
   stretched, recoloured, filtered or painted over. Every number on the canvas is checked against the text read
   from the screens the shot shows, and a UI look-alike that isn't cropped from the app gets flagged. Further
   checks: decoration without a motive, colours and fonts outside the campaign, contrast measured on the
-  rendered pixels, three shots with the same composition, and Google Play's 20 % text rule.
+  rendered pixels, and three shots with the same composition. Google Play rules come labelled as
+  *requirement*, *recommendation* or *promotion eligibility*, because missing each one costs something different.
+- **Effects with a source, not by habit** - glass panels, coloured glow, callouts and SVG illustrations are
+  layers, and each needs its reason in the campaign's `materials`: from the app's DNA, the concept or the
+  shot's message. The renderer flags the skill's own habits across a set: a lift in every shot, the bundled
+  example's numbers, a light app shown only on dark. With `--history` (opt-in) it compares a set with the ones
+  made earlier for other apps. A reference you like lends its principles; the renderer warns if its palette
+  ends up in the campaign.
 - **Niche, not generic** - a step that finds the app's *angle* (the exact person, the enemy, the ritual,
   the insider word, the proof only it has), a playbook per category (what the chart does, what the best
   sets do differently, the clichés to avoid, where the room is), and - as a fast path and fallback - **seven

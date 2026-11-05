@@ -5,12 +5,14 @@
   python3 compose.py render set.json --out out/ --size ios --shots promise collections
   python3 compose.py xray set.json --shot promise -o x.png      # layer boxes, roles, margins, seam, thumbnail
   python3 compose.py concepts a.json b.json c.json --board dna-board.jpg -o review.jpg   # the concept checkpoint
+  python3 compose.py render set.json --out out/ --history       # opt-in: compare with your earlier sets, then log this one
+  python3 compose.py history                                    # what the log holds (~/.store-screenshots/history.jsonl)
 
 set.json (version 2) - see references/scene-format.md:
   {"version": 2, "evidence": "evidence.json", "campaign": {...} | "campaign.json",
    "locales": ["tr", "en"], "sizes": ["ios", "ios-large", "android"], "promise_words": [...],
-   "concept": {"name": "...", "idea": "..."},
-   "shots": [{"id": "promise", "message": "...", "proof": [{"evidence": "discover"}], "span": 1,
+   "concept": {"name": "...", "idea": "..."}, "dna": "dna.json",
+   "shots": [{"id": "promise", "message": "...", "alt": "...", "proof": [{"evidence": "discover"}], "span": 1,
               "background": {"fill": "$surface"}, "layers": [ ... ]}],
    "feature_graphic": {"background": ..., "layers": [...]}}
 
@@ -19,6 +21,7 @@ written next to the PNG so the set can be opened and edited in Figma or Illustra
 scene checks (validate.py) and the store/set rules; check_set.py reads the results from _render.json.
 """
 import argparse
+import datetime
 import json
 import os
 import sys
@@ -65,8 +68,12 @@ def context(spec, spec_dir, lang, fonts, preset=None, W=None, H=None):
         fonts_abs[k] = v if (v in rs.FONT_ALIASES or os.path.isabs(v)) else os.path.join(camp_dir, v)
     camp = dict(camp, fonts=fonts_abs)
     dev = rs.device_class(preset, W, H) if preset else None
+    dna = None
+    if spec.get("dna"):  # the materials, palette and references the campaign is checked against
+        dna = load_json(spec["dna"], spec_dir)[0] if isinstance(spec["dna"], str) else spec["dna"]
     return {"fonts": fonts, "lang": lang, "tokens": tokens, "campaign": camp, "evidence": evidence, "evidence_dir": ev_dir,
-            "spec_dir": spec_dir, "preset": preset, "device": dev, "store": rs.store_of(preset, W, H) if preset else None}
+            "spec_dir": spec_dir, "preset": preset, "device": dev, "store": rs.store_of(preset, W, H) if preset else None,
+            "dna": dna}
 
 
 def shot_list(spec, name, W, H):
@@ -114,6 +121,7 @@ def cmd_render(a):
         runs = [r for r in runs if r[0] == a.locale] or sys.exit(f"locale {a.locale!r} not in {locales}")
     fonts = rs.Fonts(spec_dir)
     exit_code = 0
+    logged = False
     if a.backend in ("auto", "svg") and not sc.have_resvg():
         msg = "resvg isn't installed (pip install resvg-py) - drawing with the Pillow backend"
         if a.backend == "svg":
@@ -161,8 +169,10 @@ def cmd_render(a):
                     piece.convert("RGB").save(os.path.join(out_dir, f"{slot:02d}.png"), optimize=True)
                     fps.append((f"{slot:02d}", va.fingerprint(scene, j)))
                     pseudo.append({"headline": heads[j]})
+                    alt = shot.get("alt")
+                    alt = alt[j] if isinstance(alt, list) and j < len(alt) else (alt if isinstance(alt, str) else None)
                     entry = {"file": f"{slot:02d}.png", "shot": shot.get("id", i), "headline": heads[j], "sub": subs[j],
-                             "layout": "scene", "backend": used, "warnings": warnings if j == 0 else []}
+                             "alt": alt, "layout": "scene", "backend": used, "warnings": warnings if j == 0 else []}
                     if span > 1:
                         entry["span"] = label
                     report["shots"].append(entry)
@@ -179,6 +189,12 @@ def cmd_render(a):
                 set_rules += rs.promise_warnings(pseudo, spec.get("promise_words"), lang)
                 set_rules += repeat_units(units)
                 set_rules += va.content_repeats(contents, ctx["evidence"])
+                set_rules += va.campaign_material_warnings(ctx) + va.habit_warnings(scenes, ctx)
+                set_rules += va.example_copies(shots, spec_dir)
+                if a.history and not logged:
+                    set_rules += history_warnings(raw, a.spec, scenes, ctx)
+                    log_history(raw, a.spec, scenes, ctx, loc, name)
+                    logged = True
                 if report["device"] == "iphone" and not a.size:
                     set_rules += rs.iphone_size_warnings(sizes)
             for w in set_rules:
@@ -209,8 +225,12 @@ def cmd_render(a):
                 with open(os.path.join(out_root, "feature-graphic.svg"), "w", encoding="utf-8") as f:
                     f.write(svg)
                 heads, subs = headlines_by_slot(scene)
+                boxes = [{"role": op["meta"].get("role"), "kind": op["meta"].get("kind"), "bbox": [round(v, 1) for v in op["meta"]["bbox"]]}
+                         for op in va.walk(scene.ops) if op.get("meta", {}).get("bbox") and op["meta"].get("role") in
+                         ("headline", "sub", "display", "callout", "proof", "brand")]
                 with open(os.path.join(out_root, "_feature-graphic.json"), "w", encoding="utf-8") as f:
-                    json.dump({"headline": heads[0], "sub": subs[0], "lang": lang}, f, ensure_ascii=False, indent=1)
+                    json.dump({"headline": heads[0], "sub": subs[0], "lang": lang, "alt": fg.get("alt"), "size": list(FG),
+                               "elements": boxes}, f, ensure_ascii=False, indent=1)
                 for w in warnings:
                     if "no \"proof\"" not in w:
                         print(f"! {loc or ''} feature graphic: {w}")
@@ -219,6 +239,104 @@ def cmd_render(a):
                 print(f"x {loc or ''} feature graphic: {e}", file=sys.stderr)
                 exit_code = 1
     sys.exit(exit_code)
+
+
+# ------------------------------------------------------------------ history (opt-in)
+
+def history_path():
+    home = os.environ.get("STORE_SCREENSHOTS_HOME") or os.path.join(os.path.expanduser("~"), ".store-screenshots")
+    return os.path.join(home, "history.jsonl")
+
+
+def set_record(raw, spec_path, scenes, ctx):
+    camp = ctx.get("campaign") or {}
+    head = (camp.get("type") or {}).get("headline") or {}
+    ground = None
+    for op in scenes[0].ops if scenes else []:
+        if op.get("meta", {}).get("role") == "background" and op["meta"].get("colors"):
+            ground = op["meta"]["colors"][0][:7]
+            break
+    fps = []
+    for scn in scenes:
+        for j in range(scn.span):
+            hb, vb = va.fingerprint(scn, j)
+            fps.append([[round(v, 3) for v in hb] if hb else None, [round(v, 3) for v in vb] if vb else None])
+    return {"time": datetime.datetime.now().isoformat(timespec="seconds"), "app": raw.get("app") or "",
+            "spec": os.path.abspath(spec_path), "concept": (raw.get("concept") or {}).get("name") or "",
+            "materials": sorted({m for scn in scenes for m, _, _ in va.materials_used(scn)}),
+            "fonts": sorted({os.path.basename(str(v)) for v in (camp.get("fonts") or {}).values()}),
+            "emphasis": (head.get("emphasis") or {}).get("style"), "ground": ground, "fingerprints": fps}
+
+
+def read_history():
+    p = history_path()
+    if not os.path.exists(p):
+        return []
+    out = []
+    with open(p, encoding="utf-8") as f:
+        for line in f:
+            try:
+                out.append(json.loads(line))
+            except ValueError:
+                continue
+    return out
+
+
+def log_history(raw, spec_path, scenes, ctx, loc, preset):
+    p = history_path()
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    rec = dict(set_record(raw, spec_path, scenes, ctx), locale=loc, preset=preset)
+    with open(p, "a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+
+def history_warnings(raw, spec_path, scenes, ctx):
+    """Does this set look like one made earlier for another app? Same concept, faces, emphasis, ground,
+    materials and compositions are what make a skill's output recognisable as the skill's."""
+    me = set_record(raw, spec_path, scenes, ctx)
+    out = []
+    for rec in read_history():
+        if rec.get("spec") == me["spec"] or (rec.get("app") and rec.get("app") == me["app"]):
+            continue
+        same = []
+        if me["concept"] and rec.get("concept", "").lower() == me["concept"].lower():
+            same.append("concept name")
+        if me["fonts"] and rec.get("fonts") == me["fonts"]:
+            same.append("fonts")
+        if me["emphasis"] and rec.get("emphasis") == me["emphasis"]:
+            same.append("emphasis device")
+        if me["materials"] and rec.get("materials") == me["materials"]:
+            same.append("materials (" + ", ".join(me["materials"]) + ")")
+        if me["ground"] and rec.get("ground") and sum((x - y) ** 2 for x, y in zip(rs.hexrgb(me["ground"]), rs.hexrgb(rec["ground"]))) < 24 ** 2:
+            same.append("ground colour")
+        theirs = [tuple(tuple(b) if b else None for b in fp) for fp in rec.get("fingerprints") or []]
+        mine = [tuple(tuple(b) if b else None for b in fp) for fp in me["fingerprints"]]
+        alike = sum(1 for fp in mine if any(all((x is None and y is None) or (x and y and va.iou(x, y) > 0.7) for x, y in zip(fp, t))
+                                            for t in theirs))
+        if mine and alike / len(mine) >= 0.5:
+            same.append(f"{alike} of {len(mine)} compositions")
+        if len(same) >= 3:
+            out.append(f"this set looks like your {rec.get('app') or os.path.basename(rec.get('spec', ''))!r} set from "
+                       f"{rec.get('time', '')[:10]}, with the same {', '.join(same)} - a set should come from this app's DNA, not from "
+                       "the last one")
+    return out
+
+
+def cmd_history(a):
+    recs = read_history()
+    if a.clear:
+        if os.path.exists(history_path()):
+            os.remove(history_path())
+        print(f"cleared {history_path()}")
+        return
+    if not recs:
+        print(f"no history yet ({history_path()}) - render with --history to start one")
+        return
+    for rec in recs[-a.last:]:
+        print(f"{rec.get('time', '')[:16]}  {rec.get('app') or '?':<18} {rec.get('concept') or '-':<22} "
+              f"{rec.get('emphasis') or '-':<10} {rec.get('ground') or '-':<8} {', '.join(rec.get('materials') or []) or 'flat'}  "
+              f"[{', '.join(rec.get('fonts') or [])}]")
+    print(f"{len(recs)} sets in {history_path()}")
 
 
 def repeat_units(units):
@@ -343,6 +461,11 @@ def main():
     r.add_argument("--locale")
     r.add_argument("--shots", nargs="+", help="only these shot ids")
     r.add_argument("--backend", choices=["auto", "svg", "pillow"], default="auto")
+    r.add_argument("--history", action="store_true", help="opt-in: warn if this set looks like an earlier one for another "
+                   "app, then log it (~/.store-screenshots/history.jsonl, or $STORE_SCREENSHOTS_HOME)")
+    hi = sub.add_parser("history", help="list the sets logged with --history")
+    hi.add_argument("--last", type=int, default=20)
+    hi.add_argument("--clear", action="store_true", help="delete the log")
     x = sub.add_parser("xray", help="one shot with layer boxes, roles, margins and a thumbnail inset")
     x.add_argument("spec")
     x.add_argument("--shot", required=True)
@@ -360,7 +483,7 @@ def main():
     c.add_argument("--backend", choices=["auto", "svg", "pillow"], default="auto")
     c.add_argument("-o", "--output", default="review.jpg")
     a = p.parse_args()
-    {"render": cmd_render, "xray": cmd_xray, "concepts": cmd_concepts}[a.cmd](a)
+    {"render": cmd_render, "xray": cmd_xray, "concepts": cmd_concepts, "history": cmd_history}[a.cmd](a)
 
 
 if __name__ == "__main__":

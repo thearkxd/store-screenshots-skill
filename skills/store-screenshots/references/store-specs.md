@@ -40,27 +40,56 @@ bezel), and all type and spacing is scaled to the wider canvas.
 
 ## Google Play
 
+Google's preview-asset page sorts its rules into three kinds, and the consequences differ. The checks keep them
+apart too: `check_set.py --store android` and the renderers label every Play message `[Play requirement]`,
+`[Play recommendation]` or `[Play promotion eligibility]`.
+
+| Kind | What Google says happens if you miss it |
+|---|---|
+| **Requirement** | "mandatory; failure to meet requirements may result in removal or suspension from Google Play" |
+| **Highly recommended** | "will not impact your store listing page, but may result in changes to how your preview assets appear on Google Play or limit promotional opportunities" |
+| **Promotion eligibility** | required "to be eligible for recommendations in formats that use screenshots" |
+
 **Phone** (presets `android` = 1080 × 1920, 9:16, promotion-eligible; `android-tall` = 1080 × 2160, allowed
-but not promotion-eligible):
-- Count: up to **8** per device type; at least 2 across device types to publish.
-- Formats: JPEG or 24-bit PNG, no alpha. Dimensions: min side 320 px, max side 3840 px, long side ≤ 2× short.
-- Promotion formats (apps): **at least 4 screenshots at ≥ 1080 px**, portrait 9:16 (≥ 1080 × 1920) or
-  landscape 16:9 (≥ 1920 × 1080). Games: at least 3, showing gameplay.
+but not promotion-eligible).
+
+*Requirements* - `check_set.py` reports these as errors:
+- At least **2 screenshots across device types** to publish; at most **8 per device type**.
+- JPEG or 24-bit PNG, no alpha. Min side 320 px, max side 3840 px, long side ≤ 2× short side.
 - Feature graphic: **1024 × 500**, JPEG or 24-bit PNG, no alpha.
 
-**Content rules** (Play Console help, "Highly recommended" + metadata policy) - `check_set.py --store
-android` and `render_set.py` flag the ones a script can see:
-- No ranking, performance, award or price/promo claims: "Best", "#1", "Top", "New", "Discount", "Sale",
-  "Million Downloads", "free", prices, "10% off" (also in the feature graphic).
-- No calls to action: "Download now", "Install now", "Play now", "Try now" (TR: "hemen indir", "şimdi dene").
-- No user testimonials or star ratings, no store badges.
-- **Avoid device imagery** in screenshots and the feature graphic ("can become obsolete quickly or alienate
-  some users"). Android presets and the feature graphic therefore show the bare rounded screen; a frame
-  (`"device": {"android_style": "android"}`) renders with a warning.
-- **Taglines take up no more than 20% of the image**, and screenshots show the actual in-app experience. A
-  type-only poster breaks both: keep it out of the Play set with `"stores": ["ios"]` on that shot (the
-  renderer warns otherwise). Captions are measured; over 20% of the height warns.
-- Localise text per language; avoid small text and busy backgrounds behind it.
+*Promotion eligibility* - warnings, because a listing publishes without them:
+- Apps: **at least 4 screenshots at ≥ 1080 px**, portrait 9:16 (≥ 1080 × 1920) or landscape 16:9 (≥ 1920 × 1080).
+- Games: at least 3, 9:16 or 16:9, at the same minimums.
+
+*Highly recommended* - warnings, which the skill follows by default:
+- **Show the in-app experience.** Taglines take up **no more than 20 % of the image**. A type-only poster
+  breaks both, so keep it out of the Play set with `"stores": ["ios"]` (the renderer warns otherwise). The
+  renderers measure the words' ink, big type included; label, annotation and footnote text is left out.
+- **No device imagery** ("can become obsolete quickly or alienate some users"). Android presets and scenes show
+  the bare rounded screen; a frame renders with a warning.
+- **No calls to action**: "Download now", "Install now", "Play now", "Try now" (TR: "hemen indir", "şimdi dene").
+- **No Play performance, ranking, award, testimonial, price or promotion wording**: "Best", "#1", "Top", "New",
+  "Discount", "Sale", "Million Downloads", "free", prices, "10% off", star ratings, quotes, store badges.
+  Google's metadata policy forbids the same claims in the app's title, icon and developer name, and
+  misleading metadata anywhere.
+- Avoid small text and busy backgrounds behind it; localise per language.
+- **Rotation:** "Do not upload images upside down, sideways, or otherwise skewed." This is about the image
+  you upload, not about a phone turned inside the composition (that one falls under device imagery and the
+  skill's materials rule).
+- **Alt text**, 140 characters or fewer: what the image shows, for screen readers. Give it per shot as
+  `"alt"`; `check_set.py` warns when shots have none.
+- **Feature graphic:**
+  - The focal point sits towards the centre.
+  - Key elements (logo, app name, slogan, main UI) stay out of the cutoff zones near the edges. Google shows the
+    zones only as a picture, without numbers. The skill keeps key elements out of the outer 7 % at the sides
+    and 6 % at top and bottom. Missing this "may result in ineligibility to appear in these formats".
+  - Background elements belong at the edges.
+  - No pure white, black or dark gray ground: they blend into Play's own background.
+  - Don't repeat the icon, no device imagery, no promo wording, and alt text of 140 characters or fewer.
+
+A brand that needs an exception (a dark-gray identity, a phone frame its users know) can make one. Say what
+it may cost: the listing still publishes, but the asset may be shown differently or promoted less.
 
 **Other device types** (no presets; render with `--size WxH` and that device's own screens): tablets and
 Chromebooks - at least 4 screenshots, 1080-7680 px, 16:9 or 9:16; Android XR - 4 to 8, 8:5, ≤ 8 MB; Wear OS -
@@ -74,7 +103,8 @@ at least one TV screenshot.
 - Anything can vary per size: `{"default": …, "android": …, "duo-inner": …}` picks the exact preset, then the
   device class (`iphone`, `duo`, `ipad`, `android`), then the store (`ios`, `android`), then `"default"`.
 - `"stores": ["ios"]` (or `"android"`, `"iphone"`, `"duo"`, `"ipad"`) keeps a shot in those sets only.
-- Many App Store examples in the library use "#1", awards, prices and offers. **Strip those for Google Play.**
+- Many App Store examples in the library use "#1", awards, prices and offers. **Leave those out of the Google
+  Play set** (Google recommends it; keeping them may limit promotion).
 - Keep at least 6 of 10 iOS shots (and every Android shot) as real UI; one poster shot is plenty.
 
 ## Sources
