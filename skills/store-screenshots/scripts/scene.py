@@ -606,6 +606,8 @@ class Scene:
              "bbox": rot_bbox(box, op["rotate"], op["centre"])}
         op["meta"] = {**op.get("meta", {}), **m}
         if L.get("id"):
+            if str(L["id"]).startswith("_ss-"):
+                raise SceneError(f'layer id {L["id"]!r}: ids starting with "_ss-" are the renderer\'s own')
             self.by_id[L["id"]] = op
         return op
 
@@ -911,6 +913,12 @@ class Scene:
             src = self.by_id.get(L["on"])
             if not src or src["op"] not in ("image", "device3d"):
                 raise SceneError('mark: "on" must name an earlier screen or device3d layer')
+            if isinstance(L.get("region"), str):  # a named region of that screen (evidence.py name)
+                named = ((self.ctx["evidence"]["screens"].get(src["meta"].get("evidence")) or {}).get("regions") or {})
+                if L["region"] not in named:
+                    raise SceneError(f"mark region {L['region']!r} isn't named on {src['meta'].get('evidence')!r} "
+                                     f"({', '.join(named) or 'no named regions'})")
+                L = dict(L, region=named[L["region"]])
             if src["op"] == "device3d":  # through the device's perspective
                 r = L.get("region") or [0, 0, 1, 1]
                 w, h = src["src"].size
@@ -919,6 +927,10 @@ class Scene:
             else:
                 r = L.get("region") or src["crop"]
                 sr, sb = src["crop"], src["src_box"]
+                if r[0] < sr[0] - 0.005 or r[1] < sr[1] - 0.005 or r[2] > sr[2] + 0.005 or r[3] > sr[3] + 0.005:
+                    self.warnings.append(f"the mark on {L['on']!r} points at {list(r)}, outside what that layer shows ({list(sr)}) - "
+                                         "a mark's region is in fractions of the whole screen, not of the crop "
+                                         "(use the region's name or its numbers from evidence.json)")
                 pts = [(sb[0] + (px - sr[0]) / (sr[2] - sr[0]) * (sb[2] - sb[0]), sb[1] + (py - sr[1]) / (sr[3] - sr[1]) * (sb[3] - sb[1]))
                        for px, py in ((r[0], r[1]), (r[2], r[3]))]
                 pts = [rot_point(p, src["rotate"], src["centre"]) for p in pts]
@@ -1153,8 +1165,10 @@ class SVGWriter:
         self.fonts = set()
 
     def uid(self, p):
+        """Ids for the renderer's own defs (clips, gradients, filters). Layer ids are written as element ids too
+        (Figma shows them as layer names), so these carry a prefix no layer id may take."""
         self.n += 1
-        return f"{p}{self.n}"
+        return f"_ss-{p}{self.n}"
 
     def fill_attr(self, fill, box):
         if fill is None:

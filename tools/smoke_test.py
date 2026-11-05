@@ -783,6 +783,33 @@ def guardrail_tests(tmp):
                 "the headline reaches into the cutoff zone", "feature graphic has no alt text", "[Play requirement]: the listing"):
         assert msg in out, (msg, out)
     assert "ERROR" not in out, out
+    # --- layer ids never collide with the renderer's own (a layer "c1" once took over clip "c1" and vanished)
+    if sc.have_resvg():
+        pics = []
+        for name, lid in (("ids", "c1"), ("ids2", "plain")):
+            render(write(name, [shot("ids", [head, dict(scr, id=lid)])]))
+            pics.append(Image.open(os.path.join(d, name, "out", "ios", "01.png")).convert("RGB"))
+        diff = sum(ImageStat.Stat(ImageChops.difference(*pics)).mean) / 3
+        assert diff < 0.5, f"a layer id that matches an internal def id changed the picture ({diff:.1f})"
+    assert "renderer's own" in render(write("idres", [shot("r", [head, dict(scr, id="_ss-c1")])]), expect=1)
+    # --- marks: a named region works; a region outside the layer's crop is warned (it was given in crop fractions)
+    card = dict(scr, id="card", crop="tiles", w=0.8, x=0.1, y=0.6)
+    out = render(write("markname", [shot("m", [head, card, {"type": "mark", "kind": "circle", "on": "card", "region": "tiles"}])]))
+    assert "outside what that layer shows" not in out and "off the canvas" not in out, out
+    out = render(write("markoff", [shot("m", [head, card, {"type": "mark", "kind": "circle", "on": "card", "region": [0.7, 0.0, 1.0, 0.1]}])]))
+    assert "outside what that layer shows" in out, out
+    # --- words under a screen, and a callout spilling out of its box
+    out = render(write("under", [shot("u", [dict(head, y=0.9), dict(scr, y=0.7)])]))
+    assert "covers" in out and "were placed under it" in out, out
+    spill = [head, scr, dict(box, w=0.2), dict(label, text="Spoiler gizli, hep gizli", w=0.5)]
+    assert "runs out of its box" in render(write("spill", [shot("c", spill)], campaign=callout_style))
+    # --- the 2.2 Seenfy example renders clean on every size
+    out = run(s("compose.py"), "render", os.path.join(ROOT, "examples", "seenfy-v2", "afisin-isigi.json"), "--out",
+              os.path.join(d, "afisin"), both=True)
+    assert "!" not in out, out
+    for size, store in (("ios", "ios"), ("ios-large", "ios"), ("android", "android")):
+        out = run(s("check_set.py"), os.path.join(d, "afisin", size), "--store", store, "--lang", "tr")
+        assert "WARN" not in out and "ERROR" not in out, out
     # --- dna: materials on the board, a reference recorded with its palette
     ev = json.load(open(ev_path, encoding="utf-8"))
     dna_path = os.path.join(d, "dna-m.json")

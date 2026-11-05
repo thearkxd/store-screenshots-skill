@@ -7,7 +7,7 @@ designer for **App Store and Google Play screenshots**: from the app's promise t
 app-specific design and pixel-exact PNGs (plus editable SVGs). Everything is built from the app's real screens
 and its own visual DNA, with copy that passes the "swap test" and doesn't read as AI-generated.
 
-![Seenfy App Store screenshots designed with this skill from the app's own DNA, concept "Ekrandaki Sayı"](docs/images/design-set.jpg)
+![Seenfy App Store screenshots made with this skill from the app's real screens, concept "Afişin Işığı"](docs/images/afisin-isigi-set.jpg)
 
 - Designs each set for one app: its visual DNA from the real screens, three app-specific concepts, and every
   shot composed freely, not a template filled in. Output: PNG and editable SVG for every store size.
@@ -182,8 +182,39 @@ python3 $S/peer_test.py out/tr/ios --category entertainment -o peer.jpg
 
 ## Examples
 
+- [Seenfy with 2.2: "Afişin Işığı"](#seenfy-with-22-afişin-işığı)
 - [Design-driven pipeline (v2): the Seenfy pilot](#design-driven-pipeline-v2-the-seenfy-pilot)
 - [Real example: Seenfy (preset route, v1)](#real-example-seenfy-preset-route-v1)
+
+## Seenfy with 2.2: "Afişin Işığı"
+
+Made in direct mode from the same five raw screens, evidence and DNA as the pilot below, with a new concept
+([`examples/seenfy-v2/afisin-isigi.json`](examples/seenfy-v2/afisin-isigi.json)).
+
+- **The idea:** Seenfy is opened in the evening, and the choice is made by looking at a poster. Every ground is
+  blurred from the poster on its own screen: Exhuma's grey, the Minions' orange, Interstellar's ice. The
+  app's indigo appears only on the word that decides.
+- **Materials, each with its source:** flat and photo come from the DNA. A soft light behind the screen comes
+  from the concept ("the screen is the only light in the room"), in three of the five shots, not all of them.
+- **One system, five compositions:**
+  1. the match-score card;
+  2. four real mood cards in a staircase;
+  3. the home screen bleeding off the top, with the S2E5 badge circled;
+  4. the facts card lifted out of a light detail shot;
+  5. the discover screen, with one callout in the campaign's own pill.
+- **Checks:** clean on every size, iPhone medium and large and Google Play. The Play set has no frames and
+  keeps taglines under 20 %. The feature graphic sits on indigo rather than white, black or dark gray, and
+  every shot has alt text.
+
+![Seenfy, concept "Afişin Işığı": App Store set](docs/images/afisin-isigi-set.jpg)
+
+The Google Play set and the feature graphic come from the same file:
+
+![Seenfy, concept "Afişin Işığı": Google Play set and feature graphic](docs/images/afisin-isigi-android.jpg)
+
+```bash
+python3 skills/store-screenshots/scripts/compose.py render examples/seenfy-v2/afisin-isigi.json --out out/
+```
 
 ## Design-driven pipeline (v2): the Seenfy pilot
 

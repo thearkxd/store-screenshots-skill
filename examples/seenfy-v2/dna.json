@@ -75,6 +75,10 @@
   "density": "medium, poster-led",
   "icons": "line icons, rounded"
  },
+ "materials": {
+  "flat": "cards and lists are flat fills on #121212, no shadows (anasayfa, koleksiyonlar)",
+  "photo": "posters and stills are the content (kesfet, sana-uygun, detay, anasayfa)"
+ },
  "signatures": [
   {
    "name": "%88 Sana Uygun match badge",
