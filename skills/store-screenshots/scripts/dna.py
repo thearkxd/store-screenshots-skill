@@ -4,6 +4,7 @@
   python3 dna.py measure evidence.json --site https://example.com -o dna.json   # palette roles, type scale, website fonts/colours
   python3 dna.py fonts evidence.json home --region 0.05,0.08,0.6,0.12 --text "Merhaba" -o font-match.jpg
   python3 dna.py board dna.json -o dna-board.jpg                                # the board the user confirms
+  python3 dna.py reference liked.png --dna dna.json -o reference.jpg            # a reference: principles only, never its look
 
 measure fills what a script can know: the UI palette (flat pixels only, so posters and photos don't count)
 with roles (surface, ink, accent, semantic), dark or light UI, the type scale from the words on screen, and -
@@ -26,6 +27,19 @@ sys.path.insert(0, HERE)
 import render_set as rs  # noqa: E402
 from PIL import Image, ImageDraw, ImageFilter, ImageFont  # noqa: E402
 
+MATERIALS = {
+    "flat": "solid fills, no depth",
+    "elevated": "cards on shadows",
+    "glass": "frosted, translucent panels (iOS materials, Liquid Glass)",
+    "glow": "coloured light: halos, lit accents, neon",
+    "gradient": "colour ramps in the UI itself",
+    "texture": "grain, noise, paper",
+    "paper": "print feel: off-white, ink, rules",
+    "3d": "rendered objects or devices",
+    "tilt": "rotated or perspective UI",
+    "illustration": "drawn art the app itself uses",
+    "photo": "photography or posters as content",
+}
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
 
 
@@ -229,6 +243,10 @@ def cmd_measure(a):
         "fonts": {"display": None, "display_italic": None, "text": None, "source": "user file | website | closest match (say which)"},
         "palette": {p["role"]: p["hex"] for p in palette},
         "shape": {"radius": "", "elevation": "", "density": "", "icons": ""},
+        "materials": {"_doc": "What the app's own screens are made of, each with where it shows: {\"glass\": \"tab bar and "
+                              "sheets (home, detail)\"}. List only what the screens show; anything else (" + ", ".join(MATERIALS) +
+                              ") is not the app's - a campaign may still use it, but only with the concept as its reason."},
+        "references": [],
         "signatures": [],
         "voice": "",
         "output": "",
@@ -240,7 +258,7 @@ def cmd_measure(a):
     if a.site:
         w = dna["website"]
         print("website: " + (w.get("error") or f"fonts {w.get('fonts')} google {w.get('google_fonts')} colours {w.get('colors', [])[:5]}"))
-    print(f"→ {a.output}  (now complete fonts, shape, signatures, voice, output, avoid by looking at the screens)")
+    print(f"→ {a.output}  (now complete fonts, shape, materials, signatures, voice, output, avoid by looking at the screens)")
 
 
 def font_label(path):
@@ -301,7 +319,7 @@ def cmd_board(a):
     fonts = rs.Fonts(base)
     W = 2400
     pad = 70
-    sheet = Image.new("RGB", (W, 1500), (244, 242, 238))
+    sheet = Image.new("RGB", (W, 2800), (244, 242, 238))  # cropped to its content at the end
     d = ImageDraw.Draw(sheet)
     fb, fm, fr = fonts.get("sans-bold", 54), fonts.get("sans-bold", 30), fonts.get("text", 26)
     d.text((pad, pad), f"{dna.get('app') or 'App'} — visual DNA", font=fb, fill=(20, 20, 20))
@@ -374,8 +392,18 @@ def cmd_board(a):
             hmax = max(hmax, piece.height)
         y += hmax + 70
     # notes
-    notes = [("Shape", ", ".join(f"{k} {v}" for k, v in (dna.get("shape") or {}).items() if v)), ("Voice", dna.get("voice")),
-             ("Makes / shows", dna.get("output")), ("Avoid", "; ".join(dna.get("avoid") or []))]
+    mats = {k: v for k, v in (dna.get("materials") or {}).items() if not k.startswith("_") and v}
+    made = "; ".join(f"{k} ({v})" if isinstance(v, str) else k for k, v in mats.items())
+    absent = ", ".join(m for m in MATERIALS if m not in mats)
+    refs = [r for r in dna.get("references") or [] if r.get("principles")]
+    borrowed = "; ".join(f"{os.path.basename(r.get('file', ''))}: " + ", ".join(f"{k} {v}" for k, v in r["principles"].items()
+                                                                                 if v and k not in ("not",) and isinstance(v, str))
+                         for r in refs)
+    notes = [("Shape", ", ".join(f"{k} {v}" for k, v in (dna.get("shape") or {}).items() if v)),
+             ("Made of", made or "(not filled in - look at the screens)"),
+             ("Not in the app", (absent + " - only with a concept reason") if mats else ""),
+             ("Voice", dna.get("voice")), ("Makes / shows", dna.get("output")), ("Avoid", "; ".join(dna.get("avoid") or [])),
+             ("From references", (borrowed + " (principles only)") if borrowed else "")]
     for k, v in notes:
         if not v:
             continue
@@ -393,6 +421,75 @@ def cmd_board(a):
     sheet = sheet.crop((0, 0, W, min(sheet.height, y + pad)))
     sheet.save(a.output, quality=90)
     print(a.output)
+
+
+def reference_palette(im, n=8):
+    """The reference's colours by area - neutrals and the chromatic accents, even small ones."""
+    small = im.convert("RGB")
+    small = small.resize((240, max(1, round(small.height * 240 / small.width))), Image.BILINEAR)
+    q = small.quantize(colors=32, method=Image.Quantize.MEDIANCUT)
+    pal = q.getpalette()
+    total = small.width * small.height
+    counts = {tuple(pal[3 * i: 3 * i + 3]): c for c, i in q.getcolors()}
+    groups = merge_colors(counts, total)
+    keep = [g for g in groups if g["share"] >= 0.03 or (chroma(g["rgb"]) > 0.35 and g["share"] >= 0.004)]
+    keep.sort(key=lambda g: -g["share"])
+    return [hexs(g["rgb"]) for g in keep[:n]]
+
+
+def cmd_reference(a):
+    im = Image.open(a.image)
+    palette = reference_palette(im)
+    entry = {"file": os.path.abspath(a.image), "palette": palette,
+             "principles": {"hierarchy": "", "density": "", "rhythm": "", "type_and_screen": "", "why_it_works": "",
+                            "not": "its palette, fonts, illustrations, 3D objects or layouts one to one"}}
+    if a.dna:
+        with open(a.dna, encoding="utf-8") as f:
+            dna = json.load(f)
+        refs = [r for r in dna.get("references") or [] if os.path.abspath(r.get("file", "")) != entry["file"]]
+        old = next((r for r in dna.get("references") or [] if os.path.abspath(r.get("file", "")) == entry["file"]), None)
+        if old and old.get("principles"):
+            entry["principles"] = old["principles"]  # keep what the designer wrote
+        dna["references"] = refs + [entry]
+        with open(a.dna, "w", encoding="utf-8") as f:
+            json.dump(dna, f, ensure_ascii=False, indent=1)
+    # the sheet: the reference, its palette marked "not ours", the principles to fill in
+    fonts = rs.Fonts(HERE)
+    fb, fr = fonts.get("sans-bold", 30), fonts.get("text", 22)
+    h = 900
+    ref = im.convert("RGB")
+    ref = ref.resize((max(1, round(ref.width * h / ref.height)), h), Image.LANCZOS)
+    if ref.width > 1500:
+        ref = ref.resize((1500, round(h * 1500 / ref.width)), Image.LANCZOS)
+    W = ref.width + 900
+    sheet = Image.new("RGB", (W, h + 140), (244, 242, 238))
+    sheet.paste(ref, (40, 100))
+    d = ImageDraw.Draw(sheet)
+    d.text((40, 36), f"Reference — {os.path.basename(a.image)}", font=fb, fill=(20, 20, 20))
+    x0, y = ref.width + 80, 100
+    d.text((x0, y), "Its palette - NOT for the campaign", font=fb, fill=(150, 40, 30))
+    y += 50
+    for i, hx in enumerate(palette[:8]):
+        d.rounded_rectangle([x0 + i * 92, y, x0 + i * 92 + 80, y + 80], radius=14, fill=rs.hexrgb(hx), outline=(200, 195, 190), width=2)
+    y += 130
+    d.text((x0, y), "Principles to take (the designer writes them)", font=fb, fill=(20, 20, 20))
+    y += 50
+    for k, v in entry["principles"].items():
+        d.text((x0, y), f"{k.replace('_', ' ')}:", font=fr, fill=(90, 90, 90))
+        line, words = "", (v or "…").split()
+        for wd in words:
+            if line and fr.getlength(line + " " + wd) > W - x0 - 270:
+                d.text((x0 + 230, y), line, font=fr, fill=(30, 30, 30))
+                y += 32
+                line = wd
+            else:
+                line = (line + " " + wd).strip()
+        d.text((x0 + 230, y), line, font=fr, fill=(30, 30, 30))
+        y += 44
+    sheet.save(a.output, quality=88)
+    print(f"palette {', '.join(palette)} recorded{' in ' + a.dna if a.dna else ''} → {a.output}")
+    print("write the principles (hierarchy, density, rhythm, how type and screen share the canvas) into dna.json; "
+          "the campaign is checked for copying the palette")
 
 
 def main():
@@ -413,8 +510,12 @@ def main():
     b = sub.add_parser("board", help="render the DNA board")
     b.add_argument("dna")
     b.add_argument("-o", "--output", default="dna-board.jpg")
+    r = sub.add_parser("reference", help="record a reference the user likes: its palette (for the copy check) and principles")
+    r.add_argument("image")
+    r.add_argument("--dna", help="dna.json to add the reference to")
+    r.add_argument("-o", "--output", default="reference.jpg")
     a = p.parse_args()
-    {"measure": cmd_measure, "fonts": cmd_fonts, "board": cmd_board}[a.cmd](a)
+    {"measure": cmd_measure, "fonts": cmd_fonts, "board": cmd_board, "reference": cmd_reference}[a.cmd](a)
 
 
 if __name__ == "__main__":

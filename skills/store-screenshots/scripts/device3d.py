@@ -34,6 +34,8 @@ MODELS = {  # all fractions of the body width
 BUTTONS = {"iphone": [(-1, 0.178, 0.212), (-1, 0.252, 0.31), (-1, 0.33, 0.388), (1, 0.27, 0.365)],
            "android": [(1, 0.2, 0.25), (1, 0.29, 0.39)]}
 LIMITS = {"yaw": 40.0, "pitch": 30.0, "roll": 25.0}
+CONTEXT_LIMITS = {"yaw": 60.0, "pitch": 45.0, "roll": 35.0}  # a device that sets the scene; nobody has to read it
+RIM = {"strength": 0.6, "dir": [0.85, -0.3, 0.45]}  # a coloured light from behind, edging band and keys
 FOV = (6.0, 60.0)
 CAMERA = {"fov": 22.0, "light": [-0.45, -0.75, -0.5]}
 GLASS = (10, 10, 11)
@@ -132,19 +134,31 @@ class Device:
     """Geometry of one device in canvas pixels. place(ox, oy) sets where the device's centre projects, then
     render() draws it; until then bbox is relative to that centre."""
 
-    def __init__(self, screen_size, width_px, yaw=0.0, pitch=0.0, roll=0.0, model="island", body=None, camera=None):
+    def __init__(self, screen_size, width_px, yaw=0.0, pitch=0.0, roll=0.0, model="island", body=None, camera=None, limits=None):
+        lim = limits or LIMITS
         for k, v in (("yaw", yaw), ("pitch", pitch), ("roll", roll)):
-            if abs(v) > LIMITS[k]:
-                raise DeviceError(f"{k} {v:g}° is past {LIMITS[k]:g}° - beyond that the UI stops reading; turn it less")
+            if abs(v) > lim[k]:
+                why = "even a context device turns no further" if limits else "beyond that the UI stops reading; turn it less"
+                raise DeviceError(f"{k} {v:g}° is past {lim[k]:g}° - {why}")
         if model not in MODELS:
             raise DeviceError(f"model {model!r}: {', '.join(MODELS)}")
-        spec = dict(MODELS[model], **{k: v for k, v in (body or {}).items() if k in ("radius", "bezel", "thickness", "cutout", "buttons")})
+        spec = dict(MODELS[model], **{k: v for k, v in (body or {}).items() if k in ("radius", "bezel", "thickness", "cutout", "buttons", "sheen")})
+        if not 0 <= float(spec.get("sheen", 0) or 0) <= 0.6:
+            raise DeviceError("body sheen: 0-0.6")
         cam = dict(CAMERA, **(camera or {}))
         if not FOV[0] <= float(cam["fov"]) <= FOV[1]:
             raise DeviceError(f"camera fov {cam['fov']}: {FOV[0]:g}-{FOV[1]:g}°")
         self.spec, self.cam = spec, cam
         self.angles = (float(yaw), float(pitch), float(roll))
         self.light = norm([float(v) for v in cam["light"]])
+        self.rim = None
+        if cam.get("rim"):
+            r = dict(RIM, **cam["rim"])
+            if not r.get("color"):
+                raise DeviceError('camera rim: {"color": "$accent", "strength": 0.6, "dir": [x, y, z]}')
+            if not 0 < float(r["strength"]) <= 1.5:
+                raise DeviceError("camera rim strength: 0-1.5")
+            self.rim = (norm([float(v) for v in r["dir"]]), hex_rgb(r["color"]), float(r["strength"]))
         colour = (body or {}).get("color", "titanium")
         self.frame = hex_rgb(FRAMES.get(colour, colour))
         sw_src, sh_src = screen_size
@@ -226,7 +240,12 @@ class Device:
         d = max(0.0, dot(n, self.light))
         hv = norm([self.light[i] + v[i] for i in range(3)])
         s = max(0.0, dot(n, hv)) ** shine
-        return tuple(max(0, min(255, int(c * (ambient + diffuse * d) + 255 * spec * s))) for c in rgb) + (255,)
+        out = [c * (ambient + diffuse * d) + 255 * spec * s for c in rgb]
+        if self.rim:  # a coloured light from behind: strongest on the edges that turn away from the viewer
+            rd, rc, k = self.rim
+            r = max(0.0, dot(n, rd)) ** 1.5 * k
+            out = [o + cc * r for o, cc in zip(out, rc)]
+        return tuple(max(0, min(255, int(o))) for o in out) + (255,)
 
     # -- drawing
     def render(self, screen, ss=3):
@@ -281,6 +300,8 @@ class Device:
             col = self.shade(self.frame, nl, c, ambient=0.55, diffuse=0.45, spec=0.6, shine=30)
             d.polygon([front[i], front[j], P((*inner[j], z0)), P((*inner[i], z0))], fill=col, outline=col)
         d.polygon([P((x, y, z0)) for x, y in inner], fill=GLASS + (255,))
+        if float(self.spec.get("sheen") or 0) > 0:
+            self._sheen(big, [P((x, y, z0)) for x, y in inner])
         body = big.reduce(ss) if ss > 1 else big
         # the screen: pre-scaled with an area filter, then one perspective resample; edges from a hi-res mask
         H = self.H()
@@ -308,6 +329,27 @@ class Device:
         if cut:
             body.paste(Image.new("RGBA", body.size, (0, 0, 0, 255)), (0, 0), cut_mask)
         return body, (X0, Y0)
+
+    def _sheen(self, big, glass_poly):
+        """A reflection band across the glass, placed by the light. The screen is pasted over it afterwards,
+        so only the bezel shows it - never the UI."""
+        k = float(self.spec["sheen"])
+        lx, ly = self.light[0], self.light[1]
+        ang = math.degrees(math.atan2(ly, lx)) if abs(lx) + abs(ly) > 1e-6 else -90.0
+        xs, ys = [p[0] for p in glass_poly], [p[1] for p in glass_poly]
+        cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+        diag = int(math.hypot(max(xs) - min(xs), max(ys) - min(ys))) + 4
+        # a band perpendicular to the light, a third of the way towards it
+        ramp = Image.linear_gradient("L").rotate(90).resize((diag, diag))  # 255 at the left -> 0 at the right
+        band = ramp.point(lambda v: int(255 * k * max(0.0, 1 - abs((255 - v) / 255 - 0.3) / 0.14) ** 1.6))
+        band = band.rotate(-ang, resample=Image.BICUBIC)  # its bright side towards the light
+        layer = Image.new("L", big.size, 0)
+        layer.paste(band, (int(cx - diag / 2), int(cy - diag / 2)))
+        mask = Image.new("L", big.size, 0)
+        ImageDraw.Draw(mask).polygon(glass_poly, fill=255)
+        from PIL import ImageChops
+        alpha = ImageChops.multiply(layer, mask)
+        big.alpha_composite(Image.merge("RGBA", (Image.new("L", big.size, 255),) * 3 + (alpha,)))
 
     def _cutout(self):
         kind = self.spec.get("cutout")

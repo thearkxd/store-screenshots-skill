@@ -147,7 +147,7 @@ every shot, smoothed). Use one motif per set, not a collage.
 **Device** - `"device": {"style": "phone" | "android" | "flat" | "none", "width", "x" (centre, fraction),
 "dy", "gap", "border_color", "shadow", "rotate"}`. `flat` is a solid border with `flat_border`,
 `flat_radius`, `offset_shadow`, `offset_color` (the playful look). Keep `rotate` at 0 - tilted phones are a
-weak-set signal (`anti-ai.md`); if you use it, ±3° on a single shot at most.
+weak-set signal (`anti-ai.md`); if you use it, ±3° on a single shot at most, for a reason the concept gives.
 
 **Background** - `{"color"}`, `{"gradient": [top, bottom]}`, `{"image": "photo.jpg"}`, or
 `{"sample": true, "box": [x0, y0, x1, y1], "blur", "darken": [top, bottom], "tint"}` (blurs a part of the

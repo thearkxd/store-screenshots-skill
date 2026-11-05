@@ -24,7 +24,16 @@ make *this* app's value obvious. Everything below serves that.
 | **Glance test** - readable at search-result size (≈ ¼ scale)? | 3–6 words, 2 lines max | 4–6 line paragraphs (Otobüsüm Nerede) |
 | **User test** - is it about the user, not the company? | "Ne yediğini artık bil." (TaraGör) | "We renewed the Ziraat Bank Mobile App for you!" |
 
-A headline that fails the swap test is the single most common reason a set "smells like AI". Fix it first.
+**How strict the swap test is depends on the shot:**
+- **The promise - shot 1, and the angle behind it - must fail for a competitor.** If another app could run the
+  same line, it isn't a promise yet. A generic promise is the single most common reason a set "smells like
+  AI", so fix it first.
+- **The other shots use it to break ties.** Between two lines that both pass the proof test, prefer the one only
+  this app can say. A plain line that names what the screen proves passes, even if a competitor could say it
+  too: "Bölüm bölüm işaretle" over the episode list, or "Find the ride you want" (Uber). These shots earn
+  their place with the screen's proof, and with the promise already made in shot 1 the set as a whole
+  stays this app's.
+- Every shot has to pass the say-it, proof, glance and user tests.
 
 ## 2. Patterns that work
 
@@ -131,6 +140,7 @@ kullanıcı dostu · keyifli hale getir · artık çok kolay! · yenilendi! · s
 1. From the brief, write the promise as a sentence a friend would say. That's shot 1.
 2. For each proof point, write three versions: a **number** version, a **moment** version and a **spoken**
    version. Pick the most concrete one that the screen under it proves.
-3. Run the five tests. Rewrite anything that fails the swap test.
+3. Run the five tests. Rewrite the promise if it fails the swap test. For the other shots, use the swap test to
+   choose between options that already pass the proof test.
 4. Read all headlines in order, out loud. They should sound like one voice telling a short story.
 5. Translate by rewriting, not translating (`localization.md`).

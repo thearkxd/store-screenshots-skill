@@ -30,6 +30,10 @@
    "display": "sans-bold",
    "text": "text"
   },
+  "materials": {
+   "flat": "dna: Dizilog's cards are flat fills on a near-black ground",
+   "3d": "concept: depth only where it means something - friends' phones facing each other, the year's report laid back"
+  },
   "type": {
    "headline": {
     "font": "display",

@@ -1,5 +1,5 @@
 {
- "_doc": "Example version-2 set for compose.py (design-driven): every shot is a free scene of layers - see references/scene-format.md and references/design-process.md. The screens are the fictional Dizilog app (example-screens/, built by tools/demo_screens/build.py); scene-evidence.json registers them (evidence.py) with named regions. Keys starting with _ are ignored.",
+ "_doc": "Example version-2 set for compose.py (design-driven): every shot is a free scene of layers - see references/scene-format.md and references/design-process.md. It shows the FORMAT, not a look to reuse: compose your own shots from your app's message and DNA (a shot that repeats this file's placements number for number is warned). The screens are the fictional Dizilog app (example-screens/, built by tools/demo_screens/build.py); scene-evidence.json registers them (evidence.py) with named regions. Keys starting with _ are ignored.",
  "version": 2,
  "app": "Dizilog (fictional example)",
  "lang": "tr",
@@ -18,7 +18,7 @@
   "name": "Tek Turuncu",
   "idea": "Dizilog turuncuyu her ekranda tek bir şey için kullanır: ilerleme, bu akşamki bölüm, en uzun çubuk, işaretler. Kampanya da öyle: sessiz, koyu bir set; turuncu yalnızca başlığın anlattığı şeyde - vurgu kelimesinde ve ekrandan öne çıkan öğede."
  },
- "_doc_campaign": "The system that stays the same while every composition changes: tokens from the app's DNA (dna.py), one headline face, one text face, one emphasis device.",
+ "_doc_campaign": "The system that stays the same while every composition changes: tokens from the app's DNA (dna.py), one headline face, one text face, one emphasis device, and the materials the set is made of - each with where it comes from.",
  "campaign": {
   "tokens": {
    "ground": "#0E0E10",
@@ -31,6 +31,9 @@
   "fonts": {
    "display": "sans-bold",
    "text": "text"
+  },
+  "materials": {
+   "flat": "dna: Dizilog's cards are flat fills on a near-black ground - no gradients, glass or glow anywhere in the app"
   },
   "type": {
    "headline": {
@@ -66,6 +69,7 @@
   {
    "id": "resume",
    "message": "Pick up the episode where you stopped",
+   "alt": "Dizilog ana ekranı: kaldığın bölüm kartı öne çıkmış, tek dokunuşla devam düğmesiyle",
    "proof": [
     {
      "evidence": "home",
@@ -130,6 +134,7 @@
   {
    "id": "tonight",
    "message": "New episodes of your shows, on a calendar, with a reminder",
+   "alt": "Takvim ekranı: bu akşam çıkan yeni bölümler ve hatırlatıcı",
    "proof": [
     {
      "evidence": "calendar",
@@ -203,6 +208,7 @@
   {
    "id": "year",
    "message": "Your year in series, in hours",
+   "alt": "İstatistik ekranı: bu yıl dizi izlemeye harcanan saatler, aylara göre çubuklarla",
    "proof": [
     {
      "evidence": "stats",
@@ -249,6 +255,7 @@
   {
    "id": "friends",
    "message": "See what your friends are watching - without spoilers",
+   "alt": "Arkadaş akışı: arkadaşlarının izlediği diziler, spoiler gizli",
    "proof": [
     {
      "evidence": "friends",
@@ -303,6 +310,7 @@
   {
    "id": "episodes",
    "message": "Tick episodes off one by one",
+   "alt": "Bölüm listesi: izlenen bölümler tek tek işaretlenmiş",
    "proof": [
     {
      "evidence": "detail",
@@ -379,6 +387,7 @@
   }
  ],
  "feature_graphic": {
+  "alt": "Dizilog: kaldığın bölüm kartı, devam düğmesiyle",
   "proof": [
    {
     "evidence": "home",
@@ -386,7 +395,7 @@
    }
   ],
   "background": {
-   "fill": "$ground"
+   "fill": "$accent"
   },
   "layers": [
    {
@@ -399,7 +408,12 @@
     "cy": "50%",
     "w": 2.2,
     "size": 0.26,
-    "min_size": 0.2
+    "min_size": 0.2,
+    "color": "$ground",
+    "emphasis": {
+     "style": "color",
+     "color": "$ink"
+    }
    },
    {
     "type": "screen",
@@ -410,6 +424,7 @@
     "cy": "50%",
     "radius": 0.08
    }
-  ]
+  ],
+  "_doc": "Google advises against white, black or dark gray grounds here (they blend into Play) - so the one accent becomes the ground."
  }
 }

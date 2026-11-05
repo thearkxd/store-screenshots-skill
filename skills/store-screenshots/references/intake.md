@@ -14,15 +14,30 @@ user doesn't have to type them and you don't have to guess.
 
 ---
 
-## 1. The opening question
+## 1. The opening question - and the pace
 
-Skip whatever the user already told you. Otherwise ask, in one message:
+Skip whatever the user already told you. Otherwise ask two things in one message:
 
 > Is the app already on the App Store / Google Play? If yes, send the store link(s). If not, I'll ask a few
-> quick questions instead.
+> quick questions instead. And shall we choose together (I'll show you the brief, the storyboard and three
+> concepts), or should I go straight to the finished set?
+
+The second question sets the **pace for the whole job**:
+
+| | Together | Direct |
+|---|---|---|
+| Brief + angle | shown, confirmed (checkpoint 1) | written at the top of your work; you go on |
+| Storyboard + screen list | shown before rendering (checkpoint 2) | the screen list still goes out - you need the screens; the storyboard goes with the delivery |
+| DNA board + concepts | the concept sheet, the user picks or mixes (checkpoint 3) | you render the sheet for yourself, pick, and say which and why |
+| Questions | one message per checkpoint | only what you can't work without: the raw screens, the store link |
+
+A user who says "just make them", "hızlıca", "sen seç" has answered it: direct. A user who doesn't answer at a
+checkpoint gets the direct path from there, with a line saying so. Either way, assumptions are written
+where the user will see them, so a wrong guess costs one round of edits, not a restart.
 
 If it's live, also ask: **"Are these screenshots for the current version, or for an update with new
-features?"** New features won't be in the listing yet; get them from the user.
+features?"** New features won't be in the listing yet; get them from the user. (Direct: assume the current
+version and say so.)
 
 ## 2. Live app: fetch, read, critique
 
@@ -44,7 +59,8 @@ Then:
    proof points (usually the description's section headings), plus the tone the listing already uses.
 3. **Critique the current set** with `references/critique.md` and give the score and the top three fixes.
    Keep what works. A good existing line ("Filmi izledin. Şimdi konuş.") should survive the redesign.
-4. Confirm the brief with the user in one short message. Ask about upcoming features at the same time.
+4. Together: confirm the brief with the user in one short message, and ask about upcoming features at the
+   same time. Direct: write the brief at the top of your work and go on.
 
 **Never cut UI out of the current store screenshots.** They are marketing images: tilted, small, often
 generated backgrounds. They're study material for the critique, not material for the new set.
@@ -75,7 +91,7 @@ pitch deck, read it: it's usually a better source for the promise than a form.
 
 ## 5. Both paths: the brief, then the screen request
 
-**Brief (5 lines, confirm with the user):**
+**Brief (5 lines; together: confirm it with the user, direct: state it):**
 ```
 Promise:      <what it does for whom, in the user's words>
 Audience:     <who, in what moment>
@@ -84,8 +100,8 @@ Tone:         <e.g. warm, witty, calm, expert - taken from the listing or the us
 Constraints:  <stores, languages, claims to avoid, brand rules, what must stay from the current set>
 ```
 
-**Then storyboard** (`storytelling.md`, `copy-rules.md`). Once the storyboard is agreed, **ask for exactly the
-raw screens it needs**, one line per shot, with how to capture them:
+**Then storyboard** (`storytelling.md`, `copy-rules.md`). Once the storyboard is agreed (direct: once it's
+written), **ask for exactly the raw screens it needs**, one line per shot, with how to capture them:
 
 ```
 For the new set I need these raw screenshots (PNG, straight from the device or simulator):
@@ -117,7 +133,8 @@ screen, a zoom card of a screen you have, or the one allowed poster shot), not t
 
 **TR - açılış**
 > Uygulama App Store ya da Google Play'de yayında mı? Yayındaysa mağaza linklerini gönder; sayfayı inceleyip
-> mevcut görselleri de değerlendireyim. Yayında değilse birkaç kısa soru soracağım.
+> mevcut görselleri de değerlendireyim. Yayında değilse birkaç kısa soru soracağım. Bir de: birlikte mi
+> seçelim (brief'i, hikâyeyi ve üç konsepti gösteririm), yoksa doğrudan bitmiş seti mi üreteyim?
 
 **TR - yayında, onay**
 > Mağaza sayfasından çıkardığım brief: … Mevcut set: 13/20 - en büyük üç sorun: … Bu görseller mevcut sürüm
@@ -125,4 +142,9 @@ screen, a zoom card of a screen you have, or the one allowed poster shot), not t
 
 **EN - opening**
 > Is the app already live on the App Store or Google Play? If so, send the store link(s) and I'll review the
-> listing and the current screenshots. If not, I'll ask a few quick questions instead.
+> listing and the current screenshots. If not, I'll ask a few quick questions instead. Also: shall we choose
+> together (brief, storyboard, three concepts), or should I go straight to the finished set?
+
+**TR - doğrudan, teslimin başında**
+> Varsayımlarım: açı "…", konsept "…" (çünkü …), başlıklar aşağıdaki tabloda. Değiştirmek istediğin bir şey
+> olursa bir turda düzeltirim.

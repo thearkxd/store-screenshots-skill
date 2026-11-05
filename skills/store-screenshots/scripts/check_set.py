@@ -20,6 +20,14 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFont
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from render_set import PLAY_PROMO, PLAY_REC, PLAY_REQ  # noqa: E402
+
+PLAY_LEGEND = (f"{PLAY_REQ}: the listing can be removed or suspended. {PLAY_REC}: the listing still publishes, but Google "
+               f"may change how the assets appear or limit promotion. {PLAY_PROMO}: required only to appear in Play's "
+               "screenshot-based recommendation formats. (support.google.com/googleplay/android-developer/answer/9866151)")
+ALT_MAX = 140  # Play: alt text "using 140 characters or less"
+
 IOS_SIZES = {(1398, 2034), (2007, 2853), (1260, 2736), (1290, 2796), (1320, 2868), (1179, 2556), (1206, 2622),
              (1284, 2778), (1242, 2688), (1170, 2532), (1125, 2436), (1080, 2340), (1242, 2208), (750, 1334),
              (640, 1096), (640, 1136), (640, 920), (640, 960)}
@@ -138,13 +146,55 @@ def copy_checks(h, lang, store):
             ctx = low[max(0, m.start() - 16): m.end() + 22]
             if pat in RANKING and re.search(NEGATION, ctx):
                 continue
-            out.append(f"Google Play disallows ranking/price/promo/award claims: matches {pat!r}")
+            out.append(f"{PLAY_REC} ranking, award, price or promotion wording (matches {pat!r}) - Google's guidelines say "
+                       "to leave it out of preview assets")
             break
         if any(re.search(p_, low) for p_ in PLAY_CTA):
-            out.append("call to action (\"download now\", \"hemen indir\"…) - Google Play's guidelines say to leave them out")
+            out.append(f"{PLAY_REC} call to action (\"download now\", \"hemen indir\"…) - Google's guidelines say to leave them out")
         if re.search(TESTIMONIAL, h):
-            out.append("looks like a user testimonial or rating - Google Play's guidelines advise against them in screenshots")
+            out.append(f"{PLAY_REC} looks like a user testimonial or rating - Google's guidelines advise against them in screenshots")
     return out
+
+
+def ground_colour(im):
+    """The colour that dominates the graphic's border - its ground."""
+    rgb = im.convert("RGB")
+    w, h = rgb.size
+    px = [rgb.getpixel((x, y)) for x in range(0, w, 8) for y in (2, h - 3)] + [rgb.getpixel((x, y)) for y in range(0, h, 8) for x in (2, w - 3)]
+    q = {}
+    for p in px:
+        k = tuple(v // 8 * 8 for v in p)
+        q[k] = q.get(k, 0) + 1
+    k, n = max(q.items(), key=lambda kv: kv[1])
+    return tuple(min(255, v + 4) for v in k) if n / len(px) >= 0.45 else None
+
+
+def plain_ground(rgb):
+    lo, hi = min(rgb), max(rgb)
+    if hi - lo > 14:
+        return False  # a colour, not white/black/gray
+    return hi >= 245 or hi <= 70  # pure white, black or dark gray
+
+
+FG_MARGIN = (0.07, 0.06)  # sides, top/bottom - the skill's reading of Google's cutoff-zone picture
+
+
+def fg_zone_checks(fgd):
+    """Google: keep the focal point towards the centre and key elements (logo, app name, slogan, main UI) out of
+    the cutoff zones. It shows the zones only as a picture, without numbers, so the check keeps key elements out
+    of the outer 7% at the sides and 6% at top and bottom."""
+    W, H = fgd.get("size") or (1024, 500)
+    mx, my = FG_MARGIN
+    out = []
+    for el in fgd.get("elements") or []:
+        x0, y0, x1, y1 = el["bbox"]
+        if el.get("role") in ("headline", "brand", "callout") or el.get("kind") == "screen":
+            if x0 < mx * W - 1 or x1 > (1 - mx) * W + 1 or y0 < my * H - 1 or y1 > (1 - my) * H + 1:
+                what = "the main UI" if el.get("kind") == "screen" else f"the {el.get('role')}"
+                out.append(f"{PLAY_REC} feature graphic: {what} reaches into the cutoff zone near the edge - keep key elements "
+                           f"towards the centre (out of the outer {mx:.0%} at the sides, {my:.0%} at top and bottom); Google says "
+                           "missing the focal-point and cutoff-zone guidance can make the graphic ineligible for formats that crop it")
+    return sorted(set(out))
 
 
 def sibling_sizes(folder):
@@ -215,22 +265,31 @@ def main():
     # count
     limit = 8 if a.store == "android" else 10
     if len(files) > limit:
-        errors.append(f"{len(files)} screenshots - {a.store} allows at most {limit}")
+        errors.append(f"{PLAY_REQ + ' ' if a.store == 'android' else ''}{len(files)} screenshots - {a.store} allows at most {limit}"
+                      f"{' per device type' if a.store == 'android' else ''}")
+    if a.store == "android" and len(files) < 2:
+        warns.append(f"{PLAY_REQ} fewer than 2 screenshots - Play needs at least two (across device types) to publish the listing")
     if a.store == "android" and len(files) < 4:
-        warns.append("fewer than 4 screenshots: not eligible for Play screenshot-based promotion formats")
+        warns.append(f"{PLAY_PROMO} fewer than 4 screenshots - apps need at least four (games three) to appear in "
+                     "screenshot-based recommendation formats")
     if len(files) < 3:
         warns.append("fewer than 3 screenshots: search results will look empty")
     if a.store == "android":
         fg = next((p for p in (os.path.join(a.folder, "feature-graphic.png"),
                                os.path.join(os.path.dirname(os.path.abspath(a.folder)), "feature-graphic.png")) if os.path.exists(p)), None)
         if not fg:
-            warns.append("no feature-graphic.png (Google Play needs a 1024x500 feature graphic; add \"feature_graphic\" to the spec)")
+            warns.append(f"{PLAY_REQ} no feature-graphic.png - Play needs a 1024x500 feature graphic to publish; add "
+                         "\"feature_graphic\" to the spec")
         else:
             im = Image.open(fg)
             if im.size != (1024, 500):
-                errors.append(f"feature graphic is {im.size[0]}x{im.size[1]}, must be 1024x500")
+                errors.append(f"{PLAY_REQ} feature graphic is {im.size[0]}x{im.size[1]}, must be 1024x500")
             if has_alpha(im):
-                errors.append("feature graphic has an alpha channel")
+                errors.append(f"{PLAY_REQ} feature graphic has an alpha channel (JPEG or 24-bit PNG)")
+            ground = ground_colour(im)
+            if ground and plain_ground(ground):
+                warns.append(f"{PLAY_REC} feature graphic ground is {'#%02X%02X%02X' % ground} - Google advises against pure white, "
+                             "black or dark gray, which blend into Play's own background")
             fj = os.path.join(os.path.dirname(fg), "_feature-graphic.json")
             if os.path.exists(fj):
                 with open(fj, encoding="utf-8") as f:
@@ -238,6 +297,12 @@ def main():
                 for text in (fgd.get("headline"), fgd.get("sub")):
                     for msg in copy_checks(text or "", fgd.get("lang", lang), "android") if text else []:
                         warns.append(f"feature graphic \"{text}\": {msg}")
+                for msg in fg_zone_checks(fgd):
+                    warns.append(msg)
+                if not fgd.get("alt"):
+                    warns.append(f"{PLAY_REC} feature graphic has no alt text (\"alt\" in \"feature_graphic\", ≤ {ALT_MAX} characters)")
+                elif len(fgd["alt"]) > ALT_MAX:
+                    warns.append(f"{PLAY_REC} feature graphic alt text is {len(fgd['alt'])} characters (≤ {ALT_MAX})")
 
     sizes = set()
     for f in files:
@@ -261,9 +326,10 @@ def main():
         else:
             lo, hi = min(w, h), max(w, h)
             if lo < 320 or hi > 3840 or hi > 2 * lo:
-                errors.append(f"{name}: {w}x{h} breaks Play limits (min 320, max 3840, long side ≤ 2× short side)")
+                errors.append(f"{PLAY_REQ} {name}: {w}x{h} breaks Play's limits (min 320, max 3840, long side ≤ 2× short side)")
             elif lo < 1080 or round(hi / lo, 2) not in (1.78, 1.77):
-                warns.append(f"{name}: {w}x{h} - promotion formats want ≥1080 px at 9:16 / 16:9")
+                warns.append(f"{PLAY_PROMO} {name}: {w}x{h} - recommendation formats want ≥ 1080 px at 9:16 (1080x1920) "
+                             "or 16:9 (1920x1080)")
     if len(sizes) > 1:
         warns.append(f"mixed sizes in one set: {sorted(sizes)}")
     if a.store == "ios":
@@ -288,6 +354,14 @@ def main():
             warns.append("duplicate headlines in the set")
     else:
         warns.append("no headlines given (no _render.json, no --headlines): copy checks skipped")
+    if a.store == "android" and render.get("shots"):
+        missing = [s["file"] for s in render["shots"] if not s.get("alt")]
+        if missing:
+            warns.append(f"{PLAY_REC} {len(missing)} of {len(render['shots'])} screenshots have no alt text - give each shot an "
+                         f"\"alt\" (≤ {ALT_MAX} characters: what the screenshot shows, for screen readers)")
+        for s in render["shots"]:
+            if s.get("alt") and len(s["alt"]) > ALT_MAX:
+                warns.append(f"{PLAY_REC} {s['file']}: alt text is {len(s['alt'])} characters (≤ {ALT_MAX})")
     for w in render.get("set_warnings", []):
         warns.append(f"set: {w}")
     for s in render.get("shots", []):
@@ -303,6 +377,8 @@ def main():
         print("ERROR ", e)
     for w in warns:
         print("WARN  ", w)
+    if any("[Play " in x for x in errors + warns):
+        print("      ", PLAY_LEGEND)
     if not errors and not warns:
         print("OK - no issues found. Still look at _search-preview.jpg and _overview.jpg.")
     print(f"wrote {os.path.join(a.folder, '_search-preview.jpg')} and _overview.jpg")
