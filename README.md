@@ -7,7 +7,7 @@ designer for **App Store and Google Play screenshots**: from the app's promise t
 app-specific design and pixel-exact PNGs (plus editable SVGs). Everything is built from the app's real screens
 and its own visual DNA, with copy that passes the "swap test" and doesn't read as AI-generated.
 
-![Seenfy App Store screenshots designed with this skill from the app's own DNA, concept "Ekrandaki Sayı"](docs/images/design-set.jpg)
+![Seenfy App Store screenshots made with this skill from the app's real screens, concept "Afişin Işığı"](docs/images/afisin-isigi-set.jpg)
 
 - Designs each set for one app: its visual DNA from the real screens, three app-specific concepts, and every
   shot composed freely, not a template filled in. Output: PNG and editable SVG for every store size.
@@ -182,8 +182,45 @@ python3 $S/peer_test.py out/tr/ios --category entertainment -o peer.jpg
 
 ## Examples
 
+- [Seenfy with 2.2: "Afişin Işığı"](#seenfy-with-22-afişin-işığı)
 - [Design-driven pipeline (v2): the Seenfy pilot](#design-driven-pipeline-v2-the-seenfy-pilot)
 - [Real example: Seenfy (preset route, v1)](#real-example-seenfy-preset-route-v1)
+
+## Seenfy with 2.2: "Afişin Işığı"
+
+This set was made in direct mode. It uses the same five raw screens, evidence and DNA as the pilot below, with a
+new concept ([`examples/seenfy-v2/afisin-isigi.json`](examples/seenfy-v2/afisin-isigi.json)). It uses
+most of what the scene engine can do, and every set check passes.
+
+- **The idea:** Seenfy is opened in the evening, in a dark room, and the choice is made by looking at a poster.
+  - Every ground is blurred from the poster on its own screen.
+  - The phone is an object in that room, lit from behind by the app's indigo.
+  - Indigo appears only on the word that decides and in the light.
+- **What it uses, each with its source in the campaign's `materials`:**
+  - 3D phones sharing one camera, with an indigo rim light and a bezel sheen;
+  - a context phone turned away behind the proof;
+  - a span pair of two phones answering each other, the home screen and the detail screen;
+  - the continue-watching progress bar drawn once across the pair as an SVG motif;
+  - a hand-drawn circle on the S2E5 badge that follows the phone's perspective;
+  - glow on the one mood that matters;
+  - a frosted glass pane for words over a loud poster;
+  - a callout in the campaign's own pill.
+- **What the rules shaped:**
+  - Turned phones appear in two shots, the opening shot and the pair, never in all.
+  - The pair sits in slots 2-3, so search results never cut it in half.
+  - Google Play gets the same set with flat screens, since Play advises against device imagery, and taglines
+    under 20 %.
+  - The feature graphic sits on indigo rather than white, black or dark gray, and every shot has alt text.
+
+![Seenfy, concept "Afişin Işığı": App Store set](docs/images/afisin-isigi-set.jpg)
+
+The Google Play set and the feature graphic come from the same file:
+
+![Seenfy, concept "Afişin Işığı": Google Play set and feature graphic](docs/images/afisin-isigi-android.jpg)
+
+```bash
+python3 skills/store-screenshots/scripts/compose.py render examples/seenfy-v2/afisin-isigi.json --out out/
+```
 
 ## Design-driven pipeline (v2): the Seenfy pilot
 

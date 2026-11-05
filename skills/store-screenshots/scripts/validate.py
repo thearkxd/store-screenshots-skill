@@ -103,6 +103,17 @@ def scene_warnings(scene, img, ctx):
                 what = "text" if op["op"] == "text" else op["op"]
                 out.append(f"{what} ({role}{' ' + m['id'] if m.get('id') else ''}) covers {ov / area(sb):.0%} of the "
                            f"screen {sop['meta'].get('evidence')!r} - keep the app's UI visible (or mark it role \"label\")")
+    # --- a screen drawn over words placed before it hides them
+    for i, sop in screens:
+        sb = sop["meta"].get("screen_bbox", sop["meta"]["bbox"])
+        for t in ops[:i]:
+            if t["op"] != "text" or t["meta"].get("role") == "background":
+                continue
+            tb = t["meta"].get("ink", t["meta"]["bbox"])
+            ov = area(inter(tb, sb))
+            if area(tb) and ov > 0.02 * area(tb):
+                out.append(f"the screen {sop['meta'].get('evidence')!r} covers {ov / area(tb):.0%} of \"{snip(t['meta'])}\" - the "
+                           "words were placed under it; move or shrink one of them")
     # --- breathing room: words pressed against a screen read as part of the UI
     for t in [op for op in ops if op["op"] == "text" and op["meta"].get("role") in ("headline", "sub", "display")]:
         tb = t["meta"]["bbox"]
@@ -171,6 +182,20 @@ def scene_warnings(scene, img, ctx):
             out.append(f"callout \"{snip(t['meta'])}\" doesn't use a campaign callout style - add \"callout\" to the campaign's "
                        "\"type\" (and a callout shape style), so a callout reads as the campaign pointing at the app, never as "
                        "the app's own UI")
+    boxes = [r for r in shapes if r["meta"].get("role") == "callout"]
+    for t in callouts:
+        ink = t["meta"].get("ink", t["meta"]["bbox"])
+        for r in boxes:
+            rb = r["meta"]["bbox"]
+            if area(inter(ink, rb)) > 0 and (ink[0] < rb[0] - 2 or ink[1] < rb[1] - 2 or ink[2] > rb[2] + 2 or ink[3] > rb[3] + 2):
+                out.append(f"callout \"{snip(t['meta'])}\" runs out of its box - widen the box, shorten the words, or place "
+                           "the text inside it (\"cx\"/\"cy\" on the box's centre)")
+    for op in ops:  # a hand mark that leaves the canvas was aimed at the wrong place
+        if op["op"] == "lines":
+            b = op["meta"]["bbox"]
+            outside = area(b) - area(inter(b, (0, 0, c.W, c.H)))
+            if area(b) and outside > 0.1 * area(b):
+                out.append(f"a hand mark runs {outside / area(b):.0%} off the canvas - check what it is meant to circle")
     for slot in range(scene.span):
         n = sum(1 for t in callouts if slot_of(scene, t["meta"]["bbox"]) == slot)
         if n > CALLOUT_MAX:

@@ -152,7 +152,7 @@ Common keys:
 | `path` | `d` in u (M L H V C S Q T Z, absolute and relative; no arcs), offset `x`/`y`, `fill`, `stroke`, `stroke_width`, `cap` |
 | `svg` | `markup` (SVG elements) or `file`, drawn in u at offset `x`/`y`; `$tokens` allowed; no `<text>`/`<image>` |
 | `group` | `layers`, and `rotate`/`opacity` for all of them together |
-| `mark` | hand-drawn: `kind` circle / underline / arrow; `on` a screen id + `region` (fractions of that screen), or `box` in u; arrow `from` [x, y] and `to`; `color`, `width`, `pad`, `curve` |
+| `mark` | hand-drawn: `kind` circle / underline / arrow; `on` a screen or device3d id + `region` (a region name, or fractions of the whole screen - not of the crop), or `box` in u; arrow `from` [x, y] and `to`; `color`, `width`, `pad`, `curve` |
 
 Screen options:
 - `frame`: `{"style": "phone", "border": 0.02, "color": "#0E0E10"}` (with the island) · `"android"` (punch hole) ·
@@ -283,12 +283,14 @@ screens captured on that device, given per size.
 - `filter`, `blur`, `tint`, `recolor`, `saturation`, `brightness` or `opacity` on a screen;
 - `<text>` or `<image>` inside an `svg` layer;
 - a `device3d` turned past its limits, with a crop, a 2D `rotate`, a filter, or lifted from.
-- `glass` on anything but a top-level rect.
+- `glass` on anything but a top-level rect;
+- a layer id starting with `_ss-` (the renderer's own SVG ids).
 
 **Warned** (printed, stored in `_render.json`, reprinted by `check_set.py`):
 
 *Truth:*
 - text or a shape covering more than 2 % of a screen;
+- a screen drawn over words placed before it;
 - a small rounded box with text in it (it looks like app UI);
 - no `proof`;
 - a number that isn't in the text read from the screens the shot shows;
@@ -316,7 +318,8 @@ screens captured on that device, given per size.
   `materials` or the layer's `motive`;
 - a campaign material without a reason, or a `dna:` reason the DNA doesn't list;
 - campaign colours taken from a reference (`dna.py reference`) rather than the app;
-- a callout outside the campaign's callout style, under 0.03u, covering more than 8 % of a screen, or more than four in a shot;
+- a callout outside the campaign's callout style, under 0.03u, covering more than 8 % of a screen, running out of its box, or more than four in a shot;
+- a hand mark aimed outside the part of the screen its layer shows, or running off the canvas;
 - colours that aren't tokens;
 - fonts outside the campaign;
 - more than one headline font in the set.

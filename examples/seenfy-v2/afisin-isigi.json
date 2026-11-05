@@ -1,0 +1,599 @@
+{
+ "_doc": "Seenfy, concept D 'Afişin Işığı' - made with store-screenshots 2.2 in direct mode from the same evidence and DNA as the pilot (set.json). It uses most of what the scene engine can do, each effect with its source in the campaign's materials: 3D phones with one camera, a rim light and a bezel sheen, a context phone, a span pair, a frosted glass pane, glow, a callout, an SVG motif, a hand mark. App Store sizes get the 3D phones; Google Play gets flat screens (Play advises against device imagery). Render: python3 skills/store-screenshots/scripts/compose.py render examples/seenfy-v2/afisin-isigi.json --out out/",
+ "version": 2,
+ "app": "Seenfy",
+ "evidence": "evidence.json",
+ "dna": "dna.json",
+ "lang": "tr",
+ "sizes": [
+  "ios",
+  "ios-large",
+  "android"
+ ],
+ "promise_words": [
+  "izle",
+  "film",
+  "dizi"
+ ],
+ "concept": {
+  "name": "Afişin Işığı",
+  "idea": "Seenfy akşam, karanlık bir odada açılır; karar bir afişe bakarak verilir. Her görselin zemini o ekrandaki afişten gelir, telefon da o odada duran bir nesnedir: arkadan uygulamanın çividiyle aydınlanır. Çivit yalnızca kararı veren kelimede ve ışıkta yanar."
+ },
+ "campaign": {
+  "tokens": {
+   "ground": "#121212",
+   "card": "#2A2A2A",
+   "ink": "#EAF6F6",
+   "muted": "#A9ADB5",
+   "accent": "#5460F0",
+   "neutral": "#2A2A2A"
+  },
+  "fonts": {
+   "display": "fonts/Poppins_600SemiBold.ttf",
+   "text": "fonts/Poppins_400Regular.ttf"
+  },
+  "materials": {
+   "flat": "dna: flat cards on #121212, no shadows - flat screens stay flat",
+   "photo": "dna: posters are the content - every ground is blurred from the poster on its own screen",
+   "glow": "concept: Afişin Işığı - the only light in the room is the app's indigo, behind the phone and on its rim",
+   "3d": "concept: the phone as an object in that dark room - in the opening shot, and in the pair where two screens answer each other",
+   "glass": "concept: words over a loud poster sit on a frosted pane, so the poster stays visible behind them",
+   "illustration": "concept: the continue-watching progress bar, drawn once across the pair"
+  },
+  "camera": {
+   "fov": 22,
+   "light": [
+    -0.45,
+    -0.75,
+    -0.5
+   ],
+   "rim": {
+    "color": "$accent",
+    "strength": 0.7
+   }
+  },
+  "type": {
+   "headline": {
+    "font": "display",
+    "size": 0.088,
+    "min_size": 0.066,
+    "line_height": 1.1,
+    "tracking": -0.018,
+    "color": "$ink",
+    "max_lines": 3,
+    "emphasis": {
+     "style": "box",
+     "color": "$accent",
+     "text_color": "$ink",
+     "radius": 0.28,
+     "pad": 0.14
+    }
+   },
+   "sub": {
+    "font": "text",
+    "size": 0.036,
+    "line_height": 1.35,
+    "tracking": 0,
+    "color": "$muted"
+   },
+   "callout": {
+    "font": "display",
+    "size": 0.034,
+    "line_height": 1.2,
+    "tracking": 0,
+    "color": "$ground"
+   }
+  }
+ },
+ "shots": [
+  {
+   "id": "promise",
+   "message": "Picks you'll love, not the charts - every pick carries a match score",
+   "alt": "Seenfy öneri ekranı bir telefonda: Exhuma, %88 Sana Uygun rozetiyle; arkada keşfet ekranı",
+   "proof": [
+    {
+     "evidence": "sana-uygun",
+     "region": "match-badge"
+    }
+   ],
+   "background": {
+    "sample": {
+     "evidence": "sana-uygun",
+     "crop": [
+      0.04,
+      0.2,
+      0.96,
+      0.46
+     ],
+     "blur": 0.1,
+     "darken": [
+      0.64,
+      0.9
+     ],
+     "tint": "$ground"
+    },
+    "light": {
+     "x": "58%",
+     "y": "66%",
+     "r": 0.85,
+     "opacity": 0.26,
+     "color": "$accent"
+    }
+   },
+   "layers": [
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Popüler olanı değil,\n*seveceğini* izle",
+     "x": 0.08,
+     "y": 0.13,
+     "w": 0.86
+    },
+    {
+     "default": {
+      "type": "text",
+      "role": "sub",
+      "style": "sub",
+      "text": "Her önerinin yanında, sana ne kadar uygun olduğu yazar.",
+      "x": 0.08,
+      "below": "head",
+      "gap": 0.035,
+      "w": 0.8
+     },
+     "android": null
+    },
+    {
+     "default": {
+      "type": "device3d",
+      "id": "behind",
+      "role": "context",
+      "evidence": "kesfet",
+      "w": 0.6,
+      "right": -0.2,
+      "y": 0.62,
+      "rotate3d": {
+       "yaw": -46,
+       "pitch": 12
+      },
+      "body": {
+       "color": "graphite",
+       "sheen": 0.2
+      }
+     },
+     "android": null
+    },
+    {
+     "default": {
+      "type": "device3d",
+      "id": "phone",
+      "evidence": "sana-uygun",
+      "w": 0.7,
+      "x": 0.05,
+      "y": 0.58,
+      "rotate3d": {
+       "yaw": 18,
+       "pitch": 4
+      },
+      "body": {
+       "color": "graphite",
+       "sheen": 0.25
+      }
+     },
+     "android": {
+      "type": "screen",
+      "id": "phone",
+      "evidence": "sana-uygun",
+      "crop": "hero-card",
+      "w": "90%",
+      "cx": "50%",
+      "cy": "60%",
+      "radius": 0.05,
+      "glow": {
+       "color": "$accent",
+       "blur": 0.12,
+       "opacity": 0.45
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "pair",
+   "span": 2,
+   "message": "The episode you left and the next film, side by side - one tap to either",
+   "alt": [
+    "Seenfy ana sayfası bir telefonda: House of the Dragon, sıradaki bölüm S2E5",
+    "Seenfy detay ekranı bir telefonda: Yıldızlararası, 2s 49dk, IMDb 8.5"
+   ],
+   "proof": [
+    {
+     "evidence": "anasayfa",
+     "region": "continue-card"
+    },
+    {
+     "evidence": "detay",
+     "region": "facts"
+    }
+   ],
+   "background": {
+    "sample": {
+     "evidence": "anasayfa",
+     "crop": [
+      0.06,
+      0.21,
+      0.77,
+      0.43
+     ],
+     "blur": 0.1,
+     "darken": [
+      0.6,
+      0.88
+     ],
+     "tint": "$ground"
+    },
+    "light": {
+     "x": "50%",
+     "y": "62%",
+     "r": 1.0,
+     "opacity": 0.24,
+     "color": "$accent"
+    }
+   },
+   "layers": [
+    {
+     "type": "text",
+     "id": "head1",
+     "role": "headline",
+     "style": "headline",
+     "text": "Dizide kaldığın yer\n*tek dokunuş* uzakta",
+     "x": "4%",
+     "y": 0.13,
+     "w": 0.86
+    },
+    {
+     "default": {
+      "type": "text",
+      "role": "sub",
+      "style": "sub",
+      "text": "Sıradaki bölüm ana sayfanda seni bekler.",
+      "x": "4%",
+      "below": "head1",
+      "gap": 0.035,
+      "w": 0.8
+     },
+     "android": null
+    },
+    {
+     "type": "text",
+     "id": "head2",
+     "role": "headline",
+     "style": "headline",
+     "text": "Puan, süre, tür:\n*açmadan önce* bil",
+     "x": "54%",
+     "y": 0.13,
+     "w": 0.86
+    },
+    {
+     "default": {
+      "type": "text",
+      "role": "sub",
+      "style": "sub",
+      "text": "Film ya da dizi, kararını verecek her şey tek ekranda.",
+      "x": "54%",
+      "below": "head2",
+      "gap": 0.035,
+      "w": 0.8
+     },
+     "android": null
+    },
+    {
+     "default": {
+      "type": "svg",
+      "role": "illustration",
+      "motive": "the continue-watching progress bar (16% on the home screen), drawn once across the pair",
+      "x": 0.14,
+      "y": 2.02,
+      "markup": "<rect width='1.72' height='0.014' rx='0.007' fill='$card'/><rect width='0.62' height='0.014' rx='0.007' fill='$accent'/>"
+     },
+     "android": null
+    },
+    {
+     "default": {
+      "type": "device3d",
+      "id": "home",
+      "evidence": "anasayfa",
+      "w": 0.68,
+      "cx": "29%",
+      "y": 0.56,
+      "rotate3d": {
+       "yaw": 20,
+       "pitch": 4
+      },
+      "body": {
+       "color": "graphite",
+       "sheen": 0.25
+      }
+     },
+     "android": {
+      "type": "screen",
+      "id": "home",
+      "evidence": "anasayfa",
+      "h": 1.72,
+      "cx": "25%",
+      "y": 0.62,
+      "radius": 0.07
+     }
+    },
+    {
+     "type": "mark",
+     "kind": "circle",
+     "on": "home",
+     "region": "episode-badge",
+     "color": "$accent",
+     "width": 0.008,
+     "pad": 0.02
+    },
+    {
+     "default": {
+      "type": "device3d",
+      "id": "detail",
+      "evidence": "detay",
+      "w": 0.68,
+      "cx": "71%",
+      "y": 0.56,
+      "rotate3d": {
+       "yaw": -20,
+       "pitch": 4
+      },
+      "body": {
+       "color": "graphite",
+       "sheen": 0.25
+      }
+     },
+     "android": {
+      "type": "screen",
+      "id": "detail",
+      "evidence": "detay",
+      "h": 1.72,
+      "cx": "75%",
+      "y": 0.5,
+      "radius": 0.07
+     }
+    }
+   ]
+  },
+  {
+   "id": "moods",
+   "message": "Pick by mood: real collections, from 'surprise me' to 'truly scary'",
+   "alt": "Seenfy koleksiyonları: Beni Şaşırt, Plot Twist Garantili, Beyin Yakan, Gerçekten Korkunç",
+   "proof": [
+    {
+     "evidence": "koleksiyonlar",
+     "region": "moods"
+    }
+   ],
+   "background": {
+    "sample": {
+     "evidence": "koleksiyonlar",
+     "crop": [
+      0.5,
+      0.4,
+      0.96,
+      0.56
+     ],
+     "blur": 0.1,
+     "darken": [
+      0.66,
+      0.84
+     ],
+     "tint": "$ground"
+    }
+   },
+   "layers": [
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Bu akşam hangi\n*moddasın?*",
+     "x": 0.08,
+     "y": 0.13,
+     "w": 0.86
+    },
+    {
+     "default": {
+      "type": "text",
+      "role": "sub",
+      "style": "sub",
+      "text": "Beni Şaşırt'tan Gerçekten Korkunç'a, ruh haline göre film koleksiyonları.",
+      "x": 0.08,
+      "below": "head",
+      "gap": 0.035,
+      "w": 0.82
+     },
+     "android": null
+    },
+    {
+     "type": "screen",
+     "id": "c1",
+     "evidence": "koleksiyonlar",
+     "crop": "beni-sasirt",
+     "w": 0.82,
+     "cx": "45%",
+     "y": 0.68
+    },
+    {
+     "type": "screen",
+     "id": "c2",
+     "evidence": "koleksiyonlar",
+     "crop": "plot-twist",
+     "w": 0.92,
+     "cx": "53%",
+     "below": "c1",
+     "gap": 0.045,
+     "glow": {
+      "color": "$accent",
+      "blur": 0.09,
+      "opacity": 0.55
+     }
+    },
+    {
+     "type": "screen",
+     "id": "c3",
+     "evidence": "koleksiyonlar",
+     "crop": "beyin-yakan",
+     "w": 0.82,
+     "cx": "45%",
+     "below": "c2",
+     "gap": 0.045
+    },
+    {
+     "type": "screen",
+     "id": "c4",
+     "evidence": "koleksiyonlar",
+     "crop": "korkunc",
+     "w": 0.82,
+     "cx": "53%",
+     "below": "c3",
+     "gap": 0.045
+    }
+   ]
+  },
+  {
+   "id": "mark",
+   "message": "Mark what you've watched in one tap - the picks follow",
+   "alt": "Seenfy keşfet ekranı: Minyonlar ve Canavarlar kartı ve Sanki Bunu da İzlemiştin satırı",
+   "proof": [
+    {
+     "evidence": "kesfet",
+     "region": "mark-row"
+    }
+   ],
+   "background": {
+    "sample": {
+     "evidence": "kesfet",
+     "crop": [
+      0.06,
+      0.24,
+      0.88,
+      0.62
+     ],
+     "blur": 0.05,
+     "darken": [
+      0.22,
+      0.5
+     ],
+     "tint": "$ground"
+    }
+   },
+   "layers": [
+    {
+     "type": "rect",
+     "id": "pane",
+     "role": "decor",
+     "x": 0.05,
+     "y": 0.08,
+     "w": 0.9,
+     "h": 0.33,
+     "radius": 0.05,
+     "fill": null,
+     "glass": {
+      "blur": 0.045,
+      "tint": "$ground",
+      "opacity": 0.42,
+      "edge": "$ink",
+      "edge_opacity": 0.2
+     },
+     "motive": "the concept's frosted pane: words over the loud poster"
+    },
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "İzledin mi?\n*İşaretle*, gerisi gelsin",
+     "x": 0.1,
+     "y": 0.14,
+     "w": 0.82
+    },
+    {
+     "type": "screen",
+     "id": "disc",
+     "evidence": "kesfet",
+     "crop": [
+      0,
+      0.065,
+      1,
+      0.905
+     ],
+     "h": 1.33,
+     "cx": "50%",
+     "y": 0.53,
+     "radius": 0.05
+    },
+    {
+     "type": "rect",
+     "id": "pill",
+     "role": "callout",
+     "cx": "50%",
+     "y": 1.93,
+     "w": 0.64,
+     "h": 0.09,
+     "radius": 0.045,
+     "fill": "$ink"
+    },
+    {
+     "type": "text",
+     "role": "callout",
+     "style": "callout",
+     "text": "Öneriler buna göre değişir",
+     "cx": "50%",
+     "cy": 1.975,
+     "w": 0.6,
+     "align": "center"
+    }
+   ]
+  }
+ ],
+ "feature_graphic": {
+  "alt": "Seenfy: Popüler olanı değil, seveceğini izle; %88 Sana Uygun rozetli öneri kartı",
+  "proof": [
+   {
+    "evidence": "sana-uygun",
+    "region": "match-badge"
+   }
+  ],
+  "background": {
+   "fill": "$accent"
+  },
+  "layers": [
+   {
+    "type": "text",
+    "id": "head",
+    "role": "headline",
+    "style": "headline",
+    "text": "Popüler olanı değil,\n*seveceğini* izle",
+    "x": 0.42,
+    "cy": "50%",
+    "w": 1.85,
+    "size": 0.16,
+    "min_size": 0.12,
+    "emphasis": {
+     "style": "color",
+     "color": "$ground"
+    }
+   },
+   {
+    "type": "screen",
+    "evidence": "sana-uygun",
+    "crop": "hero-card",
+    "h": "76%",
+    "right": 0.36,
+    "cy": "50%",
+    "radius": 0.07
+   }
+  ]
+ }
+}
