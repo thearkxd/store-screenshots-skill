@@ -1,0 +1,246 @@
+{
+ "version": 2,
+ "app": "Seenfy",
+ "evidence": "../evidence.json",
+ "lang": "tr",
+ "sizes": [
+  "ios",
+  "ios-large",
+  "android"
+ ],
+ "promise_words": [
+  "izle",
+  "film",
+  "dizi"
+ ],
+ "concept": {
+  "name": "Sana Uygun",
+  "idea": "Uygulamanın kendi dili kampanyanın dili olur: Seenfy'nin indigo hapı (%88 Sana Uygun, S2E5) her başlığın vurgu kelimesini taşır. Ekranlar uygulamanın siyah zemininde çerçevesiz ve büyük durur; başlığı kanıtlayan gerçek öğe ekrandan büyüyerek öne çıkar."
+ },
+ "campaign": {
+  "tokens": {
+   "ground": "#000000",
+   "surface": "#121212",
+   "edge": "#2A2A2A",
+   "ink": "#EAF6F6",
+   "muted": "#A9ADB5",
+   "accent": "#5460F0"
+  },
+  "fonts": {
+   "display": "../fonts/Poppins_600SemiBold.ttf",
+   "text": "../fonts/Poppins_400Regular.ttf"
+  },
+  "type": {
+   "headline": {
+    "font": "display",
+    "size": 0.1,
+    "min_size": 0.075,
+    "line_height": 1.12,
+    "tracking": -0.02,
+    "color": "$ink",
+    "emphasis": {
+     "style": "box",
+     "color": "$accent",
+     "text_color": "$ink",
+     "radius": 0.5,
+     "pad": 0.24
+    },
+    "max_lines": 2
+   },
+   "sub": {
+    "font": "text",
+    "size": 0.038,
+    "line_height": 1.35,
+    "tracking": 0,
+    "color": "$muted"
+   }
+  }
+ },
+ "shots": [
+  {
+   "id": "promise",
+   "message": "Seenfy picks what you'll love, not what's popular - the match score proves it",
+   "proof": [
+    {
+     "evidence": "sana-uygun",
+     "region": "match-badge"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "text",
+     "role": "headline",
+     "style": "headline",
+     "text": "Popüler olanı değil,\n*seveceğini* izle",
+     "x": 0.08,
+     "y": 0.15,
+     "w": 0.86,
+     "id": "head"
+    },
+    {
+     "type": "text",
+     "role": "sub",
+     "style": "sub",
+     "text": "Son izlediklerine göre senin için seçilir.",
+     "x": 0.08,
+     "w": 0.8,
+     "below": "head",
+     "gap": 0.035
+    },
+    {
+     "type": "screen",
+     "id": "main",
+     "evidence": "sana-uygun",
+     "w": 0.96,
+     "x": 0.16,
+     "y": 0.56,
+     "radius": 0.075,
+     "frame": {
+      "style": "plain",
+      "border": 0.005,
+      "color": "$edge",
+      "island": false
+     }
+    },
+    {
+     "type": "screen",
+     "evidence": "sana-uygun",
+     "crop": "match-badge",
+     "lift": {
+      "from": "main",
+      "scale": 1.55,
+      "dx": -0.07
+     },
+     "radius": 0.05,
+     "shadow": "tight"
+    }
+   ]
+  },
+  {
+   "id": "moods",
+   "message": "Collections by mood - pick tonight's feeling",
+   "proof": [
+    {
+     "evidence": "koleksiyonlar",
+     "region": "moods"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "screen",
+     "id": "list",
+     "evidence": "koleksiyonlar",
+     "crop": "moods",
+     "w": 0.9,
+     "cx": "50%",
+     "y": 0.13,
+     "radius": 0.04
+    },
+    {
+     "type": "screen",
+     "evidence": "koleksiyonlar",
+     "crop": "plot-twist",
+     "lift": {
+      "from": "list",
+      "scale": 1.08
+     },
+     "shadow": "soft"
+    },
+    {
+     "type": "text",
+     "role": "headline",
+     "style": "headline",
+     "text": "Bu akşam\n*plot twist* mi?",
+     "x": 0.08,
+     "w": 0.86,
+     "id": "head",
+     "bottom": 0.36
+    },
+    {
+     "type": "text",
+     "role": "sub",
+     "style": "sub",
+     "text": "Beni Şaşırt, Beyin Yakan, Gerçekten Korkunç: moduna göre seç.",
+     "x": 0.08,
+     "w": 0.84,
+     "below": "head",
+     "gap": 0.035
+    }
+   ]
+  },
+  {
+   "id": "track",
+   "message": "Your next episode is waiting on the home screen",
+   "proof": [
+    {
+     "evidence": "anasayfa",
+     "region": "continue-card"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "screen",
+     "id": "home",
+     "evidence": "anasayfa",
+     "crop": [
+      0,
+      0,
+      1,
+      0.452
+     ],
+     "w": 0.88,
+     "cx": "50%",
+     "y": 0.1,
+     "radius": 0.06,
+     "frame": {
+      "style": "plain",
+      "border": 0.005,
+      "color": "$edge",
+      "island": false
+     }
+    },
+    {
+     "type": "screen",
+     "evidence": "anasayfa",
+     "crop": "continue-card",
+     "lift": {
+      "from": "home",
+      "scale": 1.14,
+      "dx": 0.035
+     },
+     "shadow": "soft"
+    },
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Kaldığın bölüm\n*hep hazır*",
+     "x": 0.08,
+     "w": 0.86,
+     "below": "home",
+     "gap": 0.2
+    },
+    {
+     "type": "text",
+     "role": "sub",
+     "style": "sub",
+     "text": "Sıradaki bölümün ana sayfanda seni bekler.",
+     "x": 0.08,
+     "below": "head",
+     "gap": 0.035,
+     "w": 0.8
+    }
+   ]
+  }
+ ]
+}

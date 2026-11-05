@@ -1,0 +1,278 @@
+{
+ "_doc": "3D devices (device3d) on the demo app: two devices in conversation, a flat shot between, one device tilted back. Used by tools/smoke_test.py and the README image.",
+ "version": 2,
+ "app": "Dizilog (fictional example)",
+ "lang": "tr",
+ "evidence": "../../skills/store-screenshots/templates/scene-evidence.json",
+ "sizes": [
+  "ios",
+  "ios-large"
+ ],
+ "promise_words": [
+  "dizi",
+  "bölüm",
+  "izle"
+ ],
+ "concept": {
+  "name": "Tek Turuncu, 3D",
+  "idea": "The Tek Turuncu system with depth only where it means something: friends' phones facing each other, the year's stats laid back like a printed report."
+ },
+ "campaign": {
+  "tokens": {
+   "ground": "#0E0E10",
+   "card": "#1A191E",
+   "edge": "#2A2930",
+   "ink": "#FFFFFF",
+   "muted": "#9C9AA3",
+   "accent": "#FF5A3C"
+  },
+  "fonts": {
+   "display": "sans-bold",
+   "text": "text"
+  },
+  "materials": {
+   "flat": "dna: Dizilog's cards are flat fills on a near-black ground",
+   "3d": "concept: depth only where it means something - friends' phones facing each other, the year's report laid back"
+  },
+  "type": {
+   "headline": {
+    "font": "display",
+    "size": 0.1,
+    "min_size": 0.072,
+    "line_height": 1.08,
+    "tracking": -0.024,
+    "color": "$ink",
+    "max_lines": 3,
+    "emphasis": {
+     "style": "color",
+     "color": "$accent"
+    }
+   },
+   "sub": {
+    "font": "text",
+    "size": 0.037,
+    "line_height": 1.35,
+    "tracking": 0,
+    "color": "$muted"
+   }
+  },
+  "camera": {
+   "fov": 22,
+   "light": [
+    -0.45,
+    -0.75,
+    -0.5
+   ]
+  }
+ },
+ "shots": [
+  {
+   "id": "friends",
+   "message": "Your friends' watching, side by side",
+   "proof": [
+    {
+     "evidence": "friends",
+     "region": "first-post"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Arkadaşların\n*ne izliyor?*",
+     "x": 0.08,
+     "y": 0.13,
+     "w": 0.86
+    },
+    {
+     "type": "device3d",
+     "id": "back",
+     "evidence": "detail",
+     "w": 0.56,
+     "right": -0.12,
+     "y": 0.5,
+     "rotate3d": {
+      "yaw": -18,
+      "pitch": 3
+     },
+     "body": {
+      "color": "graphite"
+     }
+    },
+    {
+     "type": "device3d",
+     "id": "front",
+     "evidence": "friends",
+     "w": 0.62,
+     "x": 0.02,
+     "y": 0.7,
+     "rotate3d": {
+      "yaw": 16,
+      "pitch": 3
+     },
+     "body": {
+      "color": "graphite"
+     }
+    }
+   ]
+  },
+  {
+   "id": "resume",
+   "message": "Pick up where you stopped",
+   "proof": [
+    {
+     "evidence": "home",
+     "region": "resume"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Kaldığın bölüm\n*hep hazır*",
+     "x": 0.08,
+     "y": 0.13,
+     "w": 0.86
+    },
+    {
+     "type": "screen",
+     "id": "main",
+     "evidence": "home",
+     "w": "84%",
+     "cx": "50%",
+     "below": "head",
+     "gap": 0.16,
+     "radius": 0.07,
+     "frame": {
+      "style": "phone",
+      "border": 0.02,
+      "color": "#050506"
+     },
+     "shadow": "deep"
+    },
+    {
+     "type": "screen",
+     "evidence": "home",
+     "crop": "resume",
+     "lift": {
+      "from": "main",
+      "scale": 1.1
+     },
+     "radius": 0.035,
+     "shadow": "deep"
+    }
+   ]
+  },
+  {
+   "id": "year",
+   "message": "Your year in series",
+   "proof": [
+    {
+     "evidence": "stats",
+     "region": "total"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "device3d",
+     "id": "ph",
+     "evidence": "stats",
+     "w": 0.72,
+     "cx": "50%",
+     "y": 0.1,
+     "rotate3d": {
+      "pitch": 16,
+      "yaw": -6
+     },
+     "body": {
+      "color": "graphite"
+     }
+    },
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Bu yıl *312 saat*\ndizi izledin",
+     "x": 0.08,
+     "bottom": 0.16,
+     "w": 0.86
+    }
+   ]
+  },
+  {
+   "id": "episodes",
+   "message": "Tick episodes off one by one",
+   "proof": [
+    {
+     "evidence": "detail",
+     "region": "episodes"
+    }
+   ],
+   "background": {
+    "fill": "$ground"
+   },
+   "layers": [
+    {
+     "type": "screen",
+     "id": "list",
+     "evidence": "detail",
+     "crop": [
+      0,
+      0.423,
+      1,
+      0.905
+     ],
+     "w": "92%",
+     "cx": "50%",
+     "y": 0.2,
+     "radius": 0.05,
+     "frame": {
+      "style": "plain",
+      "border": 0.005,
+      "color": "$edge",
+      "island": false
+     }
+    },
+    {
+     "type": "mark",
+     "kind": "circle",
+     "on": "list",
+     "region": [
+      0.875,
+      0.85,
+      0.945,
+      0.888
+     ],
+     "color": "$accent",
+     "width": 0.008,
+     "pad": 0.014
+    },
+    {
+     "type": "text",
+     "id": "head",
+     "role": "headline",
+     "style": "headline",
+     "text": "Bölüm bölüm\n*işaretle*",
+     "x": 0.08,
+     "below": "list",
+     "gap": 0.2,
+     "w": 0.86
+    }
+   ]
+  }
+ ]
+}

@@ -23,14 +23,14 @@ headlines; point to the shot number.
 |---|---|---|---|---|
 | 1 | **Promise in shot 1** | Logo/splash/UI only | Generic claim | Clear, specific benefit |
 | 2 | **Shots 1–3 alone** explain the app | No | Partly | Yes |
-| 3 | **Specificity** (swap test) | Most headlines generic | Mixed | All specific |
+| 3 | **Specificity** (swap test: strict for the promise, a tie-breaker for the rest) | The promise could be any app's | Promise ownable, other lines vague or unproven | Promise ownable; every other line names what its screen proves |
 | 4 | **Voice** (say-it test) | Slogans/Title Case | Plain | Sounds like a person |
 | 5 | **Glance legibility** at search size | Unreadable | Some | All readable |
 | 6 | **One idea per shot** | Paragraphs/lists | Some crowding | Clean |
 | 7 | **Proof** (screen proves headline; believable data; no proof shown twice) | Unrelated screens | Loose, thin or repeated | Each screen proves it, data holds up |
 | 8 | **Visual system** (colour/type/emphasis) | Inconsistent | Mostly | One system |
 | 9 | **No AI/template smell** (`anti-ai.md`) | Several signals | One or two | None |
-| 10 | **Localisation & compliance** | Wrong language / store violations | Minor issues | Correct |
+| 10 | **Localisation & compliance** | Wrong language / a store requirement broken | Play recommendations missed without a reason | Correct |
 
 16–20 strong · 11–15 workable, fix the top three · ≤ 10 rebuild the story first.
 

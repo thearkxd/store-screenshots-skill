@@ -36,8 +36,10 @@ section to judge or adjust it. Decide these once and keep them for every shot:
 
 Rules of thumb:
 - The **UI must stay big**: in exemplary sets the device usually spans 70–85 % of the canvas width.
-- **Straight devices.** Tilted floating phones appear in 12 weak apps and 0 exemplary ones in the library.
-  If you want energy, use a callout or a crop, not a 15° rotation.
+- **Straight devices by default.** Tilted floating phones appear in 12 weak apps and 0 exemplary ones in the
+  library. If you want energy, use a callout or a crop, not a 15° rotation. A turned phone is right when depth
+  is the message (a stack, a scene, several devices) and the campaign lists `tilt` or `3d` with that reason
+  (`anti-ai.md`, "When an effect is right").
 - Don't draw a branded device bezel (Apple's or anyone's hardware artwork). The renderer's `"device":
   {"style": "phone"}` is a neutral thin bezel with a pill cutout; `"style": "none"` is just the rounded screen
   with a shadow. Google Play sets, iPad and iPhone Duo use `none` automatically (Play advises against device
@@ -131,3 +133,9 @@ exact pixel size and screenshot it with a headless browser (Playwright or Chrome
 ```
 `page.set_viewport_size({"width":1206,"height":2622})` then `page.screenshot(path="01.png")`, then run
 `check_set.py` on the result like any other set. Keep the same system rules as above.
+
+Most of what used to need this route is now a scene (`scene-format.md`): free placement, crops and lifts,
+gradients, any vector shape in an `svg` layer, editable SVG output. Use HTML only for what no layer can do. The
+truth rules (`design-process.md` §1) still apply: screens are `<img>` tags of the evidence files at their own
+aspect ratio - no CSS filters, no stretching, nothing drawn over them. Every number in the copy must be on a
+screen.
