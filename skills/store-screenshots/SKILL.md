@@ -242,7 +242,7 @@ python3 scripts/compose.py xray set.json --shot <id> -o xray.png   # boxes, role
     - A 1024×500 feature graphic.
   - **Recommendations** ("highly recommended"): breaking them doesn't block the listing, but Google may show
     the assets differently or limit promotion.
-    - No device frames.
+    - No device imagery: no phone frames, no 3D phones.
     - Taglines on at most 20 % of the image.
     - No calls to action, rankings, awards, prices or testimonials.
     - Alt text.
@@ -250,8 +250,9 @@ python3 scripts/compose.py xray set.json --shot <id> -o xray.png   # boxes, role
   - **Promotion eligibility:** required only for Play's screenshot-based recommendation formats. Apps need
     4+ screenshots at ≥ 1080 px in 9:16 or 16:9.
 
-  Follow the recommendations by default. If the user's brand needs an exception, make it knowingly and say
-  what it costs.
+  Follow the recommendations by default. When the user asks for an exception (3D phones on Play too, a frame
+  their users know), make it: a recommendation isn't a requirement. Say once what it may cost, render it, and
+  don't raise it again; the check keeps reporting it as `[Play recommendation]`, which is expected.
 - **Several languages:** `"locales": ["tr", "en"]` and `{"tr": …, "en": …}` values.
 - **Fast path / fallback:** when the user wants a quick conventional set, the brand already has a system, or
   scenes can't render, use `render_set.py` with a preset `"direction"` (`references/directions.md`,

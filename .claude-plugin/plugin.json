@@ -1,7 +1,7 @@
 {
   "name": "store-screenshots",
   "description": "Plan, write and design App Store / Google Play screenshots that explain the app and don't look AI-made - from the app's own visual DNA, three app-specific concepts and free compositions built from its real screens (never altered), exported as PNG + editable SVG for every store size; with a classified library of 1,700+ real top-chart screenshots (TR + US), category playbooks, and scripts for search, rendering, store checks and peer tests.",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "author": {
     "name": "Alpiworks"
   },

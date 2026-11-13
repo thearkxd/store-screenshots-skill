@@ -263,7 +263,11 @@ Let the message decide the composition:
   - A **rim light** (`"camera": {"rim": {"color": "$accent", "strength": 0.6}}`) edges the body in a colour.
     It is coloured light, so it is the `glow` material and needs its reason. A **sheen** (`"body": {"sheen":
     0.2}`) is a reflection on the glass bezel. Neither ever touches the screen's pixels.
-  - No 3D on Google Play (device imagery).
+  - **Google Play:** flat screens by default, because Play recommends against device imagery. When the user
+    wants 3D phones on Play too, use the same `device3d` layers in the android variant. Say once that the
+    listing still publishes, but the assets may be shown differently or promoted less. On Android sizes the
+    body has a punch hole, so give it screens captured on Android: an iOS status bar in an Android body is a
+    giveaway.
 - **Free vector work** (a motif, a pattern, a drawn shape, a spot illustration) goes in an `svg` layer, written
   in u (recipes: `scene-format.md` §5). For something
   no layer can do - complex illustration - use the HTML route (`layouts.md` §6). The truth rules

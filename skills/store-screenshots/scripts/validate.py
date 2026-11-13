@@ -439,8 +439,8 @@ def store_warnings(scene, ctx):
         any3d = any(op["op"] == "device3d" for op in screens)
         if any3d or any(op.get("frame") and op["frame"]["style"] in ("phone", "android") for op in screens):
             out.append(f"{rs.PLAY_REC} device frame in a Google Play set{' (a 3D device is one too)' if any3d else ''} - Play "
-                       "advises against device imagery (it dates quickly); in the android variant show the bare screen (a "
-                       "flat \"screen\" layer with a radius, no \"frame\")")
+                       "advises against device imagery (it dates quickly): the listing still publishes, but the assets may be "
+                       "shown differently or promoted less. Flat screens are the default; keep it if the user chose it")
         for slot in range(scene.span):
             hs = [op["meta"].get("ink", op["meta"]["bbox"]) for op in ops if op["op"] == "text" and op["meta"].get("role") not in ("label", "annotation", "footnote")
                   and slot_of(scene, op["meta"]["bbox"]) == slot]  # a giant number is tagline text too
